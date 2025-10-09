@@ -5,9 +5,21 @@ export const navItems = [
     iconComponent: { name: 'cil-speedometer' }
   },
   {
-    name: 'Job Orders',
+    name: 'Job Management',
     url: '/jobs',
-    iconComponent: { name: 'cil-truck' }
+    iconComponent: { name: 'cil-file' },
+    children:[
+      {
+        name: 'New Job Order',
+        url: '/jobs/new',
+        iconComponent: { name: 'cil-pencil' }
+      },
+      {
+        name: 'Job List',
+        url: '/jobs/list',
+        iconComponent: { name: 'cil-list' }
+      }
+    ]
   },
   {
     name: 'Billing',
@@ -15,19 +27,14 @@ export const navItems = [
     iconComponent: { name: 'cil-description' }
   },
   {
-    name: 'Users',
-    url: '/users',
-    iconComponent: { name: 'cil-user' },
+    name: 'Data Management',
+    url: '/manage',
+    iconComponent: { name: 'cil-settings' },
     children:[
       {
-        name: 'User List',
+        name: 'Manage Users',
         url: '/users/list',
-        iconComponent: { name: 'cil-list' }
-      },
-      {
-        name: 'User Roles',
-        url: '/users/roles',
-        iconComponent: { name: 'cil-lock-locked' }
+        iconComponent: { name: 'cil-user' }
       }
     ]
   }
