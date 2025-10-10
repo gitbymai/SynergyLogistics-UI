@@ -1,21 +1,195 @@
-<c-card class="my-4">
-    <c-card-header>
-        <h4 class="card-title">Create New Job</h4>
-    </c-card-header>
-    <c-card-body>
-        <form cForm>
-            <div class="mb-3">
-                <label cLabel for="exampleFormControlInput1">Email address</label>
-                <input cFormControl id="exampleFormControlInput1" placeholder="name@example.com" type="email" />
-            </div>
-            <div class="mb-3">
-                <label cLabel for="exampleFormControlTextarea1">Example textarea</label>
-                <textarea cFormControl id="exampleFormControlTextarea1" rows="3"></textarea>
-            </div>
-        </form>
+<div class="card my-4 shadow-sm">
+    <div class="card-header">
+        <h4 class="mb-0">Create New Job</h4>
+    </div>
 
-    </c-card-body>
-    <c-card-footer class="text-end">
-        <button cButton color="primary">Submit</button>
-    </c-card-footer>
-</c-card>
+    <div class="card-body">
+        <!-- Step Navigation -->
+        <ul class="nav nav-pills mb-4">
+            <li class="nav-item" *ngFor="let s of [1, 2]">
+                <button class="nav-link" type="button" [class.active]="step === s" [disabled]="s > step + 1"
+                    (click)="goToStep(s)">
+                    {{ s === 1 ? 'Job Details' : 'Freight Details' }}
+                </button>
+            </li>
+        </ul>
+
+        <!-- STEP 1: Job Details -->
+        <div *ngIf="step === 1">
+            <form [formGroup]="jobDetailsForm" class="p-3">
+                <!-- Client -->
+                <div class="row mb-3">
+                    <div class="col-md-8 col-lg-6">
+                        <div class="position-relative client-dropdown">
+                            <label class="form-label">Client</label>
+                            <input type="text" class="form-control" placeholder="Search or select client"
+                                [value]="clientSearch" (input)="onClientSearchChange($event.target.value)"
+                                (focus)="dropdownOpen = true" />
+
+                            <ul *ngIf="dropdownOpen && filteredClients.length > 0"
+                                class="list-group position-absolute w-100 shadow-sm"
+                                style="z-index: 1000; max-height: 200px; overflow-y: auto;">
+                                <li class="list-group-item list-group-item-action"
+                                    *ngFor="let client of filteredClients" (click)="selectClient(client)">
+                                    {{ client.name }}
+                                </li>
+                            </ul>
+                            <input type="hidden" formControlName="clientInformation" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transaction + Incoterms -->
+                <div class="row mb-3">
+                    <div class="col-md-8 col-lg-6 mb-3">
+                        <label class="form-label">Transaction Type</label>
+                        <select formControlName="transactionType" class="form-select"
+                            (change)="onTransactionTypeChange($event)">
+                            <option value="">Select Transaction</option>
+                            <option value="FAE">Air Export</option>
+                            <option value="FAI">Air Import</option>
+                            <option value="CRA">Customs Releasing (A)</option>
+                            <option value="CRS">Customs Releasing (S)</option>
+                            <option value="DFA">Domestic Forwarding Airfreight</option>
+                            <option value="DFS">Domestic Forwarding Seafreight</option>
+                            <option value="FSE">Sea Export</option>
+                            <option value="FSI">Sea Import</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Incoterms</label>
+                        <select formControlName="incoterms" class="form-select">
+                            <option value="">Select Incoterms</option>
+                            <option *ngFor="let term of incotermsList" [value]="term">{{ term }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Payment + Amount -->
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Payment Type</label>
+                        <select formControlName="paymentType" class="form-select">
+                            <option value="">Select Payment</option>
+                            <option value="Prepaid">Prepaid</option>
+                            <option value="Collect">Collect</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Amount</label>
+                        <input type="text" class="form-control" formControlName="amount" appNumberFormat
+                            placeholder="0.00" />
+                        <div *ngIf="jobDetailsForm.get('amount')?.invalid && jobDetailsForm.get('amount')?.touched"
+                            class="text-danger small">
+                            Please enter a valid amount.
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" type="button" (click)="nextStep()" [disabled]="!jobDetailsForm.valid">
+                    Next →
+                </button>
+            </form>
+        </div>
+
+        <!-- STEP 2: Freight Details -->
+        <div *ngIf="step === 2">
+            <form [formGroup]="freightForm" class="p-3">
+                <h6 class="fw-semibold mb-3">Freight Details ({{ freightTypeLabel }})</h6>
+
+                <!-- SEA FIELDS -->
+                <div *ngIf="isSeaFreight">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Cut-off / LCT Date</label>
+                            <input type="date" class="form-control" formControlName="cutoff" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">ETD (Estimated Departure)</label>
+                            <input type="date" class="form-control" formControlName="etd" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">ETA (Estimated Arrival)</label>
+                            <input type="date" class="form-control" formControlName="eta" />
+                        </div>
+                    </div>
+                    
+      <h6 class="fw-semibold mt-4">Routing & Location</h6>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Origin / Port of Loading</label>
+          <input type="text" class="form-control" formControlName="origin" />
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Destination / Port of Discharge</label>
+          <input type="text" class="form-control" formControlName="destination" />
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Port / CFS</label>
+          <input type="text" class="form-control" formControlName="portCfs" />
+        </div>
+      </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">MBL Reference</label>
+                            <input type="text" class="form-control" formControlName="mbl" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">HBL Reference</label>
+                            <input type="text" class="form-control" formControlName="hbl" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Vessel</label>
+                            <input type="text" class="form-control" formControlName="vessel" />
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Container Count</label>
+                            <input type="number" class="form-control" formControlName="containerCount" />
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Container Size</label>
+                            <select class="form-select" formControlName="containerSize">
+                                <option value="">Select Size</option>
+                                <option value="20GP">20GP</option>
+                                <option value="40GP">40GP</option>
+                                <option value="40HQ">40HQ</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AIR FIELDS -->
+                <div *ngIf="isAirFreight">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">MAWB Reference</label>
+                            <input type="text" class="form-control" formControlName="mawb" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">HAWB Reference</label>
+                            <input type="text" class="form-control" formControlName="hawb" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Flight No.</label>
+                            <input type="text" class="form-control" formControlName="flightNo" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Chargeable Weight</label>
+                            <input type="number" step="0.01" class="form-control" formControlName="chargeableWeight" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button class="btn btn-secondary" type="button" (click)="previousStep()">← Previous</button>
+                    <button class="btn btn-success" type="button" (click)="finish()" [disabled]="!freightForm.valid">
+                        Finish
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

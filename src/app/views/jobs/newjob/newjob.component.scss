@@ -1,0 +1,25 @@
+/* newjob.component.scss */
+.card {
+  max-width: 1100px;
+  margin: 0 auto; /* Center the card */
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.nav-pills .nav-link {
+  border-radius: 20px;
+  margin-right: 8px;
+}
+
+.client-dropdown {
+  .list-group-item {
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #f8f9fa;
+    }
+  }
+}
