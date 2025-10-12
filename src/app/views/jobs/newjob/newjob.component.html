@@ -6,10 +6,16 @@
     <div class="card-body">
         <!-- Step Navigation -->
         <ul class="nav nav-pills mb-4">
-            <li class="nav-item" *ngFor="let s of [1, 2]">
+            <li class="nav-item" *ngFor="let s of [1, 2, 3]">
                 <button class="nav-link" type="button" [class.active]="step === s" [disabled]="s > step + 1"
                     (click)="goToStep(s)">
-                    {{ s === 1 ? 'Job Details' : 'Freight Details' }}
+                    {{
+                    s === 1
+                    ? 'Job Details'
+                    : s === 2
+                    ? 'Cargo & Routing Details'
+                    : 'Freight Details'
+                    }}
                 </button>
             </li>
         </ul>
@@ -61,7 +67,9 @@
                         <label class="form-label">Incoterms</label>
                         <select formControlName="incoterms" class="form-select">
                             <option value="">Select Incoterms</option>
-                            <option *ngFor="let term of incotermsList" [value]="term">{{ term }}</option>
+                            <option *ngFor="let term of incotermsList" [value]="term">
+                                {{ term }}
+                            </option>
                         </select>
                     </div>
                 </div>
@@ -94,44 +102,86 @@
             </form>
         </div>
 
-        <!-- STEP 2: Freight Details -->
+        <!-- STEP 2: Common Freight Details -->
         <div *ngIf="step === 2">
+            <form [formGroup]="shipmentFreightForm" class="p-3">
+                <h6 class="fw-semibold mb-3">Shipment Schedule</h6>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Cut-off / LCT Date</label>
+                        <input type="date" class="form-control" formControlName="cutoff" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">ETD (Estimated Departure)</label>
+                        <input type="date" class="form-control" formControlName="etd" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">ETA (Estimated Arrival)</label>
+                        <input type="date" class="form-control" formControlName="eta" />
+                    </div>
+                </div>
+                <h6 class="fw-semibold mt-4">Routing & Location</h6>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Origin / Port of Loading</label>
+                        <input type="text" class="form-control" formControlName="origin" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Destination / Port of Discharge</label>
+                        <input type="text" class="form-control" formControlName="destination" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Port / CFS</label>
+                        <input type="text" class="form-control" formControlName="portCfs" />
+                    </div>
+                </div>
+
+                <h6 class="fw-semibold mt-4">Shipment Details</h6>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Commodity</label>
+                        <input type="text" class="form-control" formControlName="commodity" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Weight / CBM</label>
+                        <input type="number" step="0.001" class="form-control" formControlName="weightCbm" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Volume (m³)</label>
+                        <input type="number" step="0.001" class="form-control" formControlName="volume" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Gross Weight (kg)</label>
+                        <input type="number" step="0.01" class="form-control" formControlName="grossWeight" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Number of Packages</label>
+                        <input type="number" class="form-control" formControlName="packages" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Cartons Count</label>
+                        <input type="number" class="form-control" formControlName="cartonsCount" />
+                    </div>
+                </div>
+
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button class="btn btn-secondary" type="button" (click)="previousStep()">← Previous</button>
+                    <button class="btn btn-primary" type="button" (click)="nextStep()"
+                        [disabled]="!shipmentFreightForm.valid">
+                        Next →
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- STEP 3: Freight Mode Details -->
+        <div *ngIf="step === 3">
             <form [formGroup]="freightForm" class="p-3">
-                <h6 class="fw-semibold mb-3">Freight Details ({{ freightTypeLabel }})</h6>
+                <h6 class="fw-semibold mb-3">Freight Mode Details ({{ freightTypeLabel }})</h6>
 
                 <!-- SEA FIELDS -->
                 <div *ngIf="isSeaFreight">
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Cut-off / LCT Date</label>
-                            <input type="date" class="form-control" formControlName="cutoff" />
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">ETD (Estimated Departure)</label>
-                            <input type="date" class="form-control" formControlName="etd" />
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">ETA (Estimated Arrival)</label>
-                            <input type="date" class="form-control" formControlName="eta" />
-                        </div>
-                    </div>
-                    
-      <h6 class="fw-semibold mt-4">Routing & Location</h6>
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label class="form-label">Origin / Port of Loading</label>
-          <input type="text" class="form-control" formControlName="origin" />
-        </div>
-        <div class="col-md-6 mb-3">
-          <label class="form-label">Destination / Port of Discharge</label>
-          <input type="text" class="form-control" formControlName="destination" />
-        </div>
-        <div class="col-md-6 mb-3">
-          <label class="form-label">Port / CFS</label>
-          <input type="text" class="form-control" formControlName="portCfs" />
-        </div>
-      </div>
-
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">MBL Reference</label>
@@ -177,9 +227,37 @@
                             <input type="text" class="form-control" formControlName="flightNo" />
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Chargeable Weight</label>
+                            <label class="form-label">Chargeable Weight (kg)</label>
                             <input type="number" step="0.01" class="form-control" formControlName="chargeableWeight" />
                         </div>
+                    </div>
+                </div>
+
+                <h6 class="fw-semibold mt-4">References & Parties</h6>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">BL / AWB / Booking No.</label>
+                        <input type="text" class="form-control" formControlName="bookingNo" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Carrier / Airline</label>
+                        <input type="text" class="form-control" formControlName="carrier" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Shipper</label>
+                        <input type="text" class="form-control" formControlName="shipper" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Consignee</label>
+                        <input type="text" class="form-control" formControlName="consignee" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Agent</label>
+                        <input type="text" class="form-control" formControlName="agent" />
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Remarks</label>
+                        <textarea rows="2" class="form-control" formControlName="remarks"></textarea>
                     </div>
                 </div>
 

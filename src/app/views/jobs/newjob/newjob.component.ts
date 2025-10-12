@@ -18,8 +18,9 @@ export class NewjobComponent implements OnInit {
   isAirFreight = false;
   isSeaFreight = false;
 
-
-  incotermsList = ['EXW', 'FCA', 'CPT', 'CIP', 'DAP', 'DPU', 'DDP', 'FAS', 'FOB', 'CFR', 'CIF'];
+  incotermsList = [
+    'EXW', 'FCA', 'CPT', 'CIP', 'DAP', 'DPU', 'DDP', 'FAS', 'FOB', 'CFR', 'CIF'
+  ];
 
   clients = [
     { id: 1, name: 'ABC Logistics', contact: 'John Doe', email: 'john@abc.com' },
@@ -33,13 +34,15 @@ export class NewjobComponent implements OnInit {
   clientSearch = '';
   dropdownOpen = false;
 
+  // Forms for each step
   jobDetailsForm!: FormGroup;
+  shipmentFreightForm!: FormGroup;
   freightForm!: FormGroup;
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
-    // Step 1 form
+    // Step 1: Job Details
     this.jobDetailsForm = this.fb.group({
       clientInformation: ['', Validators.required],
       transactionType: ['', Validators.required],
@@ -48,50 +51,59 @@ export class NewjobComponent implements OnInit {
       amount: ['', [Validators.required]]
     });
 
-    // Step 2 form
-    this.freightForm = this.fb.group({
-      hawb: [''],
-      mawb: [''],
-      hbl: [''],
-      mbl: [''],
+    // Step 2: Common Freight Details
+    this.shipmentFreightForm = this.fb.group({
       cutoff: [''],
-      commodity: [''],
       eta: [''],
       etd: [''],
       origin: [''],
       destination: [''],
-      weightCbm: [''],
       portCfs: [''],
+      commodity: [''],
+      weightCbm: [''],
       cartonsCount: [''],
+      remarks: ['']
+    });
+
+    // Step 3: Specific Freight Details (Air/Sea)
+    this.freightForm = this.fb.group({
+      // Shared fields
       carrier: [''],
-      pod: [''],
       consignee: [''],
       shipper: [''],
+      agent: [''],
+
+      // Sea-specific
+      mbl: [''],
+      hbl: [''],
       vessel: [''],
-      mode: [''],
       containerCount: [''],
       containerSize: [''],
       containerNumbers: [''],
+      bookingNo: [''],
+      pod: [''],
+
+      // Air-specific
+      mawb: [''],
+      hawb: [''],
+      flt: [''],
+      chargeableWeight: [''],
+
+      // General
       numberOfPackages: [''],
       grossWeight: [''],
       volume: [''],
-      flt: [''],
-      chargeableWeight: [''],
-      remarks: [''],
-      bookingNo: [''],
-      agent: ['']
+      mode: ['']
     });
-
   }
 
-
-
-  // Transaction type logic
+  /** Handle transaction type changes */
   onTransactionTypeChange(event: Event) {
     const selectElement = event.target as HTMLSelectElement;
     const value = selectElement?.value || '';
     this.updateFreightFields(value);
   }
+
   updateFreightFields(value: string) {
     this.isAirFreight = ['FAE', 'FAI', 'CRA', 'DFA'].includes(value);
     this.isSeaFreight = ['FSE', 'FSI', 'CRS', 'DFS'].includes(value);
@@ -99,9 +111,9 @@ export class NewjobComponent implements OnInit {
     if (this.isAirFreight) this.freightTypeLabel = 'Air Freight';
     else if (this.isSeaFreight) this.freightTypeLabel = 'Sea Freight';
     else this.freightTypeLabel = 'Other Type';
-
   }
-  /** Client Search */
+
+  /** Client search logic */
   onClientSearchChange(value: string) {
     this.clientSearch = value;
     this.filteredClients = this.clients.filter(c =>
@@ -110,7 +122,6 @@ export class NewjobComponent implements OnInit {
     this.dropdownOpen = true;
   }
 
-  /** Select Client */
   selectClient(client: any) {
     this.jobDetailsForm.patchValue({
       clientInformation: client.id
@@ -119,7 +130,7 @@ export class NewjobComponent implements OnInit {
     this.dropdownOpen = false;
   }
 
-  /** Click outside dropdown */
+  /** Hide dropdown on outside click */
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
     const target = event.target as HTMLElement;
@@ -139,26 +150,35 @@ export class NewjobComponent implements OnInit {
     if (parts.length === 2 && parts[1].length >= 2 && event.key !== 'Backspace') event.preventDefault();
   }
 
-goToStep(s: number) {
-  if (s === 2) {
-    if (this.jobDetailsForm.invalid) {
+  /** Navigation between steps */
+  goToStep(s: number) {
+    if (s === 2 && this.jobDetailsForm.invalid) {
       this.jobDetailsForm.markAllAsTouched();
       return;
     }
-  }
-  // If validation passes, move to desired step
-  this.step = s;
-}
 
+    if (s === 3 && this.shipmentFreightForm.invalid) {
+      this.shipmentFreightForm.markAllAsTouched();
+      return;
+    }
+
+    this.step = s;
+  }
 
   nextStep() {
     if (this.step === 1) {
       if (this.jobDetailsForm.invalid) {
         this.jobDetailsForm.markAllAsTouched();
-        return; 
+        return;
       }
       this.step = 2;
     } else if (this.step === 2) {
+      if (this.shipmentFreightForm.invalid) {
+        this.shipmentFreightForm.markAllAsTouched();
+        return;
+      }
+      this.step = 3;
+    } else if (this.step === 3) {
       if (this.freightForm.invalid) {
         this.freightForm.markAllAsTouched();
         return;
@@ -171,8 +191,10 @@ goToStep(s: number) {
     if (this.step > 1) this.step--;
   }
 
+  /** Final submission */
   finish() {
     console.log('Job Details:', this.jobDetailsForm.value);
+    console.log('Common Freight Details:', this.shipmentFreightForm.value);
     console.log('Freight Details:', this.freightForm.value);
     alert('Job successfully created!');
   }
