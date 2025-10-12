@@ -1,1 +1,214 @@
-<p>jobmanagement works!</p>
+<div class="card shadow-sm my-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h4 class="mb-0">Job Details</h4>
+    <div class="d-flex gap-2">
+      <button routerLink="/jobs/list" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1">
+        <svg cIcon name="cilArrowLeft" size="sm"></svg>
+        <span>Back to List</span>
+      </button>
+      <button class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1" (click)="printJobDetails()">
+        <svg cIcon name="cilPrint" size="sm"></svg>
+        <span>Print</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div class="accordion" id="jobDetailsAccordion">
+      <!-- ======================= 1. JOB DETAILS ======================== -->
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingJobInfo">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseJobInfo"
+            aria-expanded="true" aria-controls="collapseJobInfo">
+            Job Information
+          </button>
+        </h2>
+        <div id="collapseJobInfo" class="accordion-collapse collapse show" aria-labelledby="headingJobInfo"
+          data-bs-parent="#jobDetailsAccordion">
+          <div class="accordion-body">
+            <div class="row mb-3">
+              <div class="col-md-8">
+                <label class="fw-semibold text-muted d-block">Client</label>
+                <div>{{ job?.client?.name || '-' }}</div>
+              </div>
+              <div class="col-md-4">
+                <label class="fw-semibold text-muted d-block">Status</label>
+                <c-badge [color]="job?.status === 'Completed' ? 'success' : 'warning'">
+                  {{ job?.status || 'Pending' }}
+                </c-badge>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label class="fw-semibold text-muted d-block">Transaction Type</label>
+                <div>{{ job?.transactionType || '-' }}</div>
+              </div>
+              <div class="col-md-4">
+                <label class="fw-semibold text-muted d-block">Incoterms</label>
+                <div>{{ job?.incoterms || '-' }}</div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label class="fw-semibold text-muted d-block">Payment Type</label>
+                <div>{{ job?.paymentType || '-' }}</div>
+              </div>
+              <div class="col-md-4">
+                <label class="fw-semibold text-muted d-block">Amount</label>
+                <div>₱{{ job?.amount | number:'1.2-2' }}</div>
+              </div>
+              <div class="col-md-4">
+                <label class="fw-semibold text-muted d-block">Created Date</label>
+                <div>{{ job?.createdDate | date:'mediumDate' }}</div>
+              </div>
+            </div>
+
+            <!-- ======================= 2. CARGO & ROUTING DETAILS ======================== -->
+            <div class="row mb-3">
+              <strong>Cargo & Routing Details</strong>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label class="fw-semibold text-muted d-block">Commodity</label>
+                <div>{{ job?.commodity || '-' }}</div>
+              </div>
+              <div class="col-md-4">
+                <label class="fw-semibold text-muted d-block">Cut-off / LCT</label>
+                <div>{{ job?.cutoff | date:'mediumDate' }}</div>
+              </div>
+              <div class="col-md-4">
+                <label class="fw-semibold text-muted d-block">Carrier</label>
+                <div>{{ job?.carrier || '-' }}</div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label class="fw-semibold text-muted d-block">Origin</label>
+                <div>{{ job?.origin || '-' }}</div>
+              </div>
+              <div class="col-md-4">
+                <label class="fw-semibold text-muted d-block">Destination</label>
+                <div>{{ job?.destination || '-' }}</div>
+              </div>
+              <div class="col-md-4">
+                <label class="fw-semibold text-muted d-block">Port / CFS</label>
+                <div>{{ job?.portCfs || '-' }}</div>
+              </div>
+            </div>
+
+            <!-- ======================= 3. FREIGHT DETAILS ======================== -->
+            <div class="row mb-3">
+              <strong>Freight Details</strong>
+            </div>
+
+            <!-- SEA FREIGHT -->
+            <div *ngIf="job?.freightType === 'Sea Freight'">
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <label class="fw-semibold text-muted d-block">MBL Reference</label>
+                  <div>{{ job?.mbl || '-' }}</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="fw-semibold text-muted d-block">HBL Reference</label>
+                  <div>{{ job?.hbl || '-' }}</div>
+                </div>
+              </div>
+              <div class="row mb-3">
+
+                <div class="col-md-4">
+                  <label class="fw-semibold text-muted d-block">Vessel</label>
+                  <div>{{ job?.vessel || '-' }}</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="fw-semibold text-muted d-block">Container Count</label>
+                  <div>{{ job?.containerCount || '-' }}</div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <label class="fw-semibold text-muted d-block">Container Size</label>
+                  <div>{{ job?.containerSize || '-' }}</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="fw-semibold text-muted d-block">Container Numbers</label>
+                  <div>{{ job?.containerNumbers || '-' }}</div>
+                </div>
+              </div>
+              <div class="row mb-3">
+
+                <div class="col-md-4">
+                  <label class="fw-semibold text-muted d-block">Gross Weight</label>
+                  <div>{{ job?.grossWeight || '-' }}</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="fw-semibold text-muted d-block">Volume (CBM)</label>
+                  <div>{{ job?.volume || '-' }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- AIR FREIGHT -->
+            <div *ngIf="job?.freightType === 'Air Freight'">
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <label class="fw-semibold text-muted d-block">MAWB Reference</label>
+                  <div>{{ job?.mawb || '-' }}</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="fw-semibold text-muted d-block">HAWB Reference</label>
+                  <div>{{ job?.hawb || '-' }}</div>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-3">
+                  <label class="fw-semibold text-muted d-block">Flight No.</label>
+                  <div>{{ job?.flt || '-' }}</div>
+                </div>
+                <div class="col-md-3">
+                  <label class="fw-semibold text-muted d-block">Chargeable Weight</label>
+                  <div>{{ job?.chargeableWeight || '-' }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ======================= 4. ADDTL DETAILS ======================== -->
+            <div class="row mb-3">
+              <strong>Additional Details</strong>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label class="fw-semibold text-muted d-block">Agent</label>
+                <div>{{ job?.agent || '-' }}</div>
+              </div>
+              <div class="col-md-8">
+                <label class="fw-semibold text-muted d-block">Remarks</label>
+                <div>{{ job?.remarks || '-' }}</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ======================= 4. CHARGES & DISBURSEMETS ======================== -->
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingCharges">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#collapseCharges" aria-expanded="false" aria-controls="collapseCharges">
+              Charges & Disbursements
+            </button>
+          </h2>
+          <div id="collapseCharges" class="accordion-collapse collapse" aria-labelledby="headingCharges"
+            data-bs-parent="#jobDetailsAccordion">
+            <div class="accordion-body">
+              <app-job-charges [charges]="charges"></app-job-charges>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>

@@ -41,6 +41,16 @@ export const routes: Routes = [
               ),
             data: { title: 'Job List' },
           },
+          {
+            path: 'jobmanagement/:id',
+            loadComponent: () =>
+              import('./views/jobs/jobmanagement/jobmanagement.component').then
+                (
+                  m => m.JobmanagementComponent
+                ),
+            data: { title: 'Job Management' }
+          },
+
         ],
       },
     ],
