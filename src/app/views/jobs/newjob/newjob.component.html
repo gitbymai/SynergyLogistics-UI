@@ -7,8 +7,8 @@
         <!-- Step Navigation -->
         <ul class="nav nav-pills mb-4">
             <li class="nav-item" *ngFor="let s of [1, 2, 3]">
-                <button class="nav-link" type="button" [class.active]="step === s" [disabled]="s > step + 1"
-                    (click)="goToStep(s)">
+                <button class="nav-link" type="button" [class.active]="currentStep === s"
+                    [disabled]="s > currentStep + 1" (click)="goToStep(s)">
                     {{
                     s === 1
                     ? 'Job Details'
@@ -21,7 +21,7 @@
         </ul>
 
         <!-- STEP 1: Job Details -->
-        <div *ngIf="step === 1">
+        <div *ngIf="currentStep === 1">
             <form [formGroup]="jobDetailsForm" class="p-3">
                 <!-- Client -->
                 <div class="row mb-3">
@@ -35,10 +35,11 @@
                             <ul *ngIf="dropdownOpen && filteredClients.length > 0"
                                 class="list-group position-absolute w-100 shadow-sm"
                                 style="z-index: 1000; max-height: 200px; overflow-y: auto;">
-                                <li class="list-group-item list-group-item-action"
-                                    *ngFor="let client of filteredClients" (click)="selectClient(client)">
-                                    {{ client.name }}
+                                @for(client of filteredClients; track client.customerId){
+                                <li class="list-group-item list-group-item-action" (click)="selectClient(client)">
+                                    {{ client.customerName }}
                                 </li>
+                                }
                             </ul>
                             <input type="hidden" formControlName="clientInformation" />
                         </div>
@@ -52,14 +53,10 @@
                         <select formControlName="transactionType" class="form-select"
                             (change)="onTransactionTypeChange($event)">
                             <option value="">Select Transaction</option>
-                            <option value="FAE">Air Export</option>
-                            <option value="FAI">Air Import</option>
-                            <option value="CRA">Customs Releasing (A)</option>
-                            <option value="CRS">Customs Releasing (S)</option>
-                            <option value="DFA">Domestic Forwarding Airfreight</option>
-                            <option value="DFS">Domestic Forwarding Seafreight</option>
-                            <option value="FSE">Sea Export</option>
-                            <option value="FSI">Sea Import</option>
+                            @for(type of jobTransactionTypeList; track type.optionId){
+                            <option [value]="type.optionId" [attr.data-freight-type]="type.remarks">
+                                {{ type.value }}
+                                }
                         </select>
                     </div>
 
@@ -67,9 +64,10 @@
                         <label class="form-label">Incoterms</label>
                         <select formControlName="incoterms" class="form-select">
                             <option value="">Select Incoterms</option>
-                            <option *ngFor="let term of incotermsList" [value]="term">
-                                {{ term }}
-                            </option>
+                            @for(term of incotermsList; track term.optionId){
+                            <option [value]="term.optionId">
+                                {{ term.value }}
+                                }
                         </select>
                     </div>
                 </div>
@@ -80,8 +78,10 @@
                         <label class="form-label">Payment Type</label>
                         <select formControlName="paymentType" class="form-select">
                             <option value="">Select Payment</option>
-                            <option value="Prepaid">Prepaid</option>
-                            <option value="Collect">Collect</option>
+                            @for (payment of paymenTypeList; track payment.optionId){
+                            <option [value]="payment.optionId">
+                                {{ payment.value }}
+                                }
                         </select>
                     </div>
 
@@ -103,7 +103,7 @@
         </div>
 
         <!-- STEP 2: Common Freight Details -->
-        <div *ngIf="step === 2">
+        <div *ngIf="currentStep === 2">
             <form [formGroup]="shipmentFreightForm" class="p-3">
                 <h6 class="fw-semibold mb-3">Shipment Schedule</h6>
                 <div class="row">
@@ -143,24 +143,16 @@
                         <input type="text" class="form-control" formControlName="commodity" />
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">Weight / CBM</label>
-                        <input type="number" step="0.001" class="form-control" formControlName="weightCbm" />
-                    </div>
-                    <div class="col-md-4 mb-3">
                         <label class="form-label">Volume (m³)</label>
                         <input type="number" step="0.001" class="form-control" formControlName="volume" />
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">Gross Weight (kg)</label>
+                        <label class="form-label">Gross Weight</label>
                         <input type="number" step="0.01" class="form-control" formControlName="grossWeight" />
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Number of Packages</label>
-                        <input type="number" class="form-control" formControlName="packages" />
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Cartons Count</label>
-                        <input type="number" class="form-control" formControlName="cartonsCount" />
+                        <input type="number" class="form-control" formControlName="numberOfPackages" />
                     </div>
                 </div>
 
@@ -176,7 +168,7 @@
         </div>
 
         <!-- STEP 3: Freight Mode Details -->
-        <div *ngIf="step === 3">
+        <div *ngIf="currentStep === 3">
             <form [formGroup]="freightForm" class="p-3">
                 <h6 class="fw-semibold mb-3">Freight Mode Details ({{ freightTypeLabel }})</h6>
 
@@ -195,18 +187,20 @@
                             <label class="form-label">Vessel</label>
                             <input type="text" class="form-control" formControlName="vessel" />
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label">Container Count</label>
-                            <input type="number" class="form-control" formControlName="containerCount" />
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label">Container Size</label>
-                            <select class="form-select" formControlName="containerSize">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Container Type</label>
+                            <select class="form-select" formControlName="containerType">
                                 <option value="">Select Size</option>
                                 <option value="20GP">20GP</option>
                                 <option value="40GP">40GP</option>
                                 <option value="40HQ">40HQ</option>
                             </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Container Count</label>
+                            <input type="number" class="form-control" formControlName="containerCount" />
                         </div>
                     </div>
                 </div>
@@ -260,11 +254,15 @@
                         <textarea rows="2" class="form-control" formControlName="remarks"></textarea>
                     </div>
                 </div>
-
                 <div class="d-flex justify-content-between mt-4">
                     <button class="btn btn-secondary" type="button" (click)="previousStep()">← Previous</button>
-                    <button class="btn btn-success" type="button" (click)="finish()" [disabled]="!freightForm.valid">
-                        Finish
+                    <button class="btn btn-success" type="button" (click)="onSubmit()"
+                        [disabled]="isSubmitting">
+                        <span *ngIf="!isSubmitting">Finish</span>
+                        <span *ngIf="isSubmitting">
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                            Submitting...
+                        </span>
                     </button>
                 </div>
             </form>

@@ -1,5 +1,6 @@
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideHttpClient, withInterceptors  } from '@angular/common/http';
 import {
   provideRouter,
   withEnabledBlockingInitialNavigation,
@@ -25,6 +26,7 @@ export const appConfig: ApplicationConfig = {
       withEnabledBlockingInitialNavigation(),
       withViewTransitions(),
     ),
+    provideHttpClient(),
     importProvidersFrom(SidebarModule, DropdownModule),
     IconSetService,
     provideAnimationsAsync()
