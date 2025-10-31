@@ -30,9 +30,9 @@
                             <label class="form-label">Client</label>
                             <input type="text" class="form-control" placeholder="Search or select client"
                                 [value]="clientSearch" (input)="onClientSearchChange($event.target.value)"
-                                (focus)="dropdownOpen = true" />
+                                (focus)="clientDropdownOpen = true" />
 
-                            <ul *ngIf="dropdownOpen && filteredClients.length > 0"
+                            <ul *ngIf="clientDropdownOpen && filteredClients.length > 0"
                                 class="list-group position-absolute w-100 shadow-sm"
                                 style="z-index: 1000; max-height: 200px; overflow-y: auto;">
                                 @for(client of filteredClients; track client.customerId){
@@ -245,9 +245,25 @@
                         <label class="form-label">Consignee</label>
                         <input type="text" class="form-control" formControlName="consignee" />
                     </div>
+                    <!-- Step 3: Agent/Agency Selection -->
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Agent</label>
-                        <input type="text" class="form-control" formControlName="agent" />
+                        <div class="position-relative agency-dropdown">
+                            <label class="form-label">Agent</label>
+                            <input type="text" class="form-control" placeholder="Search or select agent"
+                                [value]="agencySearch" (input)="onAgencySearchChange($any($event.target).value)"
+                                (focus)="agencyDropdownOpen = true" />
+
+                            <ul *ngIf="agencyDropdownOpen && filteredAgencies.length > 0"
+                                class="list-group position-absolute w-100 shadow-sm"
+                                style="z-index: 1000; max-height: 200px; overflow-y: auto;">
+                                @for(agency of filteredAgencies; track agency.agencyGuid){
+                                <li class="list-group-item list-group-item-action" (click)="selectAgency(agency)">
+                                    {{ agency.agentName }}
+                                </li>
+                                }
+                            </ul>
+                            <input type="hidden" formControlName="agent" />
+                        </div>
                     </div>
                     <div class="col-md-12 mb-3">
                         <label class="form-label">Remarks</label>
@@ -256,8 +272,7 @@
                 </div>
                 <div class="d-flex justify-content-between mt-4">
                     <button class="btn btn-secondary" type="button" (click)="previousStep()">← Previous</button>
-                    <button class="btn btn-success" type="button" (click)="onSubmit()"
-                        [disabled]="isSubmitting">
+                    <button class="btn btn-success" type="button" (click)="onSubmit()" [disabled]="isSubmitting">
                         <span *ngIf="!isSubmitting">Finish</span>
                         <span *ngIf="isSubmitting">
                             <span class="spinner-border spinner-border-sm me-2"></span>

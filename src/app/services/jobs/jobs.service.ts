@@ -32,6 +32,10 @@ export class JobsService extends ApiService {
     return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/configuration`);
   }
 
+  getAllAgency(): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/agency`);
+  }
+
   getAllJobs(): Observable<ApiResponse<any[]>> {
     return this.http.get<ApiResponse<any[]>>(this.apiUrl);
   }
@@ -41,7 +45,7 @@ export class JobsService extends ApiService {
   }
 
   createJob(job: CreateJobRequest): Observable<ApiResponse<Job>> {
-    return this.http.post<ApiResponse<any>>(this.apiUrl, job);
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/job`, job);
   }
 
   updateJob(id: number, job: any): Observable<ApiResponse<any>> {

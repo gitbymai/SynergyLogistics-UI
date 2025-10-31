@@ -1,0 +1,119 @@
+<div class="card">
+  <div class="card-header">
+    <h4>{{ isEditing ? 'Edit Agency' : 'Create New Agency' }}</h4>
+  </div>
+  <div class="card-body">
+    <form [formGroup]="agencyForm" (ngSubmit)="onSubmit()">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Agent Name *</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            formControlName="agentName"
+            [class.is-invalid]="agencyForm.get('agentName')?.invalid && agencyForm.get('agentName')?.touched">
+          <div class="invalid-feedback">Agent name is required (max 200 characters)</div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Contact Person *</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            formControlName="contactPerson"
+            [class.is-invalid]="agencyForm.get('contactPerson')?.invalid && agencyForm.get('contactPerson')?.touched">
+          <div class="invalid-feedback">Contact person is required (max 200 characters)</div>
+        </div>
+
+        <div class="col-md-12 mb-3">
+          <label class="form-label">Address</label>
+          <textarea 
+            class="form-control" 
+            formControlName="address" 
+            rows="2"
+            maxlength="1000"></textarea>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Contact Number</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            formControlName="contactNumber"
+            maxlength="20">
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Email Address *</label>
+          <input 
+            type="email" 
+            class="form-control" 
+            formControlName="emailAddress"
+            [class.is-invalid]="agencyForm.get('emailAddress')?.invalid && agencyForm.get('emailAddress')?.touched">
+          <div class="invalid-feedback">Valid email is required (max 50 characters)</div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading || agencyForm.invalid">
+          {{ isLoading ? 'Saving...' : (isEditing ? 'Update Agency' : 'Create Agency') }}
+        </button>
+        
+        <button type="button" class="btn btn-secondary" (click)="resetForm()" *ngIf="isEditing">
+          Cancel
+        </button>
+      </div>
+    </form>
+
+    <!-- Agency List -->
+    <div class="mt-4">
+      <h5>All Agencies</h5>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Agent Name</th>
+            <th>Contact Person</th>
+            <th>Email</th>
+            <th>Contact Number</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (agency of agencies; track agency.agencyGuid) {
+            <tr>
+              <td>{{ agency.agencyCode }}</td>
+              <td>{{ agency.agentName }}</td>
+              <td>{{ agency.contactPerson }}</td>
+              <td>{{ agency.emailAddress }}</td>
+              <td>{{ agency.contactNumber || 'N/A' }}</td>
+              <td>
+                <span [class]="agency.isActive ? 'badge bg-success' : 'badge bg-danger'">
+                  {{ agency.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-primary me-2" (click)="editAgency(agency)">
+                  Edit
+                </button>
+                <button 
+                  class="btn btn-sm btn-danger me-2" 
+                  (click)="deleteAgency(agency)"
+                  *ngIf="agency.isActive">
+                  Delete
+                </button>
+                <button 
+                  class="btn btn-sm btn-success" 
+                  (click)="activateAgency(agency)"
+                  *ngIf="!agency.isActive">
+                  Activate
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

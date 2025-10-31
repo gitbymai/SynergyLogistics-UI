@@ -6,43 +6,34 @@ export interface CreateJobRequest {
   paymentTypeId: number;
   amount: number;
 
-  // Shipment Details
-  cutoff?: string;
-  etd?: string;
-  eta?: string;
-  origin?: string;
-  destination?: string;
-  portCfs?: string;
-  commodity?: string;
-  
-  // Weight & Volume
-  grossWeight?: number;
-  volume?: number;
-  chargeableWeight?: number;
-  numberOfPackages?: number;
-  
-  // Container Details (Sea)
-  containerType?: string;
-  containerCount?: number;
-  
-  // Freight Documents
-  // Sea Freight
-  mbl?: string;
-  hbl?: string;
-  vessel?: string;
-  
-  // Air Freight  
-  mawb?: string;
-  hawb?: string;
-  flightNo?: string;
-  
-  // Common
-  bookingNo?: string;
-  carrier?: string;
-  shipper?: string;
-  consignee?: string;
-  agent?: string;
-  remarks?: string;
+  // Shipment Freight Details
+  cutoff?: string | null;
+  etd?: string | null;
+  eta?: string | null;
+  origin?: string | null;
+  destination?: string | null;
+  portCfs?: string | null;
+  commodity?: string | null;
+  volume?: number | null;  // Changed from undefined to null
+  grossWeight?: number | null;  // Changed from undefined to null
+  numberOfPackages?: number | null;  // Changed from undefined to null
+
+  // Freight Details
+  mbl?: string | null;
+  hbl?: string | null;
+  vessel?: string | null;
+  containerType?: string | null;
+  containerCount?: number | null;
+  mawb?: string | null;
+  hawb?: string | null;
+  flightNo?: string | null;
+  chargeableWeight?: number | null;
+  bookingNo?: string | null;
+  carrier?: string | null;
+  shipper?: string | null;
+  consignee?: string | null;
+  agent?: string | null;
+  remarks?: string | null;
 }
 
 export interface Job extends CreateJobRequest {
