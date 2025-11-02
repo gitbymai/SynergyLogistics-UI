@@ -7,6 +7,7 @@ import { AgencyService } from '../../../services/agency/agency.service';
 import { Configuration } from '../../../models/configuration';
 import { CustomerAccount } from '../../../models/customer';
 import { Agency } from '../../../models/agency';
+import { JobTransactionType } from '../../../models/jobtransactiontype';
 import { CreateJobRequest } from '../../../models/job-new';
 
 @Component({
@@ -28,9 +29,9 @@ export class NewjobComponent implements OnInit {
 
   // Configuration lists
   incotermsList: Configuration[] = [];
-  jobTransactionTypeList: Configuration[] = [];
+  jobTransactionTypeList: JobTransactionType[] = [];
   paymenTypeList: Configuration[] = [];
-  
+
   // Client list and search
   clientList: CustomerAccount[] = [];
   filteredClients: CustomerAccount[] = [];
@@ -49,7 +50,7 @@ export class NewjobComponent implements OnInit {
   freightForm!: FormGroup;
 
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private jobService: JobsService,
     private agencyService: AgencyService
   ) { }
@@ -57,6 +58,7 @@ export class NewjobComponent implements OnInit {
   ngOnInit(): void {
     this.initializeForms();
     this.loadConfigurations();
+    this.loadJobTransactionTypes();
     this.loadCustomers();
     this.loadAgencies();
   }
@@ -116,11 +118,10 @@ export class NewjobComponent implements OnInit {
   }
 
   loadConfigurations(): void {
-    this.jobService.getAllConfiguratios().subscribe({
+    this.jobService.getAllConfigurations().subscribe({
       next: (response) => {
         if (response.success) {
           this.setIncotermsList(response.data);
-          this.setJobTransactionTypeList(response.data);
           this.setPaymentTypeList(response.data);
         } else {
           console.error('API returned error:', response.message);
@@ -130,6 +131,25 @@ export class NewjobComponent implements OnInit {
         console.error('Error loading configurations:', error);
       }
     });
+  }
+
+  loadJobTransactionTypes(): void {
+    this.jobService.getJobTransactionTypes().subscribe({
+      next: (response) => {
+        if (response.success && response.data?.length) {
+
+          this.jobTransactionTypeList = response.data
+            .filter(type => type.isActive)
+            .sort((a, b) => a.jobTransactionType.localeCompare(b.jobTransactionType));
+
+        } else {
+          console.error('API returned error: ', response.message);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading job transaction types:', error);
+      }
+    })
   }
 
   loadCustomers(): void {
@@ -149,37 +169,29 @@ export class NewjobComponent implements OnInit {
       }
     });
   }
-  
-loadAgencies(): void {
-  this.agencyService.getAllAgencies().subscribe({
-    next: (response) => {
-      if (response.success && response.data?.length) {
-        this.agencyList = response.data
-          .filter((a: Agency) => a.isActive)
-          .sort((a: Agency, b: Agency) => a.agentName.localeCompare(b.agentName));
-        this.filteredAgencies = [...this.agencyList];
-      } else {
-        console.error('API returned error:', response.message);
+
+  loadAgencies(): void {
+    this.agencyService.getAllAgencies().subscribe({
+      next: (response) => {
+        if (response.success && response.data?.length) {
+          this.agencyList = response.data
+            .filter((a: Agency) => a.isActive)
+            .sort((a: Agency, b: Agency) => a.agentName.localeCompare(b.agentName));
+          this.filteredAgencies = [...this.agencyList];
+        } else {
+          console.error('API returned error:', response.message);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading agencies:', error);
       }
-    },
-    error: (error) => {
-      console.error('Error loading agencies:', error);
-    }
-  });
-}
+    });
+  }
 
   setIncotermsList(incoterms: Configuration[]): void {
     if (incoterms?.length) {
       this.incotermsList = incoterms
         .filter(term => term.category === 'INCOTERMS' && term.isActive)
-        .sort((a, b) => a.value.localeCompare(b.value));
-    }
-  }
-
-  setJobTransactionTypeList(transactionTypes: Configuration[]): void {
-    if (transactionTypes?.length) {
-      this.jobTransactionTypeList = transactionTypes
-        .filter(type => type.category === 'JOBTRANSACTIONTYPE' && type.isActive)
         .sort((a, b) => a.value.localeCompare(b.value));
     }
   }
@@ -332,17 +344,17 @@ loadAgencies(): void {
         this.isSubmitting = false;
       }
     });
-    
+
   }
 
   validateAmountInput(event: KeyboardEvent): void {
     const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
     const input = (event.target as HTMLInputElement).value;
-    
+
     if (allowedKeys.includes(event.key)) return;
     if (!/^[0-9.]$/.test(event.key)) event.preventDefault();
     if (event.key === '.' && input.includes('.')) event.preventDefault();
-    
+
     const parts = input.split('.');
     if (parts.length === 2 && parts[1].length >= 2 && event.key !== 'Backspace') {
       event.preventDefault();

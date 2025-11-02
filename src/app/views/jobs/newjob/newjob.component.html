@@ -53,9 +53,9 @@
                         <select formControlName="transactionType" class="form-select"
                             (change)="onTransactionTypeChange($event)">
                             <option value="">Select Transaction</option>
-                            @for(type of jobTransactionTypeList; track type.optionId){
-                            <option [value]="type.optionId" [attr.data-freight-type]="type.remarks">
-                                {{ type.value }}
+                            @for(type of jobTransactionTypeList; track type.jobTransactionTypeId){
+                            <option [value]="type.jobTransactionTypeId" [attr.data-freight-type]="type.jobTransactionTypePrefix">
+                                {{ type.jobTransactionType }}
                                 }
                         </select>
                     </div>
