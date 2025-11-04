@@ -40,8 +40,15 @@ export class JobsService extends ApiService {
     return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job`);
   }
 
-  getJobById(id: number): Observable<ApiResponse<any>> {
-    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/${id}`);
+    getByGuid(jobGuid: string): Observable<Job> {
+    return this.http.get<ApiResponse<Job>>(`${this.apiUrl}/job/${jobGuid}`).pipe(
+      map(response => {
+        if (response.success && response.data) {
+          return response.data;
+        }
+        throw new Error(response.message || 'Job not found');
+      })
+    );
   }
 
   createJob(job: CreateJobRequest): Observable<ApiResponse<Job>> {

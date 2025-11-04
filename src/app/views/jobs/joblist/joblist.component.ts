@@ -32,9 +32,7 @@ export class JoblistComponent implements OnInit {
     origin: '',
     destination: '',
     dateFrom: '',
-    dateTo: '',
-    minAmount: null as number | null,
-    maxAmount: null as number | null
+    dateTo: ''
   };
 
   constructor(private router: Router, private jobService: JobsService) { }
@@ -127,7 +125,6 @@ export class JoblistComponent implements OnInit {
     });
   }
 
-  /** 📄 Paginate jobs */
   get paginatedJobs() {
     const start = (this.currentPage - 1) * this.pageSize;
     return this.filteredJobs.slice(start, start + this.pageSize);
@@ -143,9 +140,8 @@ export class JoblistComponent implements OnInit {
     }
   }
 
-  /** 🚀 Actions */
   viewJob(job: any) {
-    this.router.navigate(['/jobs/jobmanagement', job.id]);
+    this.router.navigate(['/jobs/jobmanagement', job.jobGuid]);
   }
 
   editJob(job: any) {
@@ -226,16 +222,6 @@ export class JoblistComponent implements OnInit {
           return false;
         }
       }
-
-      // Amount range filter
-      if (this.filters.minAmount !== null && job.amount < this.filters.minAmount) {
-        return false;
-      }
-
-      if (this.filters.maxAmount !== null && job.amount > this.filters.maxAmount) {
-        return false;
-      }
-
       return true;
     });
 
@@ -258,8 +244,6 @@ export class JoblistComponent implements OnInit {
       destination: '',
       dateFrom: '',
       dateTo: '',
-      minAmount: null,
-      maxAmount: null
     };
     this.filteredJobs = [...this.jobs];
     this.currentPage = 1;
@@ -274,9 +258,7 @@ export class JoblistComponent implements OnInit {
       this.filters.origin !== '' ||
       this.filters.destination !== '' ||
       this.filters.dateFrom !== '' ||
-      this.filters.dateTo !== '' ||
-      this.filters.minAmount !== null ||
-      this.filters.maxAmount !== null;
+      this.filters.dateTo !== '';
   }
 
   activeFilterCount(): number {
@@ -290,8 +272,6 @@ export class JoblistComponent implements OnInit {
     if (this.filters.destination) count++;
     if (this.filters.dateFrom) count++;
     if (this.filters.dateTo) count++;
-    if (this.filters.minAmount !== null) count++;
-    if (this.filters.maxAmount !== null) count++;
     return count;
   }
 
