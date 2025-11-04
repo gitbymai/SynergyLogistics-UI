@@ -14,9 +14,9 @@ export interface CreateJobRequest {
   destination?: string | null;
   portCfs?: string | null;
   commodity?: string | null;
-  volume?: number | null;  // Changed from undefined to null
-  grossWeight?: number | null;  // Changed from undefined to null
-  numberOfPackages?: number | null;  // Changed from undefined to null
+  volume?: number | null;
+  grossWeight?: number | null;
+  numberOfPackages?: number | null;
 
   // Freight Details
   mbl?: string | null;
@@ -45,4 +45,11 @@ export interface Job extends CreateJobRequest {
   createdDate: string;
   modifiedBy: number;
   modifiedDate: string;
+  
+  // Additional display/reference fields from API response
+  customerName: string;
+  jobStatusName: string;
+  transactionTypeName: string;
+  incotermsName: string;
+  paymentTypeName: string;
 }

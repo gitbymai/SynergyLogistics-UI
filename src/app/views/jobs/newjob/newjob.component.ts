@@ -8,7 +8,7 @@ import { Configuration } from '../../../models/configuration';
 import { CustomerAccount } from '../../../models/customer';
 import { Agency } from '../../../models/agency';
 import { JobTransactionType } from '../../../models/jobtransactiontype';
-import { CreateJobRequest } from '../../../models/job-new';
+import { CreateJobRequest } from '../../../models/job';
 
 @Component({
   selector: 'app-newjob',

@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Job } from '../../../models/job';
+import { JobsService } from '../../../services/jobs/jobs.service';
 
 @Component({
   selector: 'app-joblist',
@@ -12,44 +14,86 @@ import { Router } from '@angular/router';
 })
 export class JoblistComponent implements OnInit {
 
-  jobs: any[] = [];
-  filteredJobs: any[] = [];
+  jobs: Job[] = [];
+  filteredJobs: Job[] = [];
   searchTerm = '';
   currentPage = 1;
   pageSize = 10;
   sortColumn = '';
   sortDirection: 'asc' | 'desc' = 'asc';
-  
-  constructor(private router: Router) { }
+
+  showFilters = false;
+  filters = {
+    status: '',
+    transactionType: '',
+    paymentType: '',
+    incoterms: '',
+    customer: '',
+    origin: '',
+    destination: '',
+    dateFrom: '',
+    dateTo: '',
+    minAmount: null as number | null,
+    maxAmount: null as number | null
+  };
+
+  constructor(private router: Router, private jobService: JobsService) { }
 
   ngOnInit(): void {
-    // 🔹 Mock Job Data — replace with API data later
-    this.jobs = [
-      { id: 'JOB-1001', client: 'ABC Logistics', transactionType: 'Sea Export', origin: 'Manila', destination: 'Singapore', amount: 12500, createdDate: '2025-10-10' },
-      { id: 'JOB-1002', client: 'Blue Ocean Freight', transactionType: 'Air Import', origin: 'Tokyo', destination: 'Cebu', amount: 8700, createdDate: '2025-10-08' },
-      { id: 'JOB-1003', client: 'SkyPort Handling', transactionType: 'Sea Import', origin: 'Singapore', destination: 'Batangas', amount: 5600, createdDate: '2025-10-05' },
-      { id: 'JOB-1004', client: 'Portlink Transport', transactionType: 'Air Export', origin: 'Manila', destination: 'Hong Kong', amount: 9100, createdDate: '2025-10-03' },
-      { id: 'JOB-1005', client: 'FreightWorks', transactionType: 'Sea Export', origin: 'Cebu', destination: 'Jakarta', amount: 13400, createdDate: '2025-09-29' },
-      { id: 'JOB-1006', client: 'FastMove Cargo', transactionType: 'Air Import', origin: 'Dubai', destination: 'Manila', amount: 11200, createdDate: '2025-09-26' }
-    ];
-    this.filteredJobs = [...this.jobs];
+    this.loadJobList();
+
   }
 
-  /** 🔍 Filter jobs by search term */
+  loadJobList() {
+
+    this.jobService.getAllJobs().subscribe({
+
+      next: (response) => {
+
+        if (response.success && response.data?.length) {
+          this.jobs = response.data
+            .filter(c => c.isActive)
+            .sort((a, b) => b.jobId = a.jobId)
+
+          this.filteredJobs = [...this.jobs];
+        }
+
+      },
+      error: (error) => {
+        console.error('API returned error:', error.message);
+      }
+
+    });
+  }
+
   onSearchChange(): void {
-    const term = this.searchTerm.toLowerCase();
-    this.filteredJobs = this.jobs.filter(job =>
-      job.client.toLowerCase().includes(term) ||
-      job.transactionType.toLowerCase().includes(term) ||
-      job.origin.toLowerCase().includes(term) ||
-      job.destination.toLowerCase().includes(term) ||
-      job.id.toLowerCase().includes(term)
-    );
+    const term = this.searchTerm.toLowerCase().trim();
+
+    this.filteredJobs = term
+      ? this.jobs.filter(job => {
+        const searchableFields = [
+          job.jobCode,
+          job.customerName,
+          job.transactionTypeName,
+          job.jobStatusName,
+          job.origin,
+          job.destination,
+          job.carrier,
+          job.vessel,
+          job.mbl,
+          job.hbl,
+          job.jobId.toString()
+        ];
+        return searchableFields.some(field =>
+          field?.toLowerCase().includes(term)
+        );
+      })
+      : [...this.jobs];
+
     this.currentPage = 1;
   }
 
-  /** ↕️ Sort by column */
-  sortBy(column: string): void {
+  sortBy(column: keyof Job): void {
     if (this.sortColumn === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
@@ -60,12 +104,26 @@ export class JoblistComponent implements OnInit {
     this.filteredJobs.sort((a, b) => {
       const valA = a[column];
       const valB = b[column];
-      if (typeof valA === 'string') {
+
+      // Handle null/undefined values (push to end)
+      if (valA == null && valB == null) return 0;
+      if (valA == null) return 1;
+      if (valB == null) return -1;
+
+      // String comparison
+      if (typeof valA === 'string' && typeof valB === 'string') {
         return this.sortDirection === 'asc'
           ? valA.localeCompare(valB)
           : valB.localeCompare(valA);
       }
-      return this.sortDirection === 'asc' ? valA - valB : valB - valA;
+
+      // Number comparison
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return this.sortDirection === 'asc' ? valA - valB : valB - valA;
+      }
+
+      // Fallback for other types
+      return 0;
     });
   }
 
@@ -95,9 +153,146 @@ export class JoblistComponent implements OnInit {
   }
 
   deleteJob(job: any) {
-    if (confirm(`Are you sure you want to delete ${job.id}?`)) {
-      this.jobs = this.jobs.filter(j => j.id !== job.id);
+    if (confirm(`Are you sure you want to delete ${job.jobId}?`)) {
+      this.jobs = this.jobs.filter(j => j.jobId !== job.jobId);
       this.filteredJobs = [...this.jobs];
     }
   }
+
+  getStatusBadgeClass(status: string): string {
+    switch (status.toUpperCase()) {
+      case 'FOR APPROVAL': return 'bg-warning text-dark';
+      case 'APPROVED': return 'bg-success';
+      case 'REJECTED': return 'bg-danger';
+      case 'COMPLETED': return 'bg-info';
+      default: return 'bg-secondary';
+    }
+  }
+
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters;
+  }
+
+  applyFilters(): void {
+    this.filteredJobs = this.jobs.filter(job => {
+      // Status filter
+      if (this.filters.status && job.jobStatusName !== this.filters.status) {
+        return false;
+      }
+
+      // Transaction Type filter
+      if (this.filters.transactionType && job.transactionTypeName !== this.filters.transactionType) {
+        return false;
+      }
+
+      // Payment Type filter
+      if (this.filters.paymentType && job.paymentTypeName !== this.filters.paymentType) {
+        return false;
+      }
+
+      // Incoterms filter
+      if (this.filters.incoterms && job.incotermsName !== this.filters.incoterms) {
+        return false;
+      }
+
+      // Customer filter
+      if (this.filters.customer && !job.customerName?.toLowerCase().includes(this.filters.customer.toLowerCase())) {
+        return false;
+      }
+
+      // Origin filter
+      if (this.filters.origin && !job.origin?.toLowerCase().includes(this.filters.origin.toLowerCase())) {
+        return false;
+      }
+
+      // Destination filter
+      if (this.filters.destination && !job.destination?.toLowerCase().includes(this.filters.destination.toLowerCase())) {
+        return false;
+      }
+
+      // Date range filter
+      if (this.filters.dateFrom) {
+        const jobDate = new Date(job.createdDate);
+        const fromDate = new Date(this.filters.dateFrom);
+        if (jobDate < fromDate) {
+          return false;
+        }
+      }
+
+      if (this.filters.dateTo) {
+        const jobDate = new Date(job.createdDate);
+        const toDate = new Date(this.filters.dateTo);
+        if (jobDate > toDate) {
+          return false;
+        }
+      }
+
+      // Amount range filter
+      if (this.filters.minAmount !== null && job.amount < this.filters.minAmount) {
+        return false;
+      }
+
+      if (this.filters.maxAmount !== null && job.amount > this.filters.maxAmount) {
+        return false;
+      }
+
+      return true;
+    });
+
+    // Apply search term if exists
+    if (this.searchTerm) {
+      this.onSearchChange();
+    }
+
+    this.currentPage = 1;
+  }
+
+  clearFilters(): void {
+    this.filters = {
+      status: '',
+      transactionType: '',
+      paymentType: '',
+      incoterms: '',
+      customer: '',
+      origin: '',
+      destination: '',
+      dateFrom: '',
+      dateTo: '',
+      minAmount: null,
+      maxAmount: null
+    };
+    this.filteredJobs = [...this.jobs];
+    this.currentPage = 1;
+  }
+
+  hasActiveFilters(): boolean {
+    return this.filters.status !== '' ||
+      this.filters.transactionType !== '' ||
+      this.filters.paymentType !== '' ||
+      this.filters.incoterms !== '' ||
+      this.filters.customer !== '' ||
+      this.filters.origin !== '' ||
+      this.filters.destination !== '' ||
+      this.filters.dateFrom !== '' ||
+      this.filters.dateTo !== '' ||
+      this.filters.minAmount !== null ||
+      this.filters.maxAmount !== null;
+  }
+
+  activeFilterCount(): number {
+    let count = 0;
+    if (this.filters.status) count++;
+    if (this.filters.transactionType) count++;
+    if (this.filters.paymentType) count++;
+    if (this.filters.incoterms) count++;
+    if (this.filters.customer) count++;
+    if (this.filters.origin) count++;
+    if (this.filters.destination) count++;
+    if (this.filters.dateFrom) count++;
+    if (this.filters.dateTo) count++;
+    if (this.filters.minAmount !== null) count++;
+    if (this.filters.maxAmount !== null) count++;
+    return count;
+  }
+
 }

@@ -5,7 +5,7 @@ import { ApiService } from '../api.service';
 import { ApiResponse } from '../../models/api-response';
 import { CustomerAccount, toCustomerAccount } from '../../models/customer';
 import { map } from 'rxjs';
-import { CreateJobRequest, Job } from '../../models/job-new';
+import { CreateJobRequest, Job } from '../../models/job';
 import { JobTransactionType } from '../../models/jobtransactiontype';
 
 @Injectable({
@@ -28,7 +28,6 @@ export class JobsService extends ApiService {
       })
     );
   }
-
   getAllConfigurations(): Observable<ApiResponse<any[]>> {
     return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/configuration`);
   }
@@ -37,8 +36,8 @@ export class JobsService extends ApiService {
     return this.http.get<ApiResponse<JobTransactionType[]>>(`${this.apiUrl}/jobtransactiontype`);
   }
 
-  getAllJobs(): Observable<ApiResponse<any[]>> {
-    return this.http.get<ApiResponse<any[]>>(this.apiUrl);
+  getAllJobs(): Observable<ApiResponse<Job[]>> {
+    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job`);
   }
 
   getJobById(id: number): Observable<ApiResponse<any>> {

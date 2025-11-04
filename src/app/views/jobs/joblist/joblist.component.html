@@ -1,18 +1,124 @@
 <div class="card my-4 shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
         <h4 class="mb-0">Job List</h4>
-        <input type="text" class="form-control w-auto" style="max-width: 250px;" placeholder="Search jobs..."
-            [(ngModel)]="searchTerm" (input)="onSearchChange()" />
+        <div class="d-flex gap-2">
+            <input type="text" class="form-control form-control-sm" style="max-width: 250px;" 
+                placeholder="Search jobs..." [(ngModel)]="searchTerm" (input)="onSearchChange()" />
+                
+<button class="btn btn-light btn-sm filter-btn-compact" (click)="toggleFilters()">
+    <i class="cil-filter" style="font-size: 11px;"></i> 
+    <span class="d-none d-md-inline filter-text">{{ showFilters ? 'Hide' : 'Show' }}</span>
+    <span class="badge bg-danger ms-1 badge-xs" *ngIf="hasActiveFilters()">{{ activeFilterCount() }}</span>
+</button>
+        </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div class="filter-panel" *ngIf="showFilters">
+        <div class="filter-header">
+            <h6 class="mb-0">
+                <i class="cil-filter"></i> Filter Options
+            </h6>
+            <button class="btn btn-sm btn-primary" (click)="clearFilters()">
+                <i class="cil-x"></i> Clear All
+            </button>
+        </div>
+        <div class="filter-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-secondary">
+                        <i class="cil-info"></i> Status
+                    </label>
+                    <select class="form-select form-select-sm filter-select" [(ngModel)]="filters.status" (change)="applyFilters()">
+                        <option value="">All Statuses</option>
+                        <option value="FOR APPROVAL">For Approval</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="IN PROGRESS">In Progress</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="REJECTED">Rejected</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-secondary">
+                        <i class="cil-airplane-mode"></i> Transaction Type
+                    </label>
+                    <select class="form-select form-select-sm filter-select" [(ngModel)]="filters.transactionType" (change)="applyFilters()">
+                        <option value="">All Types</option>
+                        <option value="AIR IMPORT">Air Import</option>
+                        <option value="AIR EXPORT">Air Export</option>
+                        <option value="SEA IMPORT">Sea Import</option>
+                        <option value="SEA EXPORT">Sea Export</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-secondary">
+                        <i class="cil-credit-card"></i> Payment Type
+                    </label>
+                    <select class="form-select form-select-sm filter-select" [(ngModel)]="filters.paymentType" (change)="applyFilters()">
+                        <option value="">All Payment Types</option>
+                        <option value="PREPAID">Prepaid</option>
+                        <option value="COLLECT">Collect</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-secondary">
+                        <i class="cil-tags"></i> Incoterms
+                    </label>
+                    <select class="form-select form-select-sm filter-select" [(ngModel)]="filters.incoterms" (change)="applyFilters()">
+                        <option value="">All Incoterms</option>
+                        <option value="CFR">CFR</option>
+                        <option value="CIF">CIF</option>
+                        <option value="FOB">FOB</option>
+                        <option value="EXW">EXW</option>
+                        <option value="DDP">DDP</option>
+                        <option value="DDU">DDU</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-secondary">
+                        <i class="cil-user"></i> Customer
+                    </label>
+                    <input type="text" class="form-control form-control-sm filter-input" 
+                        placeholder="Enter customer name" 
+                        [(ngModel)]="filters.customer" 
+                        (input)="applyFilters()" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-secondary">
+                        <i class="cil-calendar"></i> Date From
+                    </label>
+                    <input type="date" class="form-control form-control-sm filter-input" 
+                        [(ngModel)]="filters.dateFrom" 
+                        (change)="applyFilters()" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-secondary">
+                        <i class="cil-calendar"></i> Date To
+                    </label>
+                    <input type="date" class="form-control form-control-sm filter-input" 
+                        [(ngModel)]="filters.dateTo" 
+                        (change)="applyFilters()" />
+                </div>
+
+            </div>
+        </div>
     </div>
 
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover table-striped align-middle mb-0">
+            <table class="table table-hover table-striped align-middle mb-0 table-sm">
                 <thead class="table-light">
-                    <tr>
-                        <th (click)="sortBy('id')" class="sortable">Job ID</th>
-                        <th (click)="sortBy('client')" class="sortable">Client</th>
-                        <th (click)="sortBy('transactionType')" class="sortable">Transaction</th>
+                    <tr class="small">
+                        <th (click)="sortBy('jobCode')" class="sortable">Job Code</th>
+                        <th (click)="sortBy('customerName')" class="sortable">Customer</th>
+                        <th (click)="sortBy('transactionTypeName')" class="sortable">Transaction</th>
+                        <th (click)="sortBy('jobStatusName')" class="sortable">Status</th>
                         <th (click)="sortBy('origin')" class="sortable">Origin</th>
                         <th (click)="sortBy('destination')" class="sortable">Destination</th>
                         <th (click)="sortBy('amount')" class="sortable text-end">Amount</th>
@@ -22,39 +128,46 @@
                 </thead>
 
                 <tbody>
-                    <tr *ngFor="let job of paginatedJobs">
-                        <td>{{ job.id }}</td>
-                        <td>{{ job.client }}</td>
-                        <td>{{ job.transactionType }}</td>
-                        <td>{{ job.origin }}</td>
-                        <td>{{ job.destination }}</td>
-                        <td class="text-end">{{ job.amount | number:'1.2-2' }}</td>
-                        <td>{{ job.createdDate | date:'yyyy-MM-dd' }}</td>
-                        <td class="text-center">
-                            <button class="btn btn-sm btn-info me-1" (click)="viewJob(job)">
-                                <i class="cil-magnifying-glass text-white"></i>
+                    <tr *ngFor="let job of paginatedJobs" class="small">
+                        <td class="text-nowrap">{{ job.jobCode }}</td>
+                        <td class="text-truncate" style="max-width: 150px;" [title]="job.customerName">
+                            {{ job.customerName }}
+                        </td>
+                        <td class="text-nowrap">{{ job.transactionTypeName }}</td>
+                        <td>
+                            <span [class]="'badge badge-sm ' + getStatusBadgeClass(job.jobStatusName)">
+                                {{ job.jobStatusName }}
+                            </span>
+                        </td>
+                        <td>{{ job.origin || '-' }}</td>
+                        <td>{{ job.destination || '-' }}</td>
+                        <td class="text-end text-nowrap">{{ job.amount | currency:'PHP':'symbol':'1.2-2' }}</td>
+                        <td class="text-nowrap">{{ job.createdDate | date:'MM/dd/yyyy' }}</td>
+                        <td class="text-center text-nowrap">
+                            <button class="btn btn-sm btn-info me-1" (click)="viewJob(job)" title="View">
+                                <i class="cil-magnifying-glass" style="font-size: 12px;"></i>
                             </button>
-                            <button class="btn btn-sm btn-primary me-1" (click)="editJob(job)">
-                                <i class="cil-pencil text-white"></i>
+                            <button class="btn btn-sm btn-primary me-1" (click)="editJob(job)" title="Edit">
+                                <i class="cil-pencil" style="font-size: 12px;"></i>
                             </button>
-                            <button class="btn btn-sm btn-danger" (click)="deleteJob(job)">
-                                <i class="cil-trash text-white"></i>
+                            <button class="btn btn-sm btn-danger" (click)="deleteJob(job)" title="Delete">
+                                <i class="cil-trash" style="font-size: 12px;"></i>
                             </button>
                         </td>
                     </tr>
 
                     <tr *ngIf="filteredJobs.length === 0">
-                        <td colspan="8" class="text-center py-3 text-muted">No jobs found</td>
+                        <td colspan="9" class="text-center py-3 text-muted small">No jobs found</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div class="card-footer d-flex justify-content-between align-items-center">
+    <div class="card-footer d-flex justify-content-between align-items-center small">
         <div>Showing {{ paginatedJobs.length }} of {{ filteredJobs.length }} jobs</div>
 
-        <ul class="pagination mb-0">
+        <ul class="pagination pagination-sm mb-0">
             <li class="page-item" [class.disabled]="currentPage === 1">
                 <button class="page-link" (click)="goToPage(currentPage - 1)">Previous</button>
             </li>
