@@ -12,6 +12,8 @@ import {
 import { DropdownModule, SidebarModule } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { routes } from './app.routes';
+import { API_URL } from './config/api.config';
+import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -29,6 +31,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     importProvidersFrom(SidebarModule, DropdownModule),
     IconSetService,
-    provideAnimationsAsync()
+    provideAnimationsAsync(),
+    { provide: API_URL, useValue: environment.apiUrl }
   ]
 };
