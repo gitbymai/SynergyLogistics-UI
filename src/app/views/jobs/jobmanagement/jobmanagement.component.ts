@@ -36,17 +36,17 @@ export class JobmanagementComponent implements OnInit {
   isLoading = true;
   errorMessage = '';
 
+
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router,
     private jobService: JobsService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    // Get job GUID from route parameters
     const jobGuid = this.route.snapshot.paramMap.get('jobGuid');
-    
+
     if (!jobGuid) {
       console.error('Job GUID not provided in route');
       this.errorMessage = 'Job identifier not found';
@@ -58,29 +58,27 @@ export class JobmanagementComponent implements OnInit {
     this.loadJobDetails(jobGuid);
   }
 
-loadJobDetails(jobGuid: string): void {
-  this.isLoading = true;
-  this.errorMessage = '';
+  loadJobDetails(jobGuid: string): void {
+    this.isLoading = true;
+    this.errorMessage = '';
 
-  this.jobService.getByGuid(jobGuid).subscribe({
-    next: (job) => {
-      // Service already unwrapped the data, so job is of type Job
-      this.job = job;
-      this.isLoading = false;
-      console.log('Job loaded:', this.job);
-      this.loadCharges();
-    },
-    error: (error) => {
-      console.error('Error loading job details:', error);
-      this.errorMessage = error.message || 'Failed to load job details. Please try again.';
-      this.isLoading = false;
-      
-      setTimeout(() => {
-        this.router.navigate(['/jobs/list']);
-      }, 3000);
-    }
-  });
-}
+    this.jobService.getByGuid(jobGuid).subscribe({
+      next: (job) => {
+        this.job = job;
+        this.isLoading = false;
+        this.loadCharges();
+      },
+      error: (error) => {
+        console.error('Error loading job details:', error);
+        this.errorMessage = error.message || 'Failed to load job details. Please try again.';
+        this.isLoading = false;
+
+        setTimeout(() => {
+          this.router.navigate(['/jobs/list']);
+        }, 3000);
+      }
+    });
+  }
 
   loadCharges(): void {
     // TODO: Replace with actual charges service call
@@ -93,11 +91,36 @@ loadJobDetails(jobGuid: string): void {
   }
 
   isSeaFreight(): boolean {
-    return this.job?.transactionTypeName?.toUpperCase().includes('SEA') || false;
+
+    const seaTransactionTypes = [
+      "CUSTOMS RELEASING (S)",
+      "SEA EXPORT",
+      "SEA IMPORT",
+      "DOMESTIC FORWARDING SEAFREIGHT"
+    ];
+
+    var result = this.job?.transactionTypeName
+      ? seaTransactionTypes.includes(this.job.transactionTypeName.toUpperCase())
+      : false;
+
+    return result;
   }
 
   isAirFreight(): boolean {
-    return this.job?.transactionTypeName?.toUpperCase().includes('AIR') || false;
+    
+      const seaTransactionTypes = [
+      "CUSTOMS RELEASING (A)",
+      "AIR EXPORT",
+      "AIR IMPORT",
+      "DOMESTIC FORWARDING AIRFREIGHT"
+    ];
+
+    var result = this.job?.transactionTypeName
+      ? seaTransactionTypes.includes(this.job.transactionTypeName.toUpperCase())
+      : false;
+
+    return result;
+
   }
 
   getStatusBadgeClass(status: string): string {
@@ -158,19 +181,19 @@ loadJobDetails(jobGuid: string): void {
           // Format dates
           const formatDate = (dateString: string | null | undefined): string => {
             if (!dateString) return '-';
-            return new Date(dateString).toLocaleDateString('en-PH', { 
-              year: 'numeric', 
-              month: 'short', 
-              day: 'numeric' 
+            return new Date(dateString).toLocaleDateString('en-PH', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
             });
           };
 
           // Format currency
           const formatCurrency = (amount: number | null | undefined): string => {
             if (!amount) return '₱0.00';
-            return `₱${amount.toLocaleString('en-PH', { 
-              minimumFractionDigits: 2, 
-              maximumFractionDigits: 2 
+            return `₱${amount.toLocaleString('en-PH', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
             })}`;
           };
 
@@ -205,11 +228,11 @@ loadJobDetails(jobGuid: string): void {
             console.error('Could not open print window');
             return;
           }
-          
+
           popupWin.document.open();
           popupWin.document.write(filledTemplate);
           popupWin.document.close();
-          
+
           // Trigger print after content loads
           popupWin.onload = () => {
             popupWin.print();

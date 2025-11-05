@@ -317,17 +317,118 @@
                         <i class="cil-arrow-left me-2"></i> Previous
                     </button>
                     <button class="btn btn-success btn-custom-success" type="button" 
-                        (click)="onSubmit()" [disabled]="isSubmitting">
-                        <span *ngIf="!isSubmitting">
-                            <i class="cil-check me-2"></i> Finish
-                        </span>
-                        <span *ngIf="isSubmitting">
-                            <span class="spinner-border spinner-border-sm me-2"></span>
-                            Submitting...
-                        </span>
+                        (click)="showConfirmationModal()">
+                        <i class="cil-check me-2"></i> Finish
                     </button>
                 </div>
             </form>
         </div>
     </div>
+</div>
+
+<!-- Confirmation Modal - Angular Based -->
+<div class="modal-backdrop" *ngIf="showConfirmModal" (click)="closeConfirmModal()"></div>
+<div class="modal custom-modal" [class.show]="showConfirmModal" [class.d-block]="showConfirmModal" 
+     tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="cil-check-circle me-2"></i>
+          Confirm Job Submission
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeConfirmModal()" 
+                aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="confirmation-content">
+          <div class="alert alert-info" role="alert">
+            <i class="cil-info me-2"></i>
+            Please review the following information before submitting:
+          </div>
+          
+          <div class="summary-section">
+            <h6 class="fw-bold mb-3">Job Summary</h6>
+            <div class="row mb-2">
+              <div class="col-5 text-muted">Client:</div>
+              <div class="col-7 fw-semibold">{{ selectedClientName || '-' }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-5 text-muted">Transaction Type:</div>
+              <div class="col-7 fw-semibold">{{ selectedTransactionType || '-' }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-5 text-muted">Amount:</div>
+              <div class="col-7 fw-semibold">₱{{ jobDetailsForm.get('amount')?.value | number:'1.2-2' }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-5 text-muted">Origin:</div>
+              <div class="col-7 fw-semibold">{{ shipmentFreightForm.get('origin')?.value || '-' }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-5 text-muted">Destination:</div>
+              <div class="col-7 fw-semibold">{{ shipmentFreightForm.get('destination')?.value || '-' }}</div>
+            </div>
+          </div>
+
+          <p class="mb-0 mt-3">
+            <i class="cil-warning text-warning me-2"></i>
+            Are you sure you want to submit this job?
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeConfirmModal()">
+          <i class="cil-x me-2"></i>Cancel
+        </button>
+        <button type="button" class="btn btn-success" (click)="confirmSubmit()" [disabled]="isSubmitting">
+          <span *ngIf="!isSubmitting">
+            <i class="cil-check me-2"></i>Yes, Submit Job
+          </span>
+          <span *ngIf="isSubmitting">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Submitting...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Toast Notifications - Angular Based -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+  <!-- Success Toast -->
+  <div class="toast align-items-center border-0" [class.show]="showSuccessToast" 
+       role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body bg-success text-white rounded">
+        <div class="d-flex align-items-center">
+          <i class="cil-check-circle me-2" style="font-size: 1.5rem;"></i>
+          <div>
+            <strong class="d-block">Success!</strong>
+            <span>{{ successMessage }}</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" 
+              (click)="showSuccessToast = false" aria-label="Close"></button>
+    </div>
+  </div>
+
+  <!-- Error Toast -->
+  <div class="toast align-items-center border-0" [class.show]="showErrorToast" 
+       role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body bg-danger text-white rounded">
+        <div class="d-flex align-items-center">
+          <i class="cil-x-circle me-2" style="font-size: 1.5rem;"></i>
+          <div>
+            <strong class="d-block">Error</strong>
+            <span>{{ errorMessage }}</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" 
+              (click)="showErrorToast = false" aria-label="Close"></button>
+    </div>
+  </div>
 </div>

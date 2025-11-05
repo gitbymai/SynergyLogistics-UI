@@ -297,7 +297,163 @@ textarea.form-control-custom {
   border-width: 0.15em;
 }
 
-/* Responsive */
+/* Confirmation Modal Styling */
+.confirmation-content {
+  .summary-section {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 2px solid #e9ecef;
+    
+    h6 {
+      color: #495057;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #dee2e6;
+    }
+    
+    .row {
+      font-size: 0.875rem;
+      
+      .text-muted {
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+/* ========================================
+   MODAL STYLES - REQUIRED FOR ANGULAR MODAL
+   ======================================== */
+
+/* Modal Backdrop */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.15s ease-in;
+}
+
+/* Custom Modal */
+.custom-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1050;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  outline: 0;
+  
+  &.show {
+    display: block;
+    animation: fadeIn 0.15s ease-in;
+  }
+  
+  &.d-block {
+    display: block !important;
+  }
+}
+
+/* Modal Dialog Animation */
+.modal-dialog {
+  animation: slideDown 0.3s ease-out;
+}
+
+/* Modal Content Styling */
+.modal-content {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  
+  .modal-title {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    
+    i {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  background: #f8f9fa;
+  border-top: 2px solid #e9ecef;
+  
+  .btn {
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    padding: 0.625rem 1.5rem;
+  }
+}
+
+/* Modal Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   TOAST STYLES - REQUIRED FOR ANGULAR TOAST
+   ======================================== */
+
+/* Toast Container */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+/* Toast Styling */
+.toast {
+  min-width: 350px;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 1rem;
+  
+  &.show {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .toast-body {
+    padding: 1rem;
+    font-weight: 500;
+  }
+}
+
+/* ========================================
+   RESPONSIVE STYLES
+   ======================================== */
+
 @media (max-width: 768px) {
   .nav-pills-custom {
     flex-direction: column;
@@ -322,5 +478,15 @@ textarea.form-control-custom {
   
   .step-actions button {
     width: 100%;
+  }
+  
+  /* Responsive Toast */
+  .toast {
+    min-width: 300px;
+  }
+  
+  .toast-container {
+    left: 20px;
+    right: 20px;
   }
 }

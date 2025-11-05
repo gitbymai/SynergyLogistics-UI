@@ -9,6 +9,7 @@ import { CustomerAccount } from '../../../models/customer';
 import { Agency } from '../../../models/agency';
 import { JobTransactionType } from '../../../models/jobtransactiontype';
 import { CreateJobRequest } from '../../../models/job';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-newjob',
@@ -49,10 +50,20 @@ export class NewjobComponent implements OnInit {
   shipmentFreightForm!: FormGroup;
   freightForm!: FormGroup;
 
+  // Modal and Toast states
+  successMessage = '';
+  errorMessage = '';
+  selectedClientName = '';
+  selectedTransactionType = '';
+  showConfirmModal = false;
+  showSuccessToast = false;
+  showErrorToast = false;
+
   constructor(
     private fb: FormBuilder,
     private jobService: JobsService,
-    private agencyService: AgencyService
+    private agencyService: AgencyService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -61,6 +72,59 @@ export class NewjobComponent implements OnInit {
     this.loadJobTransactionTypes();
     this.loadCustomers();
     this.loadAgencies();
+  }
+
+  showConfirmationModal(): void {
+    // Validate all forms before showing modal
+    if (this.jobDetailsForm.invalid) {
+      this.currentStep = 1;
+      this.jobDetailsForm.markAllAsTouched();
+      this.displayErrorToast('Please complete Job Details form.');
+      return;
+    }
+
+    if (this.shipmentFreightForm.invalid) {
+      this.currentStep = 2;
+      this.shipmentFreightForm.markAllAsTouched();
+      this.displayErrorToast('Please complete Cargo & Routing form.');
+      return;
+    }
+
+    if (this.freightForm.invalid) {
+      this.currentStep = 3;
+      this.freightForm.markAllAsTouched();
+      this.displayErrorToast('Please complete Freight Details form.');
+      return;
+    }
+
+    // Update summary information
+    this.updateConfirmationSummary();
+    
+    // Show the modal
+    this.showConfirmModal = true;
+  }
+
+  closeConfirmModal(): void {
+    this.showConfirmModal = false;
+  }
+
+  updateConfirmationSummary(): void {
+    // Get selected client name
+    const selectedClient = this.clientList.find(
+      c => c.customerId === this.jobDetailsForm.get('clientInformation')?.value
+    );
+    this.selectedClientName = selectedClient?.customerName || '';
+
+    // Get selected transaction type
+    const selectedTransaction = this.jobTransactionTypeList.find(
+      t => t.jobTransactionTypeId === this.jobDetailsForm.get('transactionType')?.value
+    );
+    this.selectedTransactionType = selectedTransaction?.jobTransactionType || '';
+  }
+
+  confirmSubmit(): void {
+    this.closeConfirmModal();
+    this.onSubmit();
   }
 
   initializeForms(): void {
@@ -75,17 +139,12 @@ export class NewjobComponent implements OnInit {
 
     // Step 2: Common Freight Details
     this.shipmentFreightForm = this.fb.group({
-      //shipment schedule
       cutoff: [''],
       etd: [''],
       eta: [''],
-
-      //routing & location
       origin: [''],
       destination: [''],
       portCfs: [''],
-
-      //shipment details
       commodity: [''],
       volume: [''],
       grossWeight: [''],
@@ -94,25 +153,20 @@ export class NewjobComponent implements OnInit {
 
     // Step 3: Specific Freight Details (Air/Sea)
     this.freightForm = this.fb.group({
-      // Sea-specific
       mbl: [''],
       hbl: [''],
       vessel: [''],
       containerType: [''],
       containerCount: [''],
-
-      // Air-specific
       mawb: [''],
       hawb: [''],
       flightNo: [''],
       chargeableWeight: [''],
-
-      // Shared fields
       bookingNo: [''],
       carrier: [''],
       shipper: [''],
       consignee: [''],
-      agent: [''], // This will store agencyId
+      agent: [''],
       remarks: [''],
     });
   }
@@ -137,11 +191,9 @@ export class NewjobComponent implements OnInit {
     this.jobService.getJobTransactionTypes().subscribe({
       next: (response) => {
         if (response.success && response.data?.length) {
-
           this.jobTransactionTypeList = response.data
             .filter(type => type.isActive)
             .sort((a, b) => a.jobTransactionType.localeCompare(b.jobTransactionType));
-
         } else {
           console.error('API returned error: ', response.message);
         }
@@ -204,7 +256,6 @@ export class NewjobComponent implements OnInit {
     }
   }
 
-  // Client search and selection
   onClientSearchChange(value: string): void {
     this.clientSearch = value;
     this.filteredClients = this.clientList.filter(c =>
@@ -221,7 +272,6 @@ export class NewjobComponent implements OnInit {
     this.clientDropdownOpen = false;
   }
 
-  // Agency search and selection
   onAgencySearchChange(value: string): void {
     this.agencySearch = value;
     this.filteredAgencies = this.agencyList.filter(a =>
@@ -269,24 +319,7 @@ export class NewjobComponent implements OnInit {
   }
 
   onSubmit(): void {
-    // Validate all forms
-    if (this.jobDetailsForm.invalid) {
-      this.currentStep = 1;
-      this.jobDetailsForm.markAllAsTouched();
-      return;
-    }
-
-    if (this.shipmentFreightForm.invalid) {
-      this.currentStep = 2;
-      this.shipmentFreightForm.markAllAsTouched();
-      return;
-    }
-
-    if (this.freightForm.invalid) {
-      this.currentStep = 3;
-      this.freightForm.markAllAsTouched();
-      return;
-    }
+    if (this.isSubmitting) return;
 
     const jobRequest: CreateJobRequest = {
       clientInformationId: +this.jobDetailsForm.value.clientInformation,
@@ -327,24 +360,36 @@ export class NewjobComponent implements OnInit {
 
     this.jobService.createJob(jobRequest).subscribe({
       next: (response) => {
-        if (response.success) {
-          console.log('Job created successfully:', response.data);
-          alert('Job created successfully!');
-          // Reset forms or navigate away
-          this.resetForms();
-        } else {
-          console.error('API returned error:', response.message);
-          alert(`Error: ${response.message}`);
-        }
+        console.log('Job created successfully:', response);
         this.isSubmitting = false;
+        
+        this.successMessage = `Job ${response.data?.jobCode || ''} created successfully!`;
+        this.displaySuccessToast(this.successMessage);
+        
+        setTimeout(() => {
+          this.router.navigate(['/jobs/list']);
+        }, 2000);
       },
       error: (error) => {
-        console.error('API call failed:', error);
-        alert('Failed to create job. Please try again.');
+        console.error('Error creating job:', error);
         this.isSubmitting = false;
+        
+        this.errorMessage = error.message || 'Failed to create job. Please try again.';
+        this.displayErrorToast(this.errorMessage);
       }
     });
+  }
 
+  displaySuccessToast(message: string): void {
+    this.successMessage = message;
+    this.showSuccessToast = true;
+    setTimeout(() => this.showSuccessToast = false, 5000);
+  }
+
+  displayErrorToast(message: string): void {
+    this.errorMessage = message;
+    this.showErrorToast = true;
+    setTimeout(() => this.showErrorToast = false, 5000);
   }
 
   validateAmountInput(event: KeyboardEvent): void {
@@ -398,7 +443,7 @@ export class NewjobComponent implements OnInit {
   }
 
   finish(): void {
-    this.onSubmit();
+    this.showConfirmationModal();
   }
 
   resetForms(): void {
@@ -407,7 +452,7 @@ export class NewjobComponent implements OnInit {
     this.freightForm.reset();
     this.clientSearch = '';
     this.filteredClients = [...this.clientList];
-    this.agencyList = [...this.agencyList];
+    this.filteredAgencies = [...this.agencyList];
     this.agencySearch = '';
     this.currentStep = 1;
   }
