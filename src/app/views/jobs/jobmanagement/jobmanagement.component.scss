@@ -68,43 +68,6 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.accordion-custom .accordion-button {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  color: #495057;
-  font-weight: 700;
-  font-size: 1rem;
-  letter-spacing: 0.5px;
-  padding: 1.25rem 1.5rem;
-  border: none;
-  text-transform: uppercase;
-  transition: all 0.3s ease;
-}
-
-.accordion-custom .accordion-button:not(.collapsed) {
-  background: linear-gradient(135deg, #adb5bd 0%, #6c757d 100%);
-  color: white;
-  box-shadow: none;
-}
-
-.accordion-custom .accordion-button:hover {
-  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
-}
-
-.accordion-custom .accordion-button:not(.collapsed):hover {
-  background: linear-gradient(135deg, #98a2ae 0%, #5a6268 100%);
-}
-
-.accordion-custom .accordion-button::after {
-  filter: brightness(0) saturate(100%);
-}
-
-.accordion-custom .accordion-button:not(.collapsed)::after {
-  filter: brightness(0) invert(1);
-}
-
-.accordion-custom .accordion-button i {
-  font-size: 1.1rem;
-}
 
 .accordion-custom .accordion-body {
   background: white;
@@ -314,8 +277,31 @@
   .accordion-button {
     display: none !important;
   }
+}
+.accordion-collapse {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  
+  &.show {
+    max-height: 5000px; // Adjust based on your content height
+    transition: max-height 0.4s ease-in;
+  }
+}
 
-  .accordion-collapse {
-    display: block !important;
+.accordion-button {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &::after {
+    transition: transform 0.3s ease;
+  }
+  
+  &.collapsed::after {
+    transform: rotate(-90deg);
+  }
+  
+  &:not(.collapsed)::after {
+    transform: rotate(0deg);
   }
 }

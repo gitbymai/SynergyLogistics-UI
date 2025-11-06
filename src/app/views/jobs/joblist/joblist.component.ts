@@ -144,17 +144,6 @@ export class JoblistComponent implements OnInit {
     this.router.navigate(['/jobs/jobmanagement', job.jobGuid]);
   }
 
-  editJob(job: any) {
-    alert(`Editing job ${job.id}`);
-  }
-
-  deleteJob(job: any) {
-    if (confirm(`Are you sure you want to delete ${job.jobId}?`)) {
-      this.jobs = this.jobs.filter(j => j.jobId !== job.jobId);
-      this.filteredJobs = [...this.jobs];
-    }
-  }
-
   getStatusBadgeClass(status: string): string {
     switch (status.toUpperCase()) {
       case 'FOR APPROVAL': return 'bg-warning text-dark';

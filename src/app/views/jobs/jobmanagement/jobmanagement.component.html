@@ -24,17 +24,20 @@
       <!-- ======================= 1. JOB INFORMATION ======================== -->
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingJobInfo">
-          <button class="accordion-button" type="button" data-bs-toggle="collapse" 
-                  data-bs-target="#collapseJobInfo" aria-expanded="true" aria-controls="collapseJobInfo">
+          <button class="accordion-button" 
+                  [class.collapsed]="!isSectionOpen('jobInfo')"
+                  type="button" 
+                  (click)="toggleSection('jobInfo')"
+                  [attr.aria-expanded]="isSectionOpen('jobInfo')">
             <i class="cil-briefcase me-2"></i>
             Job Information
           </button>
         </h2>
-        <div id="collapseJobInfo" class="accordion-collapse collapse show" 
-             aria-labelledby="headingJobInfo" data-bs-parent="#jobDetailsAccordion">
+        <div id="collapseJobInfo" 
+             class="accordion-collapse" 
+             [class.show]="isSectionOpen('jobInfo')">
           <div class="accordion-body">
-            
-            <!-- Client & Status -->
+            <!-- ... existing content ... -->
             <div class="detail-section">
               <div class="row g-4">
                 <div class="col-md-8">
@@ -60,7 +63,6 @@
               </div>
             </div>
 
-            <!-- Transaction Details -->
             <div class="detail-section">
               <div class="row g-4">
                 <div class="col-md-4">
@@ -90,7 +92,6 @@
               </div>
             </div>
 
-            <!-- Financial & Date Info -->
             <div class="detail-section">
               <div class="row g-4">
                 <div class="col-md-6">
@@ -111,7 +112,6 @@
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -119,17 +119,20 @@
       <!-- ======================= 2. CARGO & ROUTING DETAILS ======================== -->
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingCargo">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                  data-bs-target="#collapseCargo" aria-expanded="false" aria-controls="collapseCargo">
+          <button class="accordion-button" 
+                  [class.collapsed]="!isSectionOpen('cargo')"
+                  type="button"
+                  (click)="toggleSection('cargo')"
+                  [attr.aria-expanded]="isSectionOpen('cargo')">
             <i class="cil-layers me-2"></i>
             Cargo & Routing Details
           </button>
         </h2>
-        <div id="collapseCargo" class="accordion-collapse collapse" 
-             aria-labelledby="headingCargo" data-bs-parent="#jobDetailsAccordion">
+        <div id="collapseCargo" 
+             class="accordion-collapse" 
+             [class.show]="isSectionOpen('cargo')">
           <div class="accordion-body">
-            
-            <!-- Shipment Info -->
+            <!-- ... existing cargo content ... -->
             <div class="detail-section">
               <h6 class="section-subtitle">
                 <i class="cil-inbox"></i> Shipment Information
@@ -158,7 +161,6 @@
               </div>
             </div>
 
-            <!-- Routing -->
             <div class="detail-section">
               <h6 class="section-subtitle">
                 <i class="cil-location-pin"></i> Routing Information
@@ -185,7 +187,6 @@
               </div>
             </div>
 
-            <!-- Measurements -->
             <div class="detail-section">
               <h6 class="section-subtitle">
                 <i class="cil-chart"></i> Measurements
@@ -211,7 +212,6 @@
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -219,17 +219,20 @@
       <!-- ======================= 3. FREIGHT DETAILS ======================== -->
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingFreight">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                  data-bs-target="#collapseFreight" aria-expanded="false" aria-controls="collapseFreight">
+          <button class="accordion-button" 
+                  [class.collapsed]="!isSectionOpen('freight')"
+                  type="button"
+                  (click)="toggleSection('freight')"
+                  [attr.aria-expanded]="isSectionOpen('freight')">
             <i class="cil-airplane-mode me-2"></i>
             Freight Details
           </button>
         </h2>
-        <div id="collapseFreight" class="accordion-collapse collapse" 
-             aria-labelledby="headingFreight" data-bs-parent="#jobDetailsAccordion">
+        <div id="collapseFreight" 
+             class="accordion-collapse" 
+             [class.show]="isSectionOpen('freight')">
           <div class="accordion-body">
-
-            <!-- SEA FREIGHT -->
+            <!-- ... existing freight content ... -->
             <div *ngIf="isSeaFreight()" class="freight-section">
               <div class="freight-type-badge">
                 <i class="cil-boat"></i> Sea Freight
@@ -285,7 +288,6 @@
               </div>
             </div>
 
-            <!-- AIR FREIGHT -->
             <div *ngIf="isAirFreight()" class="freight-section">
               <div class="freight-type-badge">
                 <i class="cil-airplane-mode"></i> Air Freight
@@ -327,7 +329,6 @@
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -335,16 +336,20 @@
       <!-- ======================= 4. ADDITIONAL DETAILS ======================== -->
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingAdditional">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                  data-bs-target="#collapseAdditional" aria-expanded="false" aria-controls="collapseAdditional">
+          <button class="accordion-button" 
+                  [class.collapsed]="!isSectionOpen('additional')"
+                  type="button"
+                  (click)="toggleSection('additional')"
+                  [attr.aria-expanded]="isSectionOpen('additional')">
             <i class="cil-notes me-2"></i>
             Additional Details
           </button>
         </h2>
-        <div id="collapseAdditional" class="accordion-collapse collapse" 
-             aria-labelledby="headingAdditional" data-bs-parent="#jobDetailsAccordion">
+        <div id="collapseAdditional" 
+             class="accordion-collapse" 
+             [class.show]="isSectionOpen('additional')">
           <div class="accordion-body">
-            
+            <!-- ... existing additional content ... -->
             <div class="detail-section">
               <div class="row g-4">
                 <div class="col-md-6">
@@ -374,7 +379,6 @@
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -382,16 +386,20 @@
       <!-- ======================= 5. CHARGES & DISBURSEMENTS ======================== -->
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingCharges">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                  data-bs-target="#collapseCharges" aria-expanded="false" aria-controls="collapseCharges">
+          <button class="accordion-button" 
+                  [class.collapsed]="!isSectionOpen('charges')"
+                  type="button"
+                  (click)="toggleSection('charges')"
+                  [attr.aria-expanded]="isSectionOpen('charges')">
             <i class="cil-dollar me-2"></i>
-            Charges & Disbursements
+            Charges | Exepenses | Disbursements
           </button>
         </h2>
-        <div id="collapseCharges" class="accordion-collapse collapse" 
-             aria-labelledby="headingCharges" data-bs-parent="#jobDetailsAccordion">
+        <div id="collapseCharges" 
+             class="accordion-collapse" 
+             [class.show]="isSectionOpen('charges')">
           <div class="accordion-body">
-            <app-job-charges [charges]="charges"></app-job-charges>
+            <app-job-charges [charges]="charges" [jobGuid] = "jobGuid"></app-job-charges>
           </div>
         </div>
       </div>

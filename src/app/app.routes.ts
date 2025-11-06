@@ -50,6 +50,14 @@ export const routes: Routes = [
                 ),
             data: { title: 'Job Management' }
           },
+          {
+            path: 'jobmanagement/:jobGuid/charges',
+            loadComponent: () =>
+              import('./views/jobs/jobchargesmanagement/jobchargesmanagement/jobchargesmanagement.component').then(
+                m => m.JobchargesmanagementComponent
+              ),
+            data: { title: 'Charges Management' }
+          },
 
         ],
       },

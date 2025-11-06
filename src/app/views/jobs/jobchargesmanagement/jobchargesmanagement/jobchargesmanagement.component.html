@@ -1,0 +1,253 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2>Charges Management</h2>
+      <p class="text-muted mb-0">Manage charges for Job {{ jobGuid }}</p>
+    </div>
+    <button class="btn btn-primary" (click)="openAddModal()">
+      <i class="bi bi-plus-circle"></i> Add Charge
+    </button>
+  </div>
+
+  <!-- Search and Filter -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-search"></i>
+            </span>
+            <input 
+              type="text" 
+              class="form-control" 
+              placeholder="Search by code, description, or category..."
+              [(ngModel)]="searchTerm"
+              (input)="onSearch()">
+          </div>
+        </div>
+        <div class="col-md-6 text-end">
+          <span class="badge bg-secondary fs-6">
+            {{ filteredCharges.length }} charge(s)
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Charges Table -->
+  <div *ngIf="!isLoading" class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Code</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th class="text-end">Amount</th>
+              <th>Created Date</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let charge of filteredCharges">
+              <td>
+                <span class="badge bg-light text-dark">{{ charge.chargecode }}</span>
+              </td>
+              <td>{{ charge.description || 'N/A' }}</td>
+              <td>
+                <span class="badge bg-secondary">
+                  {{ charge.chargesubcategoryname }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getStatusClass(charge.chargestransactionstatus || '')">
+                  {{ charge.chargestransactionstatus }}
+                </span>
+              </td>
+              <td class="text-end">
+                <strong>{{ charge.currencycode }} {{ charge.amount | number:'1.2-2' }}</strong>
+              </td>
+              <td>
+                <small class="text-muted">{{ charge.createddate | date:'short' }}</small>
+              </td>
+              <td class="text-center">
+                <div class="btn-group btn-group-sm" role="group">
+                  <button 
+                    class="btn btn-outline-primary" 
+                    (click)="openEditModal(charge)"
+                    title="Edit">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button 
+                    class="btn btn-outline-danger" 
+                    (click)="deleteCharge(charge)"
+                    title="Delete">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="filteredCharges.length === 0">
+              <td colspan="7" class="text-center text-muted py-4">
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                No charges found
+              </td>
+            </tr>
+          </tbody>
+          <tfoot *ngIf="filteredCharges.length > 0" class="table-light">
+            <tr>
+              <td colspan="4" class="text-end fw-bold">Total:</td>
+              <td class="text-end fw-bold">₱{{ total | number:'1.2-2' }}</td>
+              <td colspan="2"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div class="modal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            {{ isEditMode ? 'Edit Charge' : 'Add New Charge' }}
+          </h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <form (ngSubmit)="onSubmit()">
+          <div class="modal-body">
+            <div class="row g-3">
+              <!-- Charge Code -->
+              <div class="col-md-6">
+                <label class="form-label">Charge Code <span class="text-danger">*</span></label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [(ngModel)]="chargeForm.chargecode"
+                  name="chargecode"
+                  required
+                  [disabled]="isEditMode">
+              </div>
+
+              <!-- Currency -->
+              <div class="col-md-6">
+                <label class="form-label">Currency <span class="text-danger">*</span></label>
+                <select 
+                  class="form-select" 
+                  [(ngModel)]="chargeForm.currencycode"
+                  name="currencycode"
+                  required>
+                  <option *ngFor="let currency of currencyCodes" [value]="currency">
+                    {{ currency }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Charge Subcategory -->
+              <div class="col-md-6">
+                <label class="form-label">Category <span class="text-danger">*</span></label>
+                <select 
+                  class="form-select" 
+                  [(ngModel)]="chargeForm.chargesubcategoryid"
+                  name="chargesubcategoryid"
+                  required>
+                  <option value="0">Select category...</option>
+                  <option *ngFor="let cat of chargeSubcategories" [value]="cat.id">
+                    {{ cat.name }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Status -->
+              <div class="col-md-6">
+                <label class="form-label">Status <span class="text-danger">*</span></label>
+                <select 
+                  class="form-select" 
+                  [(ngModel)]="chargeForm.optionchargestatusid"
+                  name="optionchargestatusid"
+                  required>
+                  <option value="0">Select status...</option>
+                  <option *ngFor="let status of chargeStatuses" [value]="status.id">
+                    {{ status.name }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Amount -->
+              <div class="col-md-6">
+                <label class="form-label">Amount <span class="text-danger">*</span></label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  [(ngModel)]="chargeForm.amount"
+                  name="amount"
+                  step="0.01"
+                  min="0"
+                  required>
+              </div>
+
+              <!-- Transaction Category Code -->
+              <div class="col-md-6">
+                <label class="form-label">Transaction Category Code</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [(ngModel)]="chargeForm.chargetransactioncategorycode"
+                  name="chargetransactioncategorycode">
+              </div>
+
+              <!-- Description -->
+              <div class="col-12">
+                <label class="form-label">Description</label>
+                <textarea 
+                  class="form-control" 
+                  rows="3"
+                  [(ngModel)]="chargeForm.description"
+                  name="description"
+                  placeholder="Enter charge description..."></textarea>
+              </div>
+
+              <!-- Active Status -->
+              <div class="col-12">
+                <div class="form-check">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    [(ngModel)]="chargeForm.isactive"
+                    name="isactive"
+                    id="isactive">
+                  <label class="form-check-label" for="isactive">
+                    Active
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isEditMode ? 'Update' : 'Create' }} Charge
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade" [class.show]="showModal" *ngIf="showModal"></div>
+</div>

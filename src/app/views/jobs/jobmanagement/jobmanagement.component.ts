@@ -12,6 +12,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { JobChargesComponent } from '../../jobs/jobcharges/jobcharges.component';
 import { JobsService } from '../../../services/jobs/jobs.service';
 import { Job } from '../../../models/job';
+import { ChargeTransaction } from '../../../models/chargetransaction';
 
 @Component({
   selector: 'app-jobmanagement',
@@ -32,9 +33,12 @@ import { Job } from '../../../models/job';
 })
 export class JobmanagementComponent implements OnInit {
   job: Job | null = null;
-  charges: Array<{ description: string; amount: number; type: string }> = [];
+  charges: ChargeTransaction[] = [];
+  jobGuid: string = "";
   isLoading = true;
   errorMessage = '';
+
+  openSection: string = 'jobInfo'; // Default to first section open
 
 
   constructor(
@@ -47,6 +51,7 @@ export class JobmanagementComponent implements OnInit {
   ngOnInit(): void {
     const jobGuid = this.route.snapshot.paramMap.get('jobGuid');
 
+    
     if (!jobGuid) {
       console.error('Job GUID not provided in route');
       this.errorMessage = 'Job identifier not found';
@@ -58,6 +63,29 @@ export class JobmanagementComponent implements OnInit {
     this.loadJobDetails(jobGuid);
   }
 
+  toggleSection(section: string): void {
+    this.openSection = this.openSection === section ? '' : section;
+  }
+
+  isSectionOpen(section: string): boolean {
+    return this.openSection === section;
+  }
+
+  loadJobRelatedTransaction(jobGuid: string):void{
+    this.jobService.getAllChargeTransction(jobGuid).subscribe({
+      next: (success) =>{
+
+        this.jobGuid = jobGuid;
+        this.charges = success.data;
+        console.log(success.data);
+      },
+      error: (error) => {
+        
+        console.error('Error loading job details:', error);
+      }
+    })
+  }
+
   loadJobDetails(jobGuid: string): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -66,7 +94,7 @@ export class JobmanagementComponent implements OnInit {
       next: (job) => {
         this.job = job;
         this.isLoading = false;
-        this.loadCharges();
+        this.loadJobRelatedTransaction(jobGuid);
       },
       error: (error) => {
         console.error('Error loading job details:', error);
@@ -78,16 +106,6 @@ export class JobmanagementComponent implements OnInit {
         }, 3000);
       }
     });
-  }
-
-  loadCharges(): void {
-    // TODO: Replace with actual charges service call
-    // For now using mock data
-    this.charges = [
-      { description: 'Freight', amount: 15000, type: 'Charge' },
-      { description: 'Customs Duty', amount: 5000, type: 'Disbursement' },
-      { description: 'Handling Fee', amount: 2000, type: 'Charge' }
-    ];
   }
 
   isSeaFreight(): boolean {

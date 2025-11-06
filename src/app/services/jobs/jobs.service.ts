@@ -7,6 +7,7 @@ import { CustomerAccount, toCustomerAccount } from '../../models/customer';
 import { map } from 'rxjs';
 import { CreateJobRequest, Job } from '../../models/job';
 import { JobTransactionType } from '../../models/jobtransactiontype';
+import { ChargeTransaction } from '../../models/chargetransaction';
 
 @Injectable({
   providedIn: 'root'
@@ -55,11 +56,9 @@ export class JobsService extends ApiService {
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}/job`, job);
   }
 
-  updateJob(id: number, job: any): Observable<ApiResponse<any>> {
-    return this.http.put<ApiResponse<any>>(`${this.apiUrl}/${id}`, job);
+  getAllChargeTransction(jobGuid: string): Observable<ApiResponse<ChargeTransaction[]>>{
+    
+    return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/${jobGuid}/charges`);
   }
 
-  deleteJob(id: number): Observable<ApiResponse<any>> {
-    return this.http.delete<ApiResponse<any>>(`${this.apiUrl}/${id}`);
-  }
 }
