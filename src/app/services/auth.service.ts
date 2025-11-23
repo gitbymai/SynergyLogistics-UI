@@ -1,4 +1,4 @@
-import { Injectable,inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
@@ -11,7 +11,7 @@ import { LoginResponse } from '../models/login-response';
   providedIn: 'root'
 })
 export class AuthService {
-  
+
   protected baseUrl = inject(API_URL);
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
@@ -28,26 +28,17 @@ export class AuthService {
     this.currentUser = this.currentUserSubject.asObservable();
   }
 
-  /**
-   * Get current user value
-   */
   public get currentUserValue(): User | null {
     return this.currentUserSubject.value;
   }
 
-  /**
-   * Check if user is authenticated
-   */
   public get isAuthenticated(): boolean {
     return !!this.getToken();
   }
 
-  /**
-   * Login user
-   */
-  login(email: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.baseUrl}/auth/login`, {
-      email,
+  login(accountcode: string, password: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.baseUrl}/account/login`, {
+      accountcode,
       password
     }).pipe(
       map(response => {
@@ -66,32 +57,23 @@ export class AuthService {
     );
   }
 
-  /**
-   * Logout user
-   */
   logout(): void {
     // Remove user data from local storage
     localStorage.removeItem('authToken');
     localStorage.removeItem('currentUser');
     localStorage.removeItem('rememberedEmail');
-    
+
     // Update current user
     this.currentUserSubject.next(null);
-    
+
     // Navigate to login
     this.router.navigate(['/login']);
   }
 
-  /**
-   * Get stored auth token
-   */
   getToken(): string | null {
     return localStorage.getItem('authToken');
   }
 
-  /**
-   * Refresh token (if your API supports it)
-   */
   refreshToken(): Observable<any> {
     const refreshToken = localStorage.getItem('refreshToken');
     return this.http.post(`${this.baseUrl}/auth/refresh`, {
@@ -105,44 +87,30 @@ export class AuthService {
     );
   }
 
-  /**
-   * Register new user
-   */
   register(userData: {
     name: string;
     email: string;
     password: string;
   }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/register`, userData);
+    return this.http.post(`${this.baseUrl}/account/register`, userData);
   }
 
-  /**
-   * Forgot password request
-   */
   forgotPassword(email: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/forgot-password`, { email });
+    return this.http.post(`${this.baseUrl}/account/forgot-password`, { email });
   }
 
-  /**
-   * Reset password
-   */
   resetPassword(token: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/reset-password`, {
+    return this.http.post(`${this.baseUrl}/account/reset-password`, {
       token,
       newPassword
     });
   }
 
-  /**
-   * Verify email
-   */
+
   verifyEmail(token: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/verify-email`, { token });
+    return this.http.post(`${this.baseUrl}/account/verify-email`, { token });
   }
 
-  /**
-   * Check if token is expired
-   */
   isTokenExpired(): boolean {
     const token = this.getToken();
     if (!token) return true;
@@ -157,9 +125,6 @@ export class AuthService {
     }
   }
 
-  /**
-   * Get authorization headers
-   */
   getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
     return new HttpHeaders({

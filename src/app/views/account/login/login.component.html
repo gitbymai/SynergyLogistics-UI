@@ -18,19 +18,18 @@
               <!-- Email Field -->
               <div class="mb-4">
                 <label class="form-label">
-                  <i class="cil-user me-2"></i>Email Address
+                  <i class="cil-user me-2"></i>User Account
                 </label>
                 <input 
                   type="email" 
                   class="form-control form-control-custom" 
                   formControlName="email"
-                  placeholder="Enter your email"
+                  placeholder="Enter your account"
                   [class.is-invalid]="email?.invalid && email?.touched"
                   [class.is-valid]="email?.valid && email?.touched"
                 />
                 <div *ngIf="email?.invalid && email?.touched" class="text-danger small mt-1">
-                  <span *ngIf="email?.errors?.['required']">Email is required.</span>
-                  <span *ngIf="email?.errors?.['email']">Please enter a valid email address.</span>
+                  <span *ngIf="email?.errors?.['required']">User account is required.</span>
                 </div>
               </div>
 
