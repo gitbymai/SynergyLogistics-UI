@@ -1,0 +1,160 @@
+<div class="login-container">
+  <div class="container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+      <div class="col-12 col-md-8 col-lg-5 col-xl-4">
+        <!-- Login Card -->
+        <div class="card shadow-lg border-0">
+          <div class="card-header bg-primary text-white text-center py-4">
+            <!-- Company Logo -->
+            <div class="logo-container mb-3">
+              <img src="assets/images/synergy-logo.jpg" alt="Synergy Logistics" class="company-logo">
+            </div>
+            <h3 class="mb-1 fw-bold">Welcome Back</h3>
+            <p class="mb-0 small opacity-90">Sign in to your account</p>
+          </div>
+
+          <div class="card-body p-4 p-md-5">
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form-professional">
+              <!-- Email Field -->
+              <div class="mb-4">
+                <label class="form-label">
+                  <i class="cil-user me-2"></i>Email Address
+                </label>
+                <input 
+                  type="email" 
+                  class="form-control form-control-custom" 
+                  formControlName="email"
+                  placeholder="Enter your email"
+                  [class.is-invalid]="email?.invalid && email?.touched"
+                  [class.is-valid]="email?.valid && email?.touched"
+                />
+                <div *ngIf="email?.invalid && email?.touched" class="text-danger small mt-1">
+                  <span *ngIf="email?.errors?.['required']">Email is required.</span>
+                  <span *ngIf="email?.errors?.['email']">Please enter a valid email address.</span>
+                </div>
+              </div>
+
+              <!-- Password Field -->
+              <div class="mb-4">
+                <label class="form-label">
+                  <i class="cil-lock-locked me-2"></i>Password
+                </label>
+                <div class="input-group">
+                  <input 
+                    [type]="showPassword ? 'text' : 'password'" 
+                    class="form-control form-control-custom border-end-0" 
+                    formControlName="password"
+                    placeholder="Enter your password"
+                    [class.is-invalid]="password?.invalid && password?.touched"
+                    [class.is-valid]="password?.valid && password?.touched"
+                  />
+                  <button 
+                    class="btn btn-outline-secondary border-start-0" 
+                    type="button"
+                    (click)="togglePasswordVisibility()"
+                    [class.border-danger]="password?.invalid && password?.touched"
+                    [class.border-success]="password?.valid && password?.touched">
+                    <i [class]="showPassword ? 'cil-lock-unlocked' : 'cil-lock-locked'"></i>
+                  </button>
+                </div>
+                <div *ngIf="password?.invalid && password?.touched" class="text-danger small mt-1">
+                  <span *ngIf="password?.errors?.['required']">Password is required.</span>
+                  <span *ngIf="password?.errors?.['minlength']">
+                    Password must be at least 6 characters long.
+                  </span>
+                </div>
+              </div>
+
+              <!-- Remember Me & Forgot Password -->
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    id="rememberMe"
+                    formControlName="rememberMe"
+                  />
+                  <label class="form-check-label small" for="rememberMe">
+                    Remember me
+                  </label>
+                </div>
+              </div>
+
+              <!-- Login Button -->
+              <button 
+                type="submit" 
+                class="btn btn-primary btn-custom w-100 mb-3"
+                [disabled]="isSubmitting">
+                <span *ngIf="!isSubmitting">
+                  <i class="cil-account-logout me-2"></i>Sign In
+                </span>
+                <span *ngIf="isSubmitting">
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                  Signing in...
+                </span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Footer -->
+          <div class="card-footer text-center bg-light py-3">
+            <small class="text-muted">
+              <i class="cil-shield-alt me-1"></i>
+              Secure Login • Your data is protected
+            </small>
+          </div>
+        </div>
+
+        <!-- Additional Info -->
+        <div class="text-center mt-4">
+          <p class="text-white small mb-1 opacity-90">
+            <i class="cil-info me-1"></i>
+            Need help? <a href="mailto:support@synergy-logistics.com" class="text-white text-decoration-none fw-semibold">Contact Support</a>
+          </p>
+          <p class="text-white small opacity-75">
+            © 2025 Synergy Air and Sea Worldwide Logistics Inc. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notifications - Angular Based -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+  <!-- Success Toast -->
+  <div class="toast align-items-center border-0" [class.show]="showSuccessToast" 
+       role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body bg-success text-white rounded">
+        <div class="d-flex align-items-center">
+          <i class="cil-check-circle me-2" style="font-size: 1.5rem;"></i>
+          <div>
+            <strong class="d-block">Success!</strong>
+            <span>{{ successMessage }}</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" 
+              (click)="showSuccessToast = false" aria-label="Close"></button>
+    </div>
+  </div>
+
+  <!-- Error Toast -->
+  <div class="toast align-items-center border-0" [class.show]="showErrorToast" 
+       role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body bg-danger text-white rounded">
+        <div class="d-flex align-items-center">
+          <i class="cil-x-circle me-2" style="font-size: 1.5rem;"></i>
+          <div>
+            <strong class="d-block">Error</strong>
+            <span>{{ errorMessage }}</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" 
+              (click)="showErrorToast = false" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
