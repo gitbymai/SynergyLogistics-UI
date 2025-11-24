@@ -2,7 +2,8 @@ export const navItems = [
   {
     name: 'Dashboard',
     url: '/dashboard',
-    iconComponent: { name: 'cil-speedometer' }
+    iconComponent: { name: 'cil-speedometer' },
+    roles: ['admin','cashier','finance','treasurer','opsmgr','processor','sales']
   },
   {
     name: 'Job Management',
@@ -12,19 +13,28 @@ export const navItems = [
       {
         name: 'New Job Order',
         url: '/jobs/new',
-        iconComponent: { name: 'cil-pencil' }
+        iconComponent: { name: 'cil-pencil' },
+        roles: ['sales','admin']
       },
       {
         name: 'Job List',
         url: '/jobs/list',
-        iconComponent: { name: 'cil-list' }
+        iconComponent: { name: 'cil-menu' },
+        roles: ['sales','admin','finance','treasurer']
+      },
+      {
+        name: 'Transactions',
+        url: 'jobs/list-processor',
+        iconComponent: { name: 'cil-notes' },
+        roles: ['admin','cashier','finance','treasurer','opsmgr','processor','sales']
       }
     ]
   },
   {
     name: 'Billing',
     url: '/billing',
-    iconComponent: { name: 'cil-description' }
+    iconComponent: { name: 'cil-description' },
+    roles: ['admin','finance','treasurer']
   },
   {
     name: 'Data Management',
@@ -34,7 +44,8 @@ export const navItems = [
       {
         name: 'Manage Users',
         url: '/users/list',
-        iconComponent: { name: 'cil-user' }
+        iconComponent: { name: 'cil-user' },
+        roles: ['admin']
       }
     ]
   }

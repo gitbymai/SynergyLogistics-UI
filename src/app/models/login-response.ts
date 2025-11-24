@@ -1,10 +1,13 @@
 export interface LoginResponse {
   token: string;
+  email: string;
+  fullName: string;
   user: {
-    id: string;
-    email: string;
-    name: string;
+    accountId: string;
+    roleId: string;
+    roleName: string;
     role: string;
+    userName: string;
   };
   expiresIn: number;
 }

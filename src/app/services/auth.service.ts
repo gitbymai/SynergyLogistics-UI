@@ -15,17 +15,23 @@ export class AuthService {
   protected baseUrl = inject(API_URL);
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
+  private isAuthenticatedSubject: BehaviorSubject<boolean>; // ADD THIS
+  public isAuthenticated$: Observable<boolean>; // ADD THIS
 
   constructor(
     private http: HttpClient,
     private router: Router
   ) {
-    // Initialize with stored user data if available
     const storedUser = localStorage.getItem('currentUser');
+    const hasToken = !!localStorage.getItem('authToken');
+
     this.currentUserSubject = new BehaviorSubject<User | null>(
       storedUser ? JSON.parse(storedUser) : null
     );
     this.currentUser = this.currentUserSubject.asObservable();
+
+    this.isAuthenticatedSubject = new BehaviorSubject<boolean>(hasToken);
+    this.isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
   }
 
   public get currentUserValue(): User | null {
@@ -41,12 +47,17 @@ export class AuthService {
       accountcode,
       password
     }).pipe(
+      tap(response => {
+        //console.log('Login response:', response);
+      }),
       map(response => {
-        // Store user details and jwt token in local storage
         if (response && response.token) {
           localStorage.setItem('authToken', response.token);
           localStorage.setItem('currentUser', JSON.stringify(response.user));
           this.currentUserSubject.next(response.user);
+          this.isAuthenticatedSubject.next(true);
+        } else {
+          console.error('No token in response!');
         }
         return response;
       }),
@@ -58,15 +69,13 @@ export class AuthService {
   }
 
   logout(): void {
-    // Remove user data from local storage
     localStorage.removeItem('authToken');
     localStorage.removeItem('currentUser');
     localStorage.removeItem('rememberedEmail');
 
-    // Update current user
     this.currentUserSubject.next(null);
+    this.isAuthenticatedSubject.next(false); 
 
-    // Navigate to login
     this.router.navigate(['/login']);
   }
 
@@ -105,7 +114,6 @@ export class AuthService {
       newPassword
     });
   }
-
 
   verifyEmail(token: string): Observable<any> {
     return this.http.post(`${this.baseUrl}/account/verify-email`, { token });

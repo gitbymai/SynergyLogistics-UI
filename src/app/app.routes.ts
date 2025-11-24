@@ -9,7 +9,7 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    loadComponent: () => 
+    loadComponent: () =>
       import('./views/account/login/login.component').then(m => m.LoginComponent),
     data: { title: 'Login' }
   },
@@ -22,11 +22,19 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         loadChildren: () => import('./views/dashboard/routes').then(m => m.routes),
-        data: { title: 'Dashboard' },
+        data: {
+          title: 'Dashboard',
+          roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales']
+        },
+
       },
       {
         path: 'jobs',
-        data: { title: 'Jobs' },
+        canActivate: [AuthGuard],
+        data: {
+          title: 'Jobs',
+          roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales']
+        },
         children: [
           {
             path: '',
@@ -39,7 +47,11 @@ export const routes: Routes = [
               import('./views/jobs/newjob/newjob.component').then(
                 m => m.NewjobComponent
               ),
-            data: { title: 'New Job' },
+            data: {
+              title: 'New Job',
+              roles: ['sales', 'admin']
+            },
+            canActivate: [AuthGuard]
           },
           {
             path: 'list',
@@ -47,7 +59,11 @@ export const routes: Routes = [
               import('./views/jobs/joblist/joblist.component').then(
                 m => m.JoblistComponent
               ),
-            data: { title: 'Job List' },
+            data: {
+              title: 'Job List',
+              roles: ['sales', 'admin', 'finance', 'treasurer']
+            },
+            canActivate: [AuthGuard]
           },
           {
             path: 'jobmanagement/:jobGuid',
@@ -56,7 +72,11 @@ export const routes: Routes = [
                 (
                   m => m.JobmanagementComponent
                 ),
-            data: { title: 'Job Management' }
+            data: {
+              title: 'Job Management',
+              roles: ['sales', 'admin']
+            },
+            canActivate: [AuthGuard]
           },
           {
             path: 'jobmanagement/:jobGuid/charges',
@@ -64,7 +84,11 @@ export const routes: Routes = [
               import('./views/jobs/jobchargesmanagement/jobchargesmanagement/jobchargesmanagement.component').then(
                 m => m.JobchargesmanagementComponent
               ),
-            data: { title: 'Charges Management' }
+            data: {
+              title: 'Charges Management',
+              roles: ['sales', 'admin']
+            },
+            canActivate: [AuthGuard]
           },
 
         ],
@@ -72,4 +96,13 @@ export const routes: Routes = [
     ],
   },
   { path: '**', redirectTo: 'dashboard' },
+  {
+    path: 'unauthorized',
+    loadComponent: () =>
+      import('./views/unauthorized/unauthorized.component').then(m => m.UnauthorizedComponent),
+    data: {
+      title: 'Unauthorized',
+      roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales']
+    }
+  },
 ];

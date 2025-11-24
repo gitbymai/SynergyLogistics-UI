@@ -58,42 +58,48 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.loginForm.invalid) {
-      this.markFormGroupTouched(this.loginForm);
-      return;
-    }
-
-    this.isSubmitting = true;
-    const { email, password, rememberMe } = this.loginForm.value;
-
-    this.authService.login(email, password).subscribe({
-      next: (response) => {
-        if (rememberMe) {
-          localStorage.setItem('rememberedEmail', email);
-        } else {
-          localStorage.removeItem('rememberedEmail');
-        }
-
-        this.successMessage = 'Login successful! Redirecting...';
-        this.showSuccessToast = true;
-
-        // Hide toast and redirect after 1.5 seconds
-        setTimeout(() => {
-          this.showSuccessToast = false;
-          this.router.navigate(['/dashboard']);
-        }, 1500);
-      },
-      error: (error) => {
-        this.isSubmitting = false;
-        this.errorMessage = error.error?.message || 'Invalid email or password. Please try again.';
-        this.showErrorToast = true;
-
-        setTimeout(() => {
-          this.showErrorToast = false;
-        }, 5000);
-      }
-    });
+  if (this.loginForm.invalid) {
+    this.markFormGroupTouched(this.loginForm);
+    return;
   }
+
+  this.isSubmitting = true;
+  const { email, password, rememberMe } = this.loginForm.value;
+
+  this.authService.login(email, password).subscribe({
+    next: (response) => {
+      if (rememberMe) {
+        localStorage.setItem('rememberedEmail', email);
+      } else {
+        localStorage.removeItem('rememberedEmail');
+      }
+
+      this.successMessage = 'Login successful! Redirecting...';
+      this.showSuccessToast = true;
+
+      // Hide toast and redirect after 1.5 seconds
+      setTimeout(() => {
+        this.showSuccessToast = false;
+        this.isSubmitting = false;
+        
+        // Navigate after ensuring auth state is set
+        this.router.navigate(['/dashboard']).then(
+          () => console.log('Navigation successful'),
+          (error) => console.error('Navigation failed:', error)
+        );
+      }, 1500);
+    },
+    error: (error) => {
+      this.isSubmitting = false;
+      this.errorMessage = error.error?.message || 'Invalid email or password. Please try again.';
+      this.showErrorToast = true;
+
+      setTimeout(() => {
+        this.showErrorToast = false;
+      }, 5000);
+    }
+  });
+}
 
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.keys(formGroup.controls).forEach(key => {
