@@ -67,9 +67,9 @@ export class JobchargesmanagementComponent implements OnInit {
   onSearch(): void {
     const term = this.searchTerm.toLowerCase();
     this.filteredCharges = this.charges.filter(charge =>
-      charge.chargecode?.toLowerCase().includes(term) ||
+      charge.chargeCode?.toLowerCase().includes(term) ||
       charge.description?.toLowerCase().includes(term) ||
-      charge.chargesubcategoryname?.toLowerCase().includes(term)
+      charge.chargeSubCategoryName?.toLowerCase().includes(term)
     );
   }
 
@@ -83,17 +83,17 @@ export class JobchargesmanagementComponent implements OnInit {
     this.isEditMode = true;
     this.selectedCharge = charge;
     this.chargeForm = {
-      chargeid: charge.chargeid,
-      chargeguid: charge.chargeguid,
-      chargecode: charge.chargecode,
-      chargesubcategoryid: charge.chargesubcategoryid,
+      chargeId: charge.chargeId,
+      chargeGuid: charge.chargeGuid,
+      chargeCode: charge.chargeCode,
+      chargeSubCategoryId: charge.chargeSubCategoryId,
       description: charge.description || '',
       amount: charge.amount,
-      currencycode: charge.currencycode,
-      jobid: charge.jobid,
-      optionchargestatusid: charge.optionchargestatusid,
-      chargetransactioncategorycode: charge.chargetransactioncategorycode,
-      isactive: charge.isactive
+      currencyCode: charge.currencyCode,
+      jobId: charge.jobId,
+      optionChargeStatusId: charge.optionChargeStatusId,
+      chargeTransactionCategoryCode: charge.chargeTransactionCategoryCode,
+      isActive: charge.isActive
     };
     this.showModal = true;
   }
@@ -147,9 +147,9 @@ export class JobchargesmanagementComponent implements OnInit {
   }
 
   deleteCharge(charge: ChargeTransaction): void {
-    if (confirm(`Are you sure you want to delete charge ${charge.chargecode}?`)) {
+    if (confirm(`Are you sure you want to delete charge ${charge.chargeCode}?`)) {
       this.isLoading = true;
-      this.chargeService.deleteCharge(charge.chargeguid).subscribe({
+      this.chargeService.deleteCharge(charge.chargeGuid).subscribe({
         next: () => {
           this.loadCharges();
           this.isLoading = false;
@@ -180,15 +180,15 @@ export class JobchargesmanagementComponent implements OnInit {
 
   private getEmptyForm(): CreateChargeTransactionRequest {
     return {
-      chargecode: '',
-      chargesubcategoryid: 0,
+      chargeCode: '',
+      chargeSubCategoryId: 0,
       description: '',
       amount: 0,
-      currencycode: 'PHP',
-      jobid: 0,
-      optionchargestatusid: 0,
-      chargetransactioncategorycode: null,
-      isactive: true
+      currencyCode: 'PHP',
+      jobId: 0,
+      optionChargeStatusId: 0,
+      chargeTransactionCategoryCode: null,
+      isActive: true
     };
   }
 }

@@ -72,7 +72,7 @@ export class JobmanagementComponent implements OnInit {
   }
 
   loadJobRelatedTransaction(jobGuid: string):void{
-    this.jobService.getAllChargeTransction(jobGuid).subscribe({
+    this.jobService.getAllChargeTransaction(jobGuid).subscribe({
       next: (success) =>{
 
         this.jobGuid = jobGuid;

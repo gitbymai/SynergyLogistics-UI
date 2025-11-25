@@ -62,24 +62,24 @@
           <tbody>
             <tr *ngFor="let charge of filteredCharges">
               <td>
-                <span class="badge bg-light text-dark">{{ charge.chargecode }}</span>
+                <span class="badge bg-light text-dark">{{ charge.chargeCode }}</span>
               </td>
               <td>{{ charge.description || 'N/A' }}</td>
               <td>
                 <span class="badge bg-secondary">
-                  {{ charge.chargesubcategoryname }}
+                  {{ charge.chargeSubCategoryName }}
                 </span>
               </td>
               <td>
-                <span class="badge" [ngClass]="getStatusClass(charge.chargestransactionstatus || '')">
-                  {{ charge.chargestransactionstatus }}
+                <span class="badge" [ngClass]="getStatusClass(charge.chargeTransactionStatus || '')">
+                  {{ charge.chargeTransactionStatus }}
                 </span>
               </td>
               <td class="text-end">
-                <strong>{{ charge.currencycode }} {{ charge.amount | number:'1.2-2' }}</strong>
+                <strong>{{ charge.currencyCode }} {{ charge.amount | number:'1.2-2' }}</strong>
               </td>
               <td>
-                <small class="text-muted">{{ charge.createddate | date:'short' }}</small>
+                <small class="text-muted">{{ charge.createdDate | date:'short' }}</small>
               </td>
               <td class="text-center">
                 <div class="btn-group btn-group-sm" role="group">
@@ -136,8 +136,8 @@
                 <input 
                   type="text" 
                   class="form-control" 
-                  [(ngModel)]="chargeForm.chargecode"
-                  name="chargecode"
+                  [(ngModel)]="chargeForm.chargeCode"
+                  name="chargeCode"
                   required
                   [disabled]="isEditMode">
               </div>
@@ -147,8 +147,8 @@
                 <label class="form-label">Currency <span class="text-danger">*</span></label>
                 <select 
                   class="form-select" 
-                  [(ngModel)]="chargeForm.currencycode"
-                  name="currencycode"
+                  [(ngModel)]="chargeForm.currencyCode"
+                  name="currencyCode"
                   required>
                   <option *ngFor="let currency of currencyCodes" [value]="currency">
                     {{ currency }}
@@ -161,8 +161,8 @@
                 <label class="form-label">Category <span class="text-danger">*</span></label>
                 <select 
                   class="form-select" 
-                  [(ngModel)]="chargeForm.chargesubcategoryid"
-                  name="chargesubcategoryid"
+                  [(ngModel)]="chargeForm.chargeSubCategoryId"
+                  name="chargeSubCategoryId"
                   required>
                   <option value="0">Select category...</option>
                   <option *ngFor="let cat of chargeSubcategories" [value]="cat.id">
@@ -176,8 +176,8 @@
                 <label class="form-label">Status <span class="text-danger">*</span></label>
                 <select 
                   class="form-select" 
-                  [(ngModel)]="chargeForm.optionchargestatusid"
-                  name="optionchargestatusid"
+                  [(ngModel)]="chargeForm.optionChargeStatusId"
+                  name="optionChargeStatusId"
                   required>
                   <option value="0">Select status...</option>
                   <option *ngFor="let status of chargeStatuses" [value]="status.id">
@@ -205,8 +205,8 @@
                 <input 
                   type="text" 
                   class="form-control" 
-                  [(ngModel)]="chargeForm.chargetransactioncategorycode"
-                  name="chargetransactioncategorycode">
+                  [(ngModel)]="chargeForm.chargeTransactionCategoryCode"
+                  name="chargeTransactionCategoryCode">
               </div>
 
               <!-- Description -->
@@ -226,7 +226,7 @@
                   <input 
                     class="form-check-input" 
                     type="checkbox" 
-                    [(ngModel)]="chargeForm.isactive"
+                    [(ngModel)]="chargeForm.isActive"
                     name="isactive"
                     id="isactive">
                   <label class="form-check-label" for="isactive">

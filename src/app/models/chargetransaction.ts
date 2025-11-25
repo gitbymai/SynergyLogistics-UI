@@ -1,70 +1,71 @@
 export interface CreateChargeTransactionRequest {
   // Charge Details
-  chargecode: string;
-  chargesubcategoryid: number;
+  chargeCode: string;
+  chargeSubCategoryId: number;
   description?: string | null;
   amount: number;
-  currencycode: string;
+  currencyCode: string;
   
   // Job Reference
-  jobid: number;
+  jobId: number;
   
   // Status
-  optionchargestatusid: number;
-  chargetransactioncategorycode?: string | null;
-  isactive?: boolean | null;
+  optionChargeStatusId: number;
+  chargeTransactionCategoryCode?: string | null;
+  isActive?: boolean | null;
 }
 
 export interface UpdateChargeTransactionRequest extends CreateChargeTransactionRequest {
-  chargeid: number;
-  chargeguid: string;
+  chargeId: number;
+  chargeGuid: string;
   
   // Date & User Tracking
-  closedate?: string | null;
-  closedby?: number | null;
-  cancelleddate?: string | null;
-  cancelledby?: number | null;
-  completeddate?: string | null;
-  completedby?: number | null;
+  closeDate?: string | null;
+  closedBy?: number | null;
+  cancelledDate?: string | null;
+  cancelledBy?: number | null;
+  completedDate?: string | null;
+  completedBy?: number | null;
 }
 
 export interface ChargeTransaction {
   // Primary Keys
-  chargeid: number;
-  chargecode: string;
-  chargeguid: string;
+  chargeId: number;
+  chargeCode: string;
+  chargeGuid: string;
   
   // Category Information (Joined)
-  chargecategoryname?: string | null;
-  chargesubcategoryid: number;
-  chargesubcategoryname?: string | null;
+  chargeCategoryName?: string | null;
+  chargeSubCategoryId: number;
+  chargeSubCategoryName?: string | null;
   
   // Charge Details
   description?: string | null;
   amount: number;
-  currencycode: string;
+  currencyCode: string;
   
   // Job Reference
-  jobid: number;
-  jobguid?: string | null;
+  jobId: number;
+  jobGuid?: string | null;
+  jobCode: string;
   
   // Status
-  optionchargestatusid: number;
-  chargestransactionstatus?: string | null;
-  chargetransactioncategorycode?: string | null;
+  optionChargeStatusId: number;
+  chargeTransactionStatus?: string | null;
+  chargeTransactionCategoryCode?: string | null;
   
   // Date & User Tracking
-  closedate?: string | null;
-  closedby?: number | null;
-  cancelleddate?: string | null;
-  cancelledby?: number | null;
-  completeddate?: string | null;
-  completedby?: number | null;
+  closeDate?: string | null;
+  closedBy?: number | null;
+  cancelledDate?: string | null;
+  cancelledBy?: number | null;
+  completedDate?: string | null;
+  completedBy?: number | null;
   
   // Audit Fields
-  createddate: string;
-  createdby: number;
-  modifieddate?: string | null;
-  modifiedby?: number | null;
-  isactive?: boolean | null;
+  createdDate: string;
+  createdBy: number;
+  modifiedDate?: string | null;
+  modifiedBy?: number | null;
+  isActive?: boolean | null;
 }

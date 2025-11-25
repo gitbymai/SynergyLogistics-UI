@@ -22,24 +22,24 @@
       <tbody>
         <tr *ngFor="let charge of charges">
           <td>
-            <small class="text-muted">{{ charge.chargecode }}</small>
+            <small class="text-muted">{{ charge.chargeCode }}</small>
           </td>
           <td>
-            <span class="badge bg-secondary">{{ charge.chargesubcategoryname }}</span>
+            <span class="badge bg-secondary">{{ charge.chargeSubCategoryName }}</span>
           </td>
           <td>{{ charge.description || 'N/A' }}</td>
           <td>
             <span class="badge" [ngClass]="{
-                    'bg-success': charge.chargestransactionstatus === 'APPROVED',
-                    'bg-warning': charge.chargestransactionstatus === 'PENDING',
-                    'bg-danger': charge.chargestransactionstatus === 'CANCELLED',
-                    'bg-info': charge.chargestransactionstatus === 'COMPLETED'
+                    'bg-success': charge.chargeTransactionStatus === 'APPROVED',
+                    'bg-warning': charge.chargeTransactionStatus === 'PENDING',
+                    'bg-danger': charge.chargeTransactionStatus === 'CANCELLED',
+                    'bg-info': charge.chargeTransactionStatus === 'COMPLETED'
                   }">
-              {{ charge.chargestransactionstatus }}
+              {{ charge.chargeTransactionStatus }}
             </span>
           </td>
           <td class="text-end">
-            {{ charge.currencycode }} {{ charge.amount | number:'1.2-2' }}
+            {{ charge.currencyCode }} {{ charge.amount | number:'1.2-2' }}
           </td>
         </tr>
         <tr *ngIf="!charges || charges.length === 0">

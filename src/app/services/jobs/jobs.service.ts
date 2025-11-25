@@ -41,7 +41,7 @@ export class JobsService extends ApiService {
     return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job`);
   }
 
-    getByGuid(jobGuid: string): Observable<Job> {
+  getByGuid(jobGuid: string): Observable<Job> {
     return this.http.get<ApiResponse<Job>>(`${this.apiUrl}/job/${jobGuid}`).pipe(
       map(response => {
         if (response.success && response.data) {
@@ -56,9 +56,21 @@ export class JobsService extends ApiService {
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}/job`, job);
   }
 
-  getAllChargeTransction(jobGuid: string): Observable<ApiResponse<ChargeTransaction[]>>{
-    
+  getAllChargeTransaction(jobGuid: string): Observable<ApiResponse<ChargeTransaction[]>> {
+
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/${jobGuid}/charges`);
   }
 
+  getAllChargeTransactionCharges(): Observable<ApiResponse<ChargeTransaction[]>> {
+
+    return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/jobtransaction/charges`);
+  }
+  getAllChargeTransactionExpenses(): Observable<ApiResponse<ChargeTransaction[]>> {
+
+    return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/jobtransaction/expenses`);
+  }
+  getAllChargeTransactionDisbursements(): Observable<ApiResponse<ChargeTransaction[]>> {
+
+    return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/jobtransaction/disbursements`);
+  }
 }

@@ -41,7 +41,7 @@ export class ChargeTransactionService extends ApiService {
       })
     );
   }
-
+  
   /**
    * Get all charge transactions
    */
@@ -132,4 +132,6 @@ export class ChargeTransactionService extends ApiService {
   completeCharge(chargeGuid: string, completedBy: number): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/charge/${chargeGuid}/complete`, { completedBy });
   }
+
+
 }

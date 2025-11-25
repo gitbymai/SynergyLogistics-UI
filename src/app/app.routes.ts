@@ -90,6 +90,18 @@ export const routes: Routes = [
             },
             canActivate: [AuthGuard]
           },
+          {
+            path: 'financials',
+            loadComponent: () =>
+              import('./views/financials/transactionlist/transactionlist.component').then(
+                m => m.TransactionlistComponent
+              ),
+            data: {
+              title: 'Financial Transactions',
+              roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales']
+            },
+            canActivate: [AuthGuard]
+          },
 
         ],
       },

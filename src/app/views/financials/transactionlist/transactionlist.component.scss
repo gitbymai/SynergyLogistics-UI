@@ -1,0 +1,235 @@
+/* Import Professional Font */
+// @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+
+
+/* Global Font Settings */
+* {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.badge-sm {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table-sm th,
+.table-sm td {
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+  font-weight: 600;
+}
+
+.sortable:hover {
+  background-color: rgba(173, 181, 189, 0.15);
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+/* Filter Panel Styling */
+.filter-panel {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-bottom: 3px solid #dee2e6;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filter-header {
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(222, 226, 230, 0.5);
+}
+
+.filter-header h6 {
+  color: #495057;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+}
+
+.filter-header h6 i {
+  margin-right: 0.5rem;
+  color: #6c757d;
+}
+
+.filter-body {
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+.filter-select,
+.filter-input {
+  border: 2px solid #dee2e6;
+  transition: all 0.3s ease;
+  background-color: #ffffff;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.filter-select:focus,
+.filter-input:focus {
+  border-color: #adb5bd;
+  box-shadow: 0 0 0 0.2rem rgba(173, 181, 189, 0.25);
+  background-color: #f8f9fa;
+}
+
+.filter-select:hover,
+.filter-input:hover {
+  border-color: #ced4da;
+}
+
+.form-label {
+  color: #495057;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.form-label i {
+  margin-right: 0.3rem;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+/* Active Filter Badge */
+.badge.bg-danger {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Card Header Styling */
+.card-header.bg-primary {
+  background: linear-gradient(135deg, #1e88e5  0%, #1565c0 100%) !important;
+  border-bottom: 3px solid #495057;
+}
+
+.card-header h4 {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-size: 1.25rem;
+}
+
+/* Button Styling */
+.btn-light {
+  background-color: #ffffff;
+  border: 2px solid #dee2e6;
+  color: #495057;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+}
+
+.btn-light:hover {
+  background-color: #f8f9fa;
+  border-color: #adb5bd;
+  color: #495057;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(73, 80, 87, 0.15);
+}
+
+.btn-outline-danger {
+  border-width: 2px;
+  border-color: #adb5bd;
+  color: #6c757d;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+}
+
+.btn-outline-danger:hover {
+  background-color: #adb5bd;
+  border-color: #adb5bd;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(173, 181, 189, 0.4);
+}
+
+.filter-btn-compact {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.filter-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-xs {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.35rem;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+/* Table Data Styling */
+.table tbody td {
+  font-weight: 500;
+  color: #212529;
+}
+
+.table thead th {
+  font-weight: 700;
+  color: #495057;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+/* Pagination Styling */
+.pagination {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.card-footer {
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
