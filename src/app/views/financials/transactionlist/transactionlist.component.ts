@@ -48,19 +48,16 @@ export class TransactionlistComponent implements OnInit {
 
         if (res.success && res.data?.length) {
 
-          console.log(res.data);
           this.financials = res.data
             .filter(a => a.isActive)
             .sort((a, b) => b.chargeId = a.chargeId)
-
-            console.log(this.financials);
 
           this.filteredFinancials = [...this.financials];
         }
 
       },
       error: (e) => {
-        console.error('API retunred error:', e.message);
+        console.error('API returned error:', e.message);
       }
     });
   }

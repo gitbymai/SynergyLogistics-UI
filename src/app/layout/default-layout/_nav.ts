@@ -43,7 +43,7 @@ export const navItems = [
     children:[
       {
         name: 'Manage Users',
-        url: '/users/list',
+        url: '/admin/users',
         iconComponent: { name: 'cil-user' },
         roles: ['admin']
       }

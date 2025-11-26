@@ -15,15 +15,15 @@ export class AuthService {
   protected baseUrl = inject(API_URL);
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
-  private isAuthenticatedSubject: BehaviorSubject<boolean>; // ADD THIS
-  public isAuthenticated$: Observable<boolean>; // ADD THIS
+  private isAuthenticatedSubject: BehaviorSubject<boolean>;
+  public isAuthenticated$: Observable<boolean>;
 
   constructor(
     private http: HttpClient,
     private router: Router
   ) {
-    const storedUser = localStorage.getItem('currentUser');
-    const hasToken = !!localStorage.getItem('authToken');
+    const storedUser = localStorage.getItem('synUser');
+    const hasToken = !!localStorage.getItem('synToken');
 
     this.currentUserSubject = new BehaviorSubject<User | null>(
       storedUser ? JSON.parse(storedUser) : null
@@ -52,8 +52,8 @@ export class AuthService {
       }),
       map(response => {
         if (response && response.token) {
-          localStorage.setItem('authToken', response.token);
-          localStorage.setItem('currentUser', JSON.stringify(response.user));
+          localStorage.setItem('synToken', response.token);
+          localStorage.setItem('synUser', JSON.stringify(response.user));
           this.currentUserSubject.next(response.user);
           this.isAuthenticatedSubject.next(true);
         } else {
@@ -69,8 +69,8 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('currentUser');
+    localStorage.removeItem('synToken');
+    localStorage.removeItem('synUser');
     localStorage.removeItem('rememberedEmail');
 
     this.currentUserSubject.next(null);
@@ -80,7 +80,7 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem('authToken');
+    return localStorage.getItem('synToken');
   }
 
   refreshToken(): Observable<any> {
@@ -90,7 +90,7 @@ export class AuthService {
     }).pipe(
       tap((response: any) => {
         if (response && response.token) {
-          localStorage.setItem('authToken', response.token);
+          localStorage.setItem('synToken', response.token);
         }
       })
     );

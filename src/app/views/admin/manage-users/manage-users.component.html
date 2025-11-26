@@ -1,0 +1,426 @@
+<div class="card my-4 shadow-sm">
+  <div class="card-header bg-primary text-white">
+    <div class="d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">
+        <i class="cil-people me-2"></i> Manage Users
+      </h4>
+      <button class="btn btn-light btn-sm" type="button" (click)="openNewUserModal()">
+        <i class="cil-plus me-2"></i> Add New User
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <!-- Search & Filter Section -->
+    <div class="filters-section mb-4">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div class="search-wrapper">
+            <i class="cil-search search-icon"></i>
+            <input type="text" class="form-control form-control-custom search-input"
+              placeholder="Search by name, email, or code..." [value]="searchTerm"
+              (input)="onSearchChange($event.target.value)" />
+          </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <label class="form-label">
+            <i class="cil-list me-1"></i> Role
+          </label>
+          <select #roleSelect class="form-select form-control-custom" (change)="onRoleChange(roleSelect.value)">
+            <option value="">All Roles</option>
+            @for(role of rolesList; track role.roleId){
+            <option [value]="role.roleId.toString()">{{ role.roleName }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <label class="form-label">
+            <i class="cil-check-circle me-1"></i> Status
+          </label>
+          <select #statusSelect class="form-select form-control-custom" (change)="onStatusChange(statusSelect.value)">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="locked">Locked</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="table-responsive">
+      <table class="table table-hover table-custom">
+        <thead>
+          <tr>
+            <th>
+              <i class="cil-user me-2"></i> Name
+            </th>
+            <th>
+              <i class="cil-envelope-closed me-2"></i> Email
+            </th>
+            <th>
+              <i class="cil-briefcase me-2"></i> Department
+            </th>
+            <th>
+              <i class="cil-list me-2"></i> Role
+            </th>
+            <th>
+              <i class="cil-calendar me-2"></i> Last Login
+            </th>
+            <th>
+              <i class="cil-check-circle me-2"></i> Status
+            </th>
+            <th class="text-center">
+              <i class="cil-settings me-2"></i> Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @if(getPagedUsers().length > 0) {
+          @for(user of getPagedUsers(); track user.accountId) {
+          <tr [class.inactive-row]="!user.isActive">
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar">{{ user.accountName.charAt(0).toUpperCase() }}</div>
+                <div class="user-info">
+                  <strong>{{ user.accountName }}</strong>
+                  <small class="text-muted d-block">{{ user.accountCode }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <a href="mailto:{{ user.email }}" class="text-primary">{{ user.email }}</a>
+            </td>
+            <td>
+              {{ user.department || '-' }}
+            </td>
+            <td>
+              <span class="badge badge-role">{{ getRoleName(user.roleId) }}</span>
+            </td>
+            <td>
+              @if(user.lastLogin) {
+              {{ user.lastLogin | date: 'MMM dd, yyyy' }}
+              } @else {
+              <span class="text-muted">Never</span>
+              }
+            </td>
+            <td>
+              <div class="status-badge-wrapper">
+                @if(user.accountLocked) {
+                <span class="badge bg-danger">
+                  <i class="cil-lock-locked me-1"></i> Locked
+                </span>
+                } @else if(user.isActive) {
+                <span class="badge bg-success">
+                  <i class="cil-check-circle me-1"></i> Active
+                </span>
+                } @else {
+                <span class="badge bg-secondary">
+                  <i class="cil-x-circle me-1"></i> Inactive
+                </span>
+                }
+              </div>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-sm btn-primary-outline" title="Edit User" (click)="editUser(user)">
+                  <i class="cil-pencil"></i>
+                </button>
+
+                @if(!user.accountLocked) {
+                <button class="btn btn-sm" [ngClass]="user.isActive ? 'btn-warning-outline' : 'btn-success-outline'"
+                  [title]="user.isActive ? 'Deactivate User' : 'Activate User'" (click)="toggleUserStatus(user)">
+                  @if(user.isActive) {
+                  <i class="cil-ban"></i>
+                  } @else {
+                  <i class="cil-check"></i>
+                  }
+                </button>
+                }
+
+                @if(user.accountLocked) {
+                <button class="btn btn-sm btn-info-outline" title="Unlock User" (click)="unlockUser(user)">
+                  <i class="cil-lock-unlocked"></i>
+                </button>
+                }
+
+                <button class="btn btn-sm btn-danger-outline" title="Delete User" (click)="openDeleteConfirm(user)">
+                  <i class="cil-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          }
+          } @else {
+          <tr>
+            <td colspan="7" class="text-center text-muted py-4">
+              <i class="cil-search me-2" style="font-size: 2rem;"></i>
+              <div class="mt-2">No users found</div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation" class="mt-4">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <button class="page-link" type="button" (click)="previousPage()" [disabled]="currentPage === 1">
+            <i class="cil-arrow-left me-1"></i> Previous
+          </button>
+        </li>
+        @for(page of getPageNumbers(); track page) {
+        <li class="page-item" [class.active]="page === currentPage">
+          <button class="page-link" type="button" (click)="currentPage = page">
+            {{ page }}
+          </button>
+        </li>
+        }
+        <li class="page-item" [class.disabled]="currentPage === getTotalPages()">
+          <button class="page-link" type="button" (click)="nextPage()" [disabled]="currentPage === getTotalPages()">
+            Next <i class="cil-arrow-right ms-1"></i>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<!-- User Modal - Create/Edit -->
+<div class="modal-backdrop" *ngIf="showUserModal" (click)="closeUserModal()"></div>
+<div class="modal custom-modal" [class.show]="showUserModal" [class.d-block]="showUserModal" tabindex="-1"
+  role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          @if(isEditMode) {
+          <i class="cil-pencil me-2"></i> Edit User
+          } @else {
+          <i class="cil-plus me-2"></i> Create New User
+          }
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeUserModal()" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="userForm" class="form-professional">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="cil-hash me-1"></i> Account Code
+              </label>
+              <input type="text" class="form-control form-control-custom" formControlName="accountCode"
+                [readonly]="isEditMode" placeholder="e.g., USR001" />
+              <div *ngIf="userForm.get('accountCode')?.invalid && userForm.get('accountCode')?.touched"
+                class="text-danger small mt-1">
+                Code must be 3-20 characters
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="cil-user me-1"></i> Full Name
+              </label>
+              <input type="text" class="form-control form-control-custom" formControlName="accountName"
+                placeholder="e.g., John Doe" />
+              <div *ngIf="userForm.get('accountName')?.invalid && userForm.get('accountName')?.touched"
+                class="text-danger small mt-1">
+                Name is required
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="cil-envelope-closed me-1"></i> Email
+              </label>
+              <input type="email" class="form-control form-control-custom" formControlName="email"
+                placeholder="user@example.com" />
+              <div *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched"
+                class="text-danger small mt-1">
+                Valid email is required
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="cil-phone me-1"></i> Phone
+              </label>
+              <input type="text" class="form-control form-control-custom" formControlName="phone"
+                placeholder="+63 912 345 6789" />
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="cil-briefcase me-1"></i> Department
+              </label>
+              <input type="text" class="form-control form-control-custom" formControlName="department"
+                placeholder="e.g., Sales, Operations" />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="cil-list me-1"></i> Role
+              </label>
+              <select formControlName="roleId" class="form-select form-control-custom">
+                <option value="">Select Role</option>
+                @for(role of rolesList; track role.roleId){
+                <option [value]="role.roleId.toString()">{{ role.roleName }}</option>
+                }
+              </select>
+              <div *ngIf="userForm.get('roleId')?.invalid && userForm.get('roleId')?.touched"
+                class="text-danger small mt-1">
+                Role is required
+              </div>
+            </div>
+          </div>
+
+          @if(!isEditMode) {
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="cil-lock me-1"></i> Password
+              </label>
+              <input type="password" class="form-control form-control-custom" formControlName="password"
+                placeholder="Enter password" />
+              <div *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched"
+                class="text-danger small mt-1">
+                Password is required
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="cil-lock me-1"></i> Confirm Password
+              </label>
+              <input type="password" class="form-control form-control-custom" formControlName="confirmPassword"
+                placeholder="Confirm password" />
+              <div *ngIf="userForm.get('confirmPassword')?.invalid && userForm.get('confirmPassword')?.touched"
+                class="text-danger small mt-1">
+                Passwords must match
+              </div>
+            </div>
+          </div>
+          }
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="isActive" formControlName="isActive">
+                <label class="form-check-label" for="isActive">
+                  <i class="cil-check-circle me-1"></i> Active
+                </label>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeUserModal()">
+          <i class="cil-x me-2"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="submitUserForm()"
+          [disabled]="!userForm.valid || isSubmitting">
+          <span *ngIf="!isSubmitting">
+            <i class="cil-check me-2"></i> {{ isEditMode ? 'Update User' : 'Create User' }}
+          </span>
+          <span *ngIf="isSubmitting">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Submitting...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-backdrop" *ngIf="showDeleteConfirmModal" (click)="closeDeleteConfirm()"></div>
+<div class="modal custom-modal" [class.show]="showDeleteConfirmModal" [class.d-block]="showDeleteConfirmModal"
+  tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">
+          <i class="cil-warning me-2"></i> Delete User
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeDeleteConfirm()"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger" role="alert">
+          <i class="cil-warning me-2"></i>
+          This action cannot be undone!
+        </div>
+        <p class="mb-2">
+          Are you sure you want to delete the user <strong>{{ selectedUser?.accountName }}</strong>?
+        </p>
+        <p class="text-muted small mb-0">
+          Email: {{ selectedUser?.email }}
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeDeleteConfirm()">
+          <i class="cil-x me-2"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="isSubmitting">
+          <span *ngIf="!isSubmitting">
+            <i class="cil-trash me-2"></i> Delete User
+          </span>
+          <span *ngIf="isSubmitting">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Deleting...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notifications -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+  <!-- Success Toast -->
+  <div class="toast align-items-center border-0" [class.show]="showSuccessToast" role="alert" aria-live="assertive"
+    aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body bg-success text-white rounded">
+        <div class="d-flex align-items-center">
+          <i class="cil-check-circle me-2" style="font-size: 1.5rem;"></i>
+          <div>
+            <strong class="d-block">Success!</strong>
+            <span>{{ successMessage }}</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showSuccessToast = false"
+        aria-label="Close"></button>
+    </div>
+  </div>
+
+  <!-- Error Toast -->
+  <div class="toast align-items-center border-0" [class.show]="showErrorToast" role="alert" aria-live="assertive"
+    aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body bg-danger text-white rounded">
+        <div class="d-flex align-items-center">
+          <i class="cil-x-circle me-2" style="font-size: 1.5rem;"></i>
+          <div>
+            <strong class="d-block">Error</strong>
+            <span>{{ errorMessage }}</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showErrorToast = false"
+        aria-label="Close"></button>
+    </div>
+  </div>
+</div>

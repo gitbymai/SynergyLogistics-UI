@@ -7,11 +7,12 @@ import { delay, filter, map, tap } from 'rxjs/operators';
 import { ColorModeService } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
+import { AuthService } from './services/auth.service';
 
 @Component({
-    selector: 'app-root',
-    template: '<router-outlet />',
-    imports: [RouterOutlet]
+  selector: 'app-root',
+  template: '<router-outlet />',
+  imports: [RouterOutlet]
 })
 export class AppComponent implements OnInit {
   title = 'Synergy Logistics Application';
@@ -24,7 +25,7 @@ export class AppComponent implements OnInit {
   readonly #colorModeService = inject(ColorModeService);
   readonly #iconSetService = inject(IconSetService);
 
-  constructor() {
+  constructor(private authService: AuthService) {
     this.#titleService.setTitle(this.title);
     this.#iconSetService.icons = { ...iconSubset };
     // this.#colorModeService.localStorageItemName.set('coreui-free-angular-admin-template-theme-default');
@@ -34,8 +35,8 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
 
     this.#router.events.pipe(
-        takeUntilDestroyed(this.#destroyRef)
-      ).subscribe((evt) => {
+      takeUntilDestroyed(this.#destroyRef)
+    ).subscribe((evt) => {
       if (!(evt instanceof NavigationEnd)) {
         return;
       }
@@ -52,5 +53,9 @@ export class AppComponent implements OnInit {
         takeUntilDestroyed(this.#destroyRef)
       )
       .subscribe();
+
+    if (this.authService.isTokenExpired()) {
+      this.authService.logout();
+    }
   }
 }
