@@ -56,14 +56,13 @@ export class ManageUsersComponent implements OnInit {
 
   initializeForm(): void {
     this.userForm = this.fb.group({
-      accountCode: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
       accountName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.maxLength(20)]],
       department: ['', Validators.maxLength(100)],
       roleId: ['', Validators.required],
-      password: ['', Validators.required],
-      confirmPassword: ['', Validators.required],
+      password: [''],
+      confirmPassword: [''],
       isActive: [true],
       accountLocked: [false]
     }, { validators: this.passwordMatchValidator });
@@ -81,8 +80,11 @@ export class ManageUsersComponent implements OnInit {
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: (response) => {
+
           if (response.success && response.data) {
-            this.userList = response.data;
+            this.userList = response.data.sort((a, b) =>
+              a.accountName.localeCompare(b.accountName)
+            );
             this.totalItems = this.userList.length;
             this.applyFilters();
           } else {
@@ -121,7 +123,7 @@ export class ManageUsersComponent implements OnInit {
         user.email.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         user.accountCode.toLowerCase().includes(this.searchTerm.toLowerCase());
 
-      const matchRole = !this.selectedRole || user.roleId.toString() === this.selectedRole;
+      const matchRole = !this.selectedRole || user.role.toString() === this.selectedRole;
       const matchStatus = !this.selectedStatus ||
         (this.selectedStatus === 'active' && user.isActive) ||
         (this.selectedStatus === 'inactive' && !user.isActive) ||
@@ -153,8 +155,6 @@ export class ManageUsersComponent implements OnInit {
     this.isEditMode = false;
     this.selectedUser = null;
     this.userForm.reset({ isActive: true, accountLocked: false });
-    this.userForm.get('password')?.setValidators([Validators.required]);
-    this.userForm.get('confirmPassword')?.setValidators([Validators.required]);
     this.userForm.updateValueAndValidity();
     this.showUserModal = true;
   }
@@ -163,17 +163,14 @@ export class ManageUsersComponent implements OnInit {
     this.isEditMode = true;
     this.selectedUser = user;
 
-    const roleId = user.roleId?.toString() || '';
+    const roleId = user.role || 0;
 
     this.userForm.patchValue({
-      accountCode: user.accountCode,
       accountName: user.accountName,
       email: user.email,
       phone: user.phone,
       department: user.department,
       roleId: roleId,
-      isActive: user.isActive,
-      accountLocked: user.accountLocked
     });
 
     // Password fields optional in edit mode
@@ -188,6 +185,7 @@ export class ManageUsersComponent implements OnInit {
   closeUserModal(): void {
     this.showUserModal = false;
     this.userForm.reset();
+    this.selectedUser = null;
   }
 
   submitUserForm(): void {
@@ -205,18 +203,13 @@ export class ManageUsersComponent implements OnInit {
     }
   }
 
-  /**
-   * Create new user via API
-   */
   private createUser(): void {
     const createRequest: CreateAccountRequest = {
-      accountCode: this.userForm.value.accountCode,
       accountName: this.userForm.value.accountName,
       email: this.userForm.value.email,
       phone: this.userForm.value.phone,
       department: this.userForm.value.department,
-      roleId: parseInt(this.userForm.value.roleId),
-      password: this.userForm.value.password
+      roleId: this.userForm.value.roleId
     };
 
     this.userManagementService.createUser(createRequest)
@@ -225,10 +218,14 @@ export class ManageUsersComponent implements OnInit {
         next: (response) => {
           if (response.success && response.data) {
             this.userList.push(response.data);
+            this.userList.sort((a, b) =>
+              a.accountName.localeCompare(b.accountName)
+            );
             this.totalItems = this.userList.length;
             this.applyFilters();
             this.showSuccess(`User ${response.data.accountName} created successfully`);
             this.closeUserModal();
+
           } else {
             this.showError(response.message || 'Failed to create user');
           }
@@ -240,22 +237,24 @@ export class ManageUsersComponent implements OnInit {
       });
   }
 
-  /**
-   * Update existing user via API
-   */
   private updateUser(): void {
     if (!this.selectedUser) return;
 
     const updateRequest: UpdateAccountRequest = {
+      accountGuid: this.selectedUser.accountGuid,
       accountName: this.userForm.value.accountName,
       email: this.userForm.value.email,
       phone: this.userForm.value.phone,
       department: this.userForm.value.department,
-      roleId: parseInt(this.userForm.value.roleId),
-      isActive: this.userForm.value.isActive
+      roleId: this.userForm.value.roleId,
+      isActive: Boolean(this.userForm.value.isActive)
     };
 
-    this.userManagementService.updateUser(this.selectedUser.accountId, updateRequest)
+    if (this.userForm.value.password && this.userForm.value.password.trim() !== '') {
+      updateRequest.password = this.userForm.value.password;
+    }
+
+    this.userManagementService.updateUser(updateRequest)
       .pipe(finalize(() => this.isSubmitting = false))
       .subscribe({
         next: (response) => {
@@ -318,11 +317,8 @@ export class ManageUsersComponent implements OnInit {
       });
   }
 
-  /**
-   * Toggle user active status via API
-   */
   toggleUserStatus(user: Account): void {
-    this.userManagementService.toggleUserStatus(user.accountId, !user.isActive)
+    this.userManagementService.toggleUserStatus(user.accountGuid, !user.isActive)
       .subscribe({
         next: (response) => {
           if (response.success && response.data) {
@@ -344,9 +340,6 @@ export class ManageUsersComponent implements OnInit {
       });
   }
 
-  /**
-   * Unlock user account via API
-   */
   unlockUser(user: Account): void {
     this.userManagementService.unlockUser(user.accountId)
       .subscribe({

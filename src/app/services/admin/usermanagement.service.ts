@@ -12,7 +12,7 @@ import { Role } from '../../models/role';
 })
 export class UsermanagementService extends ApiService {
 
-  private apiUrl = `${this.baseUrl}/user`;
+  private apiUrl = `${this.baseUrl}/account`;
 
   constructor(http: HttpClient) {
     super(http); // Call parent constructor
@@ -22,43 +22,27 @@ export class UsermanagementService extends ApiService {
    * Get all users
    */
   getAllUsers(): Observable<ApiResponse<Account[]>> {
-    return this.http.get<ApiResponse<Account[]>>(`${this.apiUrl}`);
+    return this.http.get<ApiResponse<Account[]>>(`${this.apiUrl}/getall`);
   }
-
-  /**
-   * Get user by ID
-   */
   getUserById(accountId: number): Observable<ApiResponse<Account>> {
     return this.http.get<ApiResponse<Account>>(`${this.apiUrl}/${accountId}`);
   }
 
-  /**
-   * Create new user
-   */
-  createUser(userData: CreateAccountRequest): Observable<ApiResponse<Account>> {
-    return this.http.post<ApiResponse<Account>>(`${this.apiUrl}`, userData);
+  createUser(dto: CreateAccountRequest): Observable<ApiResponse<Account>> {
+    return this.http.post<ApiResponse<Account>>(`${this.apiUrl}/create`, dto);
   }
 
-  /**
-   * Update user
-   */
-  updateUser(accountId: number, userData: UpdateAccountRequest): Observable<ApiResponse<Account>> {
-    return this.http.put<ApiResponse<Account>>(`${this.apiUrl}/${accountId}`, userData);
+  updateUser(dto: UpdateAccountRequest): Observable<ApiResponse<Account>> {
+    return this.http.put<ApiResponse<Account>>(`${this.apiUrl}`, dto);
   }
 
-  /**
-   * Delete user
-   */
   deleteUser(accountId: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${accountId}`);
   }
 
-  /**
-   * Toggle user active status
-   */
-  toggleUserStatus(accountId: number, isActive: boolean): Observable<ApiResponse<Account>> {
+  toggleUserStatus(guid: string, isActive: boolean): Observable<ApiResponse<Account>> {
     return this.http.patch<ApiResponse<Account>>(
-      `${this.apiUrl}/${accountId}/status`,
+      `${this.apiUrl}/${guid}/status`,
       { isActive }
     );
   }
@@ -77,7 +61,7 @@ export class UsermanagementService extends ApiService {
    * Get all roles
    */
   getAllRoles(): Observable<ApiResponse<Role[]>> {
-    return this.http.get<ApiResponse<Role[]>>(`${this.baseUrl}/role`);
+    return this.http.get<ApiResponse<Role[]>>(`${this.apiUrl}/getroles`);
   }
 
   /**

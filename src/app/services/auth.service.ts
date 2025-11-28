@@ -48,10 +48,8 @@ export class AuthService {
       password
     }).pipe(
       tap(response => {
-        //console.log('Login response:', response);
-      }),
-      map(response => {
         if (response && response.token) {
+          console.log('Token received:', response.token.substring(0, 20) + '...');
           localStorage.setItem('synToken', response.token);
           localStorage.setItem('synUser', JSON.stringify(response.user));
           this.currentUserSubject.next(response.user);

@@ -14,7 +14,7 @@ export interface Account {
   email: string;
   phone: string;
   department: string;
-  roleId: number;
+  role: number;
   isActive: boolean;
   accountLocked: boolean;
   lastLogin: Date | null;
@@ -25,20 +25,20 @@ export interface Account {
 }
 
 export interface CreateAccountRequest {
-  accountCode: string;
   accountName: string;
   email: string;
   phone?: string;
   department?: string;
   roleId: number;
-  password: string;
 }
 
 export interface UpdateAccountRequest {
+  accountGuid: string;
   accountName: string;
   email: string;
   phone?: string;
   department?: string;
   roleId: number;
   isActive: boolean;
+  password?: string;
 }
