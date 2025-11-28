@@ -56,11 +56,12 @@ export class JobsService extends ApiService {
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}/job`, job);
   }
 
-  getAllChargeTransaction(jobGuid: string): Observable<ApiResponse<ChargeTransaction[]>> {
+  getAllChargeTransactionByGuid(jobGuid: string): Observable<ApiResponse<ChargeTransaction[]>> {
 
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/${jobGuid}/charges`);
   }
 
+  //ends here
   getAllChargeTransactionCharges(): Observable<ApiResponse<ChargeTransaction[]>> {
 
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/jobtransaction/charges`);

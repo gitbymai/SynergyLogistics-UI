@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { JobsService } from '../../../services/jobs/jobs.service';
 import { ChargeTransaction } from '../../../models/chargetransaction';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-transactionlist',
@@ -30,7 +31,7 @@ export class TransactionlistComponent implements OnInit {
     chargecode: ''
   };
 
-  constructor(private router: Router, private jobService: JobsService) {
+  constructor(private router: Router, private jobService: JobsService, private authService: AuthService) {
 
   }
 
@@ -42,24 +43,31 @@ export class TransactionlistComponent implements OnInit {
 
   loadChargeList() {
 
-    this.jobService.getAllChargeTransactionCharges().subscribe({
+    // fix charges -- not yet completed
+    var currentRole = this.authService.getCurrentUserRole();
+    var limitToCharges = currentRole == "PROCESSOR" || currentRole == "OPSMGR";
+    if(limitToCharges){
 
-      next: (res) => {
+      this.jobService.getAllChargeTransactionCharges().subscribe({
 
-        if (res.success && res.data?.length) {
+        next: (res) => {
 
-          this.financials = res.data
-            .filter(a => a.isActive)
-            .sort((a, b) => b.chargeId = a.chargeId)
+          if (res.success && res.data?.length) {
 
-          this.filteredFinancials = [...this.financials];
+            this.financials = res.data
+              .filter(a => a.isActive)
+              .sort((a, b) => b.chargeId = a.chargeId)
+
+            this.filteredFinancials = [...this.financials];
+          }
+
+        },
+        error: (e) => {
+          console.error('API returned error:', e.message);
         }
+      });
+    }
 
-      },
-      error: (e) => {
-        console.error('API returned error:', e.message);
-      }
-    });
   }
 
   onSearchChange(): void {

@@ -13,8 +13,9 @@ import { LoginResponse } from '../models/login-response';
 export class AuthService {
 
   protected baseUrl = inject(API_URL);
-  private currentUserSubject: BehaviorSubject<User | null>;
-  public currentUser: Observable<User | null>;
+ private currentUserSubject = new BehaviorSubject<User | null>(null);
+  public currentUser: Observable<User | null> = this.currentUserSubject.asObservable();
+
   private isAuthenticatedSubject: BehaviorSubject<boolean>;
   public isAuthenticated$: Observable<boolean>;
 
@@ -42,6 +43,10 @@ export class AuthService {
     return !!this.getToken();
   }
 
+    getCurrentUserRole(): string | null {
+    return this.currentUserSubject.value?.role || null;
+  }
+
   login(accountcode: string, password: string): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.baseUrl}/account/login`, {
       accountcode,
@@ -49,7 +54,6 @@ export class AuthService {
     }).pipe(
       tap(response => {
         if (response && response.token) {
-          console.log('Token received:', response.token.substring(0, 20) + '...');
           localStorage.setItem('synToken', response.token);
           localStorage.setItem('synUser', JSON.stringify(response.user));
           this.currentUserSubject.next(response.user);
