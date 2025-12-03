@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, Input, input } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from './../../../services/auth.service';
 
@@ -33,6 +33,7 @@ import { IconDirective } from '@coreui/icons-angular';
 })
 export class DefaultHeaderComponent extends HeaderComponent {
 
+  @Input() fullName: string = '';
   readonly #colorModeService = inject(ColorModeService);
   readonly colorMode = this.#colorModeService.colorMode;
 
@@ -42,6 +43,10 @@ export class DefaultHeaderComponent extends HeaderComponent {
     { name: 'auto', text: 'Auto', icon: 'cilContrast' }
   ];
 
+  get username(): string{
+    return this.fullName;
+  }
+
   readonly icons = computed(() => {
     const currentMode = this.colorMode();
     return this.colorModes.find(mode => mode.name === currentMode)?.icon ?? 'cilSun';
@@ -50,6 +55,7 @@ export class DefaultHeaderComponent extends HeaderComponent {
   constructor(private authService: AuthService, private router: Router) {
     super();
   }
+
  logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);

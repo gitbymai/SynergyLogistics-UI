@@ -29,7 +29,16 @@ export const routes: Routes = [
 
       },
       {
-        path: 'admin/users',
+        path: 'admin',
+        canActivate:[AuthGuard],
+        data: {
+          title: 'Admin',
+          roles:['admin']
+        },
+        children:[
+          {
+            path:'users',
+          
             loadComponent: () =>
               import('./views/admin/manage-users/manage-users.component').then(
                 m => m.ManageUsersComponent
@@ -39,6 +48,8 @@ export const routes: Routes = [
               roles: ['admin']
             },
             canActivate: [AuthGuard]
+          }
+        ]
       },
 
       {

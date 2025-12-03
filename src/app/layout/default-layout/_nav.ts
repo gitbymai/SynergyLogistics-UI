@@ -38,7 +38,7 @@ export const navItems = [
   },
   {
     name: 'Data Management',
-    url: '/manage',
+    url: '/admin',
     iconComponent: { name: 'cil-settings' },
     children:[
       {

@@ -56,6 +56,8 @@ export class DefaultLayoutComponent implements OnInit, OnDestroy {
   public navItems: any[] = [];
   currentUserRole: string = '';
   private userSubscription?: Subscription;
+  fullName: string = '';
+
 
   constructor(private authService: AuthService) { }
 
@@ -63,10 +65,11 @@ export class DefaultLayoutComponent implements OnInit, OnDestroy {
     this.userSubscription = this.authService.currentUser.subscribe(user => {
       if (user) {
         this.currentUserRole = user.role.trim().toLowerCase();
-
+        this.fullName = user.fullName;
         this.navItems = this.filterNavItemsByRole(navItems, this.currentUserRole);
       }
     });
+
   }
   ngOnDestroy(): void {
     this.userSubscription?.unsubscribe();

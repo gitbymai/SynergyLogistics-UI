@@ -85,40 +85,12 @@ export class AuthService {
     return localStorage.getItem('synToken');
   }
 
-  refreshToken(): Observable<any> {
-    const refreshToken = localStorage.getItem('refreshToken');
-    return this.http.post(`${this.baseUrl}/auth/refresh`, {
-      refreshToken
-    }).pipe(
-      tap((response: any) => {
-        if (response && response.token) {
-          localStorage.setItem('synToken', response.token);
-        }
-      })
-    );
-  }
-
   register(userData: {
     name: string;
     email: string;
     password: string;
   }): Observable<any> {
     return this.http.post(`${this.baseUrl}/account/register`, userData);
-  }
-
-  forgotPassword(email: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/account/forgot-password`, { email });
-  }
-
-  resetPassword(token: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/account/reset-password`, {
-      token,
-      newPassword
-    });
-  }
-
-  verifyEmail(token: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/account/verify-email`, { token });
   }
 
   isTokenExpired(): boolean {

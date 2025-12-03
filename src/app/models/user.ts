@@ -4,6 +4,7 @@ export interface User {
   roleName: string;
   role: string;
   userName: string;
+  fullName: string;
 }
 
 export interface Account {

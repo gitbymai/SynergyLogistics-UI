@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiService } from '../api.service';
 import { ApiResponse } from '../../models/api-response';
@@ -73,5 +73,13 @@ export class JobsService extends ApiService {
   getAllChargeTransactionDisbursements(): Observable<ApiResponse<ChargeTransaction[]>> {
 
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/jobtransaction/disbursements`);
+  }
+  getChargeTransactionByRole(role: string): Observable<ApiResponse<ChargeTransaction[]>> {
+
+    const params = new HttpParams().set('role', role);
+    return this.http.get<ApiResponse<ChargeTransaction[]>>(
+      `${this.apiUrl}/job/jobtransaction/rolebased`,
+      { params }
+    );
   }
 }

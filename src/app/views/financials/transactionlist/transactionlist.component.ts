@@ -43,12 +43,9 @@ export class TransactionlistComponent implements OnInit {
 
   loadChargeList() {
 
-    // fix charges -- not yet completed
-    var currentRole = this.authService.getCurrentUserRole();
-    var limitToCharges = currentRole == "PROCESSOR" || currentRole == "OPSMGR";
-    if(limitToCharges){
+    var currentRole = this.authService.getCurrentUserRole()?.toString() ?? '';
 
-      this.jobService.getAllChargeTransactionCharges().subscribe({
+      this.jobService.getChargeTransactionByRole(currentRole).subscribe({
 
         next: (res) => {
 
@@ -66,7 +63,6 @@ export class TransactionlistComponent implements OnInit {
           console.error('API returned error:', e.message);
         }
       });
-    }
 
   }
 
