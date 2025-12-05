@@ -52,7 +52,7 @@ export class TransactionlistComponent implements OnInit {
           if (res.success && res.data?.length) {
 
             this.financials = res.data
-              .filter(a => a.isActive)
+              .filter(a => a.isActive && a.amount > 0)
               .sort((a, b) => b.chargeId = a.chargeId)
 
             this.filteredFinancials = [...this.financials];

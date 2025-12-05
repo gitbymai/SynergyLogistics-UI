@@ -53,3 +53,13 @@ export interface Job extends CreateJobRequest {
   incotermsName: string;
   paymentTypeName: string;
 }
+
+
+export interface JobStatus{
+
+  optionStatusId: number;
+  optionStatusCode: string;
+  jobStatus: string;
+  isActive: boolean;
+
+}

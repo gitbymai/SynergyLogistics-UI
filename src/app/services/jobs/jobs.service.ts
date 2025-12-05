@@ -29,6 +29,7 @@ export class JobsService extends ApiService {
       })
     );
   }
+  
   getAllConfigurations(): Observable<ApiResponse<any[]>> {
     return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/configuration`);
   }

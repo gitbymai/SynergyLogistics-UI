@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Job } from '../../../models/job';
+import { Job, JobStatus } from '../../../models/job';
 import { JobsService } from '../../../services/jobs/jobs.service';
+import { Configuration } from '../../../models/configuration';
+import { JobTransactionType } from '../../../models/jobtransactiontype';
 
 @Component({
   selector: 'app-joblist',
@@ -15,6 +17,12 @@ import { JobsService } from '../../../services/jobs/jobs.service';
 export class JoblistComponent implements OnInit {
 
   jobs: Job[] = [];
+  filterJobStatus: Configuration[] = [];
+
+  filterIncotermsList: Configuration[] = [];
+  filterJobTransactionTypeList: JobTransactionType[] = [];
+  filterPaymenTypeList: Configuration[] = [];
+
   filteredJobs: Job[] = [];
   searchTerm = '';
   currentPage = 1;
@@ -39,6 +47,8 @@ export class JoblistComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadJobList();
+    this.loadFilterOptionFields();
+    this.loadJobTransactionTypes();
 
   }
 
@@ -49,6 +59,8 @@ export class JoblistComponent implements OnInit {
       next: (response) => {
 
         if (response.success && response.data?.length) {
+
+          console.log(response.data);
           this.jobs = response.data
             .filter(c => c.isActive)
             .sort((a, b) => b.jobId = a.jobId)
@@ -62,6 +74,66 @@ export class JoblistComponent implements OnInit {
       }
 
     });
+  }
+
+  loadFilterOptionFields() {
+
+    this.jobService.getAllConfigurations().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.setFilterJobStatus(response.data);
+          this.setFilterIncotermsList(response.data);
+          this.setFilterPaymentTypeList(response.data);
+        } else {
+          console.error('API returned error:', response.message);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading configurations:', error);
+      }
+    });
+
+  }
+
+  loadJobTransactionTypes(): void {
+    this.jobService.getJobTransactionTypes().subscribe({
+      next: (response) => {
+        if (response.success && response.data?.length) {
+          this.filterJobTransactionTypeList = response.data
+            .filter(type => type.isActive)
+            .sort((a, b) => a.jobTransactionType.localeCompare(b.jobTransactionType));
+        } else {
+          console.error('API returned error: ', response.message);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading job transaction types:', error);
+      }
+    })
+  }
+
+  setFilterJobStatus(jobStatus: Configuration[]) {
+    if (jobStatus?.length) {
+      this.filterJobStatus = jobStatus
+        .filter(term => term.category === 'JOBSTATUS' && term.isActive)
+        .sort((a, b) => a.value.localeCompare(b.value));
+    }
+  }
+
+  setFilterIncotermsList(incoterms: Configuration[]): void {
+    if (incoterms?.length) {
+      this.filterIncotermsList = incoterms
+        .filter(term => term.category === 'INCOTERMS' && term.isActive)
+        .sort((a, b) => a.value.localeCompare(b.value));
+    }
+  }
+
+  setFilterPaymentTypeList(paymentTypes: Configuration[]): void {
+    if (paymentTypes?.length) {
+      this.filterPaymenTypeList = paymentTypes
+        .filter(type => type.category === 'JOBPAYMENTTYPE' && type.isActive)
+        .sort((a, b) => a.value.localeCompare(b.value));
+    }
   }
 
   onSearchChange(): void {

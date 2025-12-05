@@ -1,138 +1,187 @@
 <div class="card my-4 shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
-        <h4 class="mb-0">Financial List</h4>
-        <div class="d-flex gap-2">
-            <input type="text" class="form-control form-control-sm" style="max-width: 250px;" 
-                placeholder="Search transactions..." [(ngModel)]="searchTerm" (input)="onSearchChange()" />
-                
-<button class="btn btn-light btn-sm filter-btn-compact" (click)="toggleFilters()">
-    <i class="cil-filter" style="font-size: 11px;"></i> 
-    <span class="d-none d-md-inline filter-text">{{ showFilters ? 'Hide' : 'Show' }}</span>
-    <span class="badge bg-danger ms-1 badge-xs" *ngIf="hasActiveFilters()">{{ activeFilterCount() }}</span>
-</button>
+  <div class="card-header bg-primary text-white">
+    <div class="d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">
+        <i class="cil-dollar me-2"></i> Financial List
+      </h4>
+      <div class="d-flex gap-2 align-items-center">
+        <div class="search-wrapper" style="width: 250px;">
+          <i class="cil-search search-icon"></i>
+          <input type="text" class="form-control form-control-custom search-input" 
+            placeholder="Search transactions..." [(ngModel)]="searchTerm" (input)="onSearchChange()" />
         </div>
+        <button class="btn btn-light btn-sm filter-btn-compact" (click)="toggleFilters()">
+          <i class="cil-filter" style="font-size: 11px;"></i> 
+          <span class="d-none d-md-inline filter-text">{{ showFilters ? 'Hide' : 'Show' }}</span>
+          <span class="badge bg-danger ms-1 badge-xs" *ngIf="hasActiveFilters()">{{ activeFilterCount() }}</span>
+        </button>
+      </div>
     </div>
+  </div>
 
-    <!-- Filter Panel -->
-    <div class="filter-panel" *ngIf="showFilters">
-        <div class="filter-header">
-            <h6 class="mb-0">
-                <i class="cil-filter"></i> Filter Options
-            </h6>
-            <button class="btn btn-sm btn-primary" (click)="clearFilters()">
-                <i class="cil-x"></i> Clear All
-            </button>
+  <!-- Filter Panel -->
+  <div class="filter-panel" *ngIf="showFilters">
+    <div class="filter-header">
+      <h6 class="mb-0">
+        <i class="cil-filter me-2"></i> Filter Options
+      </h6>
+      <button class="btn btn-sm btn-primary" (click)="clearFilters()">
+        <i class="cil-x me-1"></i> Clear All
+      </button>
+    </div>
+    <div class="filter-body">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-info me-1"></i> Status
+          </label>
+          <select class="form-select form-control-custom" [(ngModel)]="filters.status" (change)="applyFilters()">
+            <option value="">All Statuses</option>
+            <option value="FOR APPROVAL">For Approval</option>
+            <option value="APPROVED">Approved</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="REJECTED">Cancelled</option>
+          </select>
         </div>
-        <div class="filter-body">
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold text-secondary">
-                        <i class="cil-info"></i> Status
-                    </label>
-                    <select class="form-select form-select-sm filter-select" [(ngModel)]="filters.status" (change)="applyFilters()">
-                        <option value="">All Statuses</option>
-                        <option value="FOR APPROVAL">For Approval</option>
-                        <option value="APPROVED">Approved</option>
-                        <option value="COMPLETED">Completed</option>
-                        <option value="REJECTED">Cancelled</option>
-                    </select>
-                </div>
 
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold text-secondary">
-                        <i class="cil-airplane-mode"></i> Transaction Name
-                    </label>
-                    <select class="form-select form-select-sm filter-select" [(ngModel)]="filters.chargesubcategory" (change)="applyFilters()">
-                        <option value="">All Types</option>
-                        <option value="AIR IMPORT">Air Import</option>
-                        <option value="AIR EXPORT">Air Export</option>
-                        <option value="SEA IMPORT">Sea Import</option>
-                        <option value="SEA EXPORT">Sea Export</option>
-                    </select>
-                </div>
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-airplane-mode me-1"></i> Transaction Name
+          </label>
+          <select class="form-select form-control-custom" [(ngModel)]="filters.chargesubcategory" (change)="applyFilters()">
+            <option value="">All Types</option>
+            <option value="AIR IMPORT">Air Import</option>
+            <option value="AIR EXPORT">Air Export</option>
+            <option value="SEA IMPORT">Sea Import</option>
+            <option value="SEA EXPORT">Sea Export</option>
+          </select>
+        </div>
 
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold text-secondary">
-                        <i class="cil-user"></i> Job Code
-                    </label>
-                    <input type="text" class="form-control form-control-sm filter-input" 
-                        placeholder="Enter Job Code" 
-                        [(ngModel)]="filters.jobcode" 
-                        (input)="applyFilters()" />
-                </div>
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-briefcase me-1"></i> Job Code
+          </label>
+          <input type="text" class="form-control form-control-custom" 
+            placeholder="Enter Job Code" 
+            [(ngModel)]="filters.jobcode" 
+            (input)="applyFilters()" />
+        </div>
 
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold text-secondary">
-                        <i class="cil-user"></i> Charge Code
-                    </label>
-                    <input type="text" class="form-control form-control-sm filter-input" 
-                        placeholder="Enter Chargd Code" 
-                        [(ngModel)]="filters.chargecode" 
-                        (input)="applyFilters()" />
-                </div>
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-credit-card me-1"></i> Charge Code
+          </label>
+          <input type="text" class="form-control form-control-custom" 
+            placeholder="Enter Charge Code" 
+            [(ngModel)]="filters.chargecode" 
+            (input)="applyFilters()" />
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- Financial Table -->
+  <div class="table-responsive">
+    <table class="table table-custom">
+      <thead>
+        <tr>
+          <th (click)="sortBy('chargeCode')" class="sortable">
+            <i class="cil-credit-card me-2"></i> Charge Code
+          </th>
+          <th (click)="sortBy('chargeSubCategoryName')" class="sortable">
+            <i class="cil-list me-2"></i> Category
+          </th>
+          <th (click)="sortBy('amount')" class="sortable text-end">
+            <i class="cil-dollar me-2"></i> Amount
+          </th>
+          <th (click)="sortBy('chargeTransactionStatus')" class="sortable">
+            <i class="cil-info me-2"></i> Status
+          </th>
+          <th (click)="sortBy('jobCode')" class="sortable">
+            <i class="cil-briefcase me-2"></i> Ref Job Code
+          </th>
+          <th (click)="sortBy('createdDate')" class="sortable">
+            <i class="cil-calendar me-2"></i> Created Date
+          </th>
+          <th class="text-center">
+            <i class="cil-settings me-2"></i> Actions
+          </th>
+        </tr>
+      </thead>
+
+      <tbody class="text-center">
+        <tr *ngFor="let tran of paginatedJobs">
+          <td>
+            <div>
+              <strong class="charge-code-badge">{{ tran.chargeCode }}</strong>
             </div>
-        </div>
+          </td>
+          <td>
+            <div class="category-cell">
+              <span>
+                {{ tran.chargeSubCategoryName }}
+              </span>
+            </div>
+          </td>
+          <td class="text-end">
+            <span class="amount-value">{{ tran.amount | currency:'PHP':'symbol':'1.2-2' }}</span>
+          </td>
+          <td>
+            <span [class]="'badge status-badge ' + getStatusBadgeClass(tran.chargeTransactionStatus ?? '')">
+              {{ tran.chargeTransactionStatus }}
+            </span>
+          </td>
+          <td>
+            <span class="job-code-text">{{ tran.jobCode }}</span>
+          </td>
+          <td>
+            <span class="date-text">{{ tran.createdDate | date:'MM/dd/yyyy' }}</span>
+          </td>
+          <td class="text-center">
+            <div class="action-buttons">
+              <button class="btn btn-sm btn-info-outline" (click)="viewJobFinancial(tran)" title="View Financial Details">
+                <i class="cil-magnifying-glass"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <tr *ngIf="paginatedJobs.length === 0">
+          <td colspan="7" class="text-center py-4 text-muted">
+            <i class="cil-search" style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>
+            <div>No transactions found</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" type="button" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+          <i class="cil-arrow-left me-1"></i> Previous
+        </button>
+      </li>
+      <li class="page-item" *ngFor="let page of [].constructor(totalPages()); let i = index"
+        [class.active]="i + 1 === currentPage">
+        <button class="page-link" type="button" (click)="goToPage(i + 1)">
+          {{ i + 1 }}
+        </button>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages()">
+        <button class="page-link" type="button" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages()">
+          Next <i class="cil-arrow-right ms-1"></i>
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Card Footer -->
+  <div class="card-footer d-flex justify-content-between align-items-center">
+    <div class="footer-info small">
+      Showing <strong>{{ paginatedJobs.length }}</strong> of <strong>{{ filteredFinancials.length }}</strong> transactions
     </div>
-
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover table-striped align-middle mb-0 table-sm">
-                <thead class="table-light">
-                    <tr class="small">
-                        <th (click)="sortBy('chargeCode')" class="sortable">Charge Code</th>
-                        <th (click)="sortBy('chargeSubCategoryName')" class="sortable">Category</th>
-                        <th (click)="sortBy('amount')" class="sortable">Amount</th>
-                        <th (click)="sortBy('chargeTransactionStatus')" class="sortable">Status</th>
-                        <th (click)="sortBy('jobCode')" class="sortable">Ref Job Code</th>
-                        <th (click)="sortBy('createdDate')" class="sortable">Created Date</th>
-                        <th class="text-center">Actions</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr *ngFor="let tran of paginatedJobs" class="small">
-                        <td class="text-nowrap">{{ tran.chargeCode }}</td>
-                        <td class="text-truncate" style="max-width: 150px;" [title]="tran.chargeSubCategoryName">
-                            {{ tran.chargeSubCategoryName }}
-                        </td>
-                        <td class="text-end text-nowrap">{{ tran.amount | currency:'PHP':'symbol':'1.2-2' }}</td>
-                        <td>
-                            <span [class]="'badge badge-sm ' + getStatusBadgeClass(tran.chargeTransactionStatus ?? '')">
-                                {{ tran.chargeTransactionStatus }}
-                            </span>
-                        </td>
-                        <td class="text-nowrap">{{ tran.jobCode }}</td>
-                        <td class="text-nowrap">{{ tran.createdDate | date:'MM/dd/yyyy' }}</td>
-                        <td class="text-center text-nowrap">
-                            <button class="btn btn-sm btn-info me-1" (click)="viewJobFinancial(tran)" title="View">
-                                <i class="cil-magnifying-glass" style="font-size: 12px;"></i>
-                            </button>
-                        </td>
-                    </tr>
-
-                    <tr *ngIf="filteredFinancials.length === 0">
-                        <td colspan="9" class="text-center py-3 text-muted small">No trasactions found</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="card-footer d-flex justify-content-between align-items-center small">
-        <div>Showing {{ paginatedJobs.length }} of {{ filteredFinancials.length }} financials</div>
-
-        <ul class="pagination pagination-sm mb-0">
-            <li class="page-item" [class.disabled]="currentPage === 1">
-                <button class="page-link" (click)="goToPage(currentPage - 1)">Previous</button>
-            </li>
-            <li class="page-item" *ngFor="let page of [].constructor(totalPages()); let i = index"
-                [class.active]="i + 1 === currentPage">
-                <button class="page-link" (click)="goToPage(i + 1)">{{ i + 1 }}</button>
-            </li>
-            <li class="page-item" [class.disabled]="currentPage === totalPages()">
-                <button class="page-link" (click)="goToPage(currentPage + 1)">Next</button>
-            </li>
-        </ul>
-    </div>
+  </div>
 </div>
