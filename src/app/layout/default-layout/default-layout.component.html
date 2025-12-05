@@ -1,35 +1,70 @@
-<!--sidebar-->
-<c-sidebar #sidebar1="cSidebar" class="d-print-none sidebar sidebar-fixed border-end" colorScheme="dark" id="sidebar1"
-  visible>
+<!-- Sidebar Navigation -->
+<c-sidebar
+  #sidebar1="cSidebar"
+  class="d-print-none sidebar sidebar-fixed border-end"
+  colorScheme="dark"
+  id="sidebar1"
+  visible
+>
+  <!-- Sidebar Header with Brand -->
   <c-sidebar-header class="border-bottom">
-    <c-sidebar-brand [routerLink]="[]">
-      <img src="assets/images/synergy-logo.jpg" alt="Synergy Logistics Logo" class="sidebar-brand-full" height="45" />
+    <c-sidebar-brand [routerLink]="[]" class="sidebar-brand">
+      <img
+        src="assets/images/synergy-logo.jpg"
+        alt="Synergy Logistics"
+        class="sidebar-brand-full"
+        height="45"
+        width="auto"
+        loading="eager"
+      />
+      <img
+        src="assets/images/synergy-logo-sm.jpg"
+        alt="Synergy"
+        class="sidebar-brand-narrow d-none"
+        height="32"
+        width="auto"
+        loading="eager"
+      />
     </c-sidebar-brand>
   </c-sidebar-header>
 
-  <ng-scrollbar pointerEventsMethod="scrollbar" visibility="hover">
-    <c-sidebar-nav [navItems]="navItems" dropdownMode="close" compact />
+  <!-- Scrollable Navigation Area -->
+  <ng-scrollbar
+    pointerEventsMethod="scrollbar"
+    visibility="hover"
+    class="sidebar-nav-scroll"
+  >
+    <c-sidebar-nav
+      [navItems]="navItems"
+      dropdownMode="close"
+      compact
+      class="sidebar-nav"
+    />
   </ng-scrollbar>
 
-  @if (!sidebar1.narrow) {
-  <c-sidebar-footer cSidebarToggle="sidebar1" class="border-top d-none d-lg-flex" toggle="unfoldable"
-    style="cursor: pointer;">
-    <button cSidebarToggler aria-label="Toggle sidebar fold"></button>
-  </c-sidebar-footer>
-  }
+
 </c-sidebar>
 
-<!--main-->
+<!-- Main Content Wrapper -->
 <div class="wrapper d-flex flex-column min-vh-100">
-  <!--app-header-->
-  <app-default-header [fullName]="fullName" [cShadowOnScroll]="'sm'" class="mb-4 d-print-none header header-sticky p-0 shadow-sm"
-    position="sticky" sidebarId="sidebar1" />
-  <!--app-body-->
-  <div class="body flex-grow-1">
+
+  <!-- Application Header -->
+  <app-default-header
+    [fullName]="fullName"
+    [cShadowOnScroll]="'sm'"
+    class="mb-4 d-print-none header header-sticky p-0 shadow-sm"
+    position="sticky"
+    sidebarId="sidebar1"
+  />
+
+  <!-- Main Body Content -->
+  <main class="body flex-grow-1" role="main">
     <c-container breakpoint="lg" class="h-auto px-4">
       <router-outlet />
     </c-container>
-  </div>
-  <!--app footer-->
-  <app-default-footer />
+  </main>
+
+  <!-- Application Footer -->
+  <app-default-footer class="app-footer" />
+
 </div>

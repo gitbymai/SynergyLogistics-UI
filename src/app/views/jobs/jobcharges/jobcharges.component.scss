@@ -1,6 +1,141 @@
-/* Global Font Settings */
-* {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Summary Card */
+.summary-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.summary-card .card-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0.75rem 1rem;
+}
+
+.summary-card .card-header h6 {
+  font-weight: 600;
+  color: #1565c0;
+  font-size: 0.85rem;
+}
+
+.summary-card .card-header .btn-sm {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Table */
+.summary-card .table {
+  font-size: 0.75rem;
+}
+
+.summary-card .table thead {
+  background: #f8f9fa;
+}
+
+.summary-card .table thead th {
+  font-weight: 600;
+  color: #666;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.summary-card .table tbody td {
+  padding: 0.5rem 0.75rem;
+  vertical-align: middle;
+  color: #444;
+}
+
+.summary-card .table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+/* Code */
+.code-text {
+  color: #1565c0;
+  font-weight: 500;
+  font-size: 0.7rem;
+}
+
+/* Item Badge */
+.badge-item {
+  background: #e3f2fd;
+  color: #1565c0;
+  font-weight: 500;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.4rem;
+}
+
+/* Description */
+.description-cell {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #666;
+}
+
+/* Status Badges */
+.badge-approved {
+  background: #d4edda;
+  color: #155724;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.4rem;
+}
+
+.badge-pending {
+  background: #fff3cd;
+  color: #856404;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.4rem;
+}
+
+.badge-cancelled {
+  background: #f8d7da;
+  color: #721c24;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.4rem;
+}
+
+.badge-completed {
+  background: #d1ecf1;
+  color: #0c5460;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.4rem;
+}
+
+/* Amount */
+.amount-cell {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Footer Total */
+.summary-card .table tfoot {
+  background: #f8f9fa;
+}
+
+.summary-card .table tfoot td {
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.total-amount {
+  color: #1565c0;
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .description-cell {
+    display: none;
+  }
+
+  .summary-card .table thead th,
+  .summary-card .table tbody td {
+    padding: 0.4rem 0.5rem;
+  }
 }

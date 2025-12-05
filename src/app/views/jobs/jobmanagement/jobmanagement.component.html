@@ -1,17 +1,19 @@
-<div class="card shadow-sm my-4">
+<div class="card my-4 shadow-sm">
   <div class="card-header bg-primary text-white">
     <div class="d-flex justify-content-between align-items-center">
       <div class="d-flex align-items-center gap-3">
-        <h4 class="mb-0">Job Details</h4>
+        <h4 class="mb-0">
+          <i class="bi bi-briefcase me-2"></i> Job Details
+        </h4>
         <span class="badge badge-code">{{ job?.jobCode }}</span>
       </div>
       <div class="d-flex gap-2">
         <button routerLink="/jobs/list" class="btn btn-light-custom btn-sm">
-          <i class="cil-arrow-left me-1"></i>
+          <i class="bi bi-arrow-left me-1"></i>
           <span>Back to List</span>
         </button>
         <button class="btn btn-light-custom btn-sm" (click)="printJobDetails()">
-          <i class="cil-print me-1"></i>
+          <i class="bi bi-printer me-1"></i>
           <span>Print</span>
         </button>
       </div>
@@ -29,21 +31,21 @@
                   type="button" 
                   (click)="toggleSection('jobInfo')"
                   [attr.aria-expanded]="isSectionOpen('jobInfo')">
-            <i class="cil-briefcase me-2"></i>
+            <i class="bi bi-briefcase me-2"></i>
             Job Information
           </button>
         </h2>
         <div id="collapseJobInfo" 
-             class="accordion-collapse" 
+             class="accordion-collapse"
+             [class.collapse]="!isSectionOpen('jobInfo')"
              [class.show]="isSectionOpen('jobInfo')">
           <div class="accordion-body">
-            <!-- ... existing content ... -->
             <div class="detail-section">
               <div class="row g-4">
                 <div class="col-md-8">
                   <div class="detail-item">
                     <label class="detail-label">
-                      <i class="cil-user"></i> Client
+                      <i class="bi bi-person"></i> Client
                     </label>
                     <div class="detail-value">{{ job?.customerName || '-' }}</div>
                   </div>
@@ -51,10 +53,11 @@
                 <div class="col-md-4">
                   <div class="detail-item">
                     <label class="detail-label">
-                      <i class="cil-info"></i> Status
+                      <i class="bi bi-info-circle"></i> Status
                     </label>
                     <div class="detail-value">
                       <span [class]="'badge status-badge ' + getStatusBadgeClass(job?.jobStatusName || '')">
+                        <i class="bi me-1" [ngClass]="getStatusIcon(job?.jobStatusName || '')"></i>
                         {{ job?.jobStatusName || 'Pending' }}
                       </span>
                     </div>
@@ -68,7 +71,7 @@
                 <div class="col-md-4">
                   <div class="detail-item">
                     <label class="detail-label">
-                      <i class="cil-swap-horizontal"></i> Transaction Type
+                      <i class="bi bi-arrow-left-right"></i> Transaction Type
                     </label>
                     <div class="detail-value">{{ job?.transactionTypeName || '-' }}</div>
                   </div>
@@ -76,7 +79,7 @@
                 <div class="col-md-4">
                   <div class="detail-item">
                     <label class="detail-label">
-                      <i class="cil-tags"></i> Incoterms
+                      <i class="bi bi-tags"></i> Incoterms
                     </label>
                     <div class="detail-value">{{ job?.incotermsName || '-' }}</div>
                   </div>
@@ -84,7 +87,7 @@
                 <div class="col-md-4">
                   <div class="detail-item">
                     <label class="detail-label">
-                      <i class="cil-credit-card"></i> Payment Type
+                      <i class="bi bi-credit-card"></i> Payment Type
                     </label>
                     <div class="detail-value">{{ job?.paymentTypeName || '-' }}</div>
                   </div>
@@ -97,7 +100,7 @@
                 <div class="col-md-6">
                   <div class="detail-item highlight-box">
                     <label class="detail-label">
-                      <i class="cil-dollar"></i> Amount
+                      <i class="bi bi-currency-dollar"></i> Amount
                     </label>
                     <div class="detail-value-large">₱{{ job?.amount | number:'1.2-2' }}</div>
                   </div>
@@ -105,7 +108,7 @@
                 <div class="col-md-6">
                   <div class="detail-item">
                     <label class="detail-label">
-                      <i class="cil-calendar"></i> Created Date
+                      <i class="bi bi-calendar"></i> Created Date
                     </label>
                     <div class="detail-value">{{ job?.createdDate | date:'MMM dd, yyyy' }}</div>
                   </div>
@@ -124,18 +127,18 @@
                   type="button"
                   (click)="toggleSection('cargo')"
                   [attr.aria-expanded]="isSectionOpen('cargo')">
-            <i class="cil-layers me-2"></i>
+            <i class="bi bi-box-seam me-2"></i>
             Cargo & Routing Details
           </button>
         </h2>
         <div id="collapseCargo" 
-             class="accordion-collapse" 
+             class="accordion-collapse"
+             [class.collapse]="!isSectionOpen('cargo')"
              [class.show]="isSectionOpen('cargo')">
           <div class="accordion-body">
-            <!-- ... existing cargo content ... -->
             <div class="detail-section">
               <h6 class="section-subtitle">
-                <i class="cil-inbox"></i> Shipment Information
+                <i class="bi bi-inbox"></i> Shipment Information
               </h6>
               <div class="row g-4">
                 <div class="col-md-4">
@@ -147,7 +150,7 @@
                 <div class="col-md-4">
                   <div class="detail-item">
                     <label class="detail-label">
-                      <i class="cil-calendar"></i> Cut-off / LCT
+                      <i class="bi bi-calendar-event"></i> Cut-off / LCT
                     </label>
                     <div class="detail-value">{{ job?.cutoff | date:'MMM dd, yyyy' }}</div>
                   </div>
@@ -163,7 +166,7 @@
 
             <div class="detail-section">
               <h6 class="section-subtitle">
-                <i class="cil-location-pin"></i> Routing Information
+                <i class="bi bi-geo-alt"></i> Routing Information
               </h6>
               <div class="row g-4">
                 <div class="col-md-4">
@@ -189,7 +192,7 @@
 
             <div class="detail-section">
               <h6 class="section-subtitle">
-                <i class="cil-chart"></i> Measurements
+                <i class="bi bi-bar-chart"></i> Measurements
               </h6>
               <div class="row g-4">
                 <div class="col-md-4">
@@ -224,18 +227,18 @@
                   type="button"
                   (click)="toggleSection('freight')"
                   [attr.aria-expanded]="isSectionOpen('freight')">
-            <i class="cil-airplane-mode me-2"></i>
+            <i class="bi bi-truck me-2"></i>
             Freight Details
           </button>
         </h2>
         <div id="collapseFreight" 
-             class="accordion-collapse" 
+             class="accordion-collapse"
+             [class.collapse]="!isSectionOpen('freight')"
              [class.show]="isSectionOpen('freight')">
           <div class="accordion-body">
-            <!-- ... existing freight content ... -->
             <div *ngIf="isSeaFreight()" class="freight-section">
-              <div class="freight-type-badge">
-                <i class="cil-boat"></i> Sea Freight
+              <div class="freight-type-badge sea">
+                <i class="bi bi-water"></i> Sea Freight
               </div>
 
               <div class="detail-section">
@@ -289,8 +292,8 @@
             </div>
 
             <div *ngIf="isAirFreight()" class="freight-section">
-              <div class="freight-type-badge">
-                <i class="cil-airplane-mode"></i> Air Freight
+              <div class="freight-type-badge air">
+                <i class="bi bi-airplane"></i> Air Freight
               </div>
 
               <div class="detail-section">
@@ -329,6 +332,11 @@
                 </div>
               </div>
             </div>
+
+            <div *ngIf="!isSeaFreight() && !isAirFreight()" class="empty-freight">
+              <i class="bi bi-question-circle"></i>
+              <p>No freight type specified</p>
+            </div>
           </div>
         </div>
       </div>
@@ -341,21 +349,21 @@
                   type="button"
                   (click)="toggleSection('additional')"
                   [attr.aria-expanded]="isSectionOpen('additional')">
-            <i class="cil-notes me-2"></i>
+            <i class="bi bi-journal-text me-2"></i>
             Additional Details
           </button>
         </h2>
         <div id="collapseAdditional" 
-             class="accordion-collapse" 
+             class="accordion-collapse"
+             [class.collapse]="!isSectionOpen('additional')"
              [class.show]="isSectionOpen('additional')">
           <div class="accordion-body">
-            <!-- ... existing additional content ... -->
             <div class="detail-section">
               <div class="row g-4">
                 <div class="col-md-6">
                   <div class="detail-item">
                     <label class="detail-label">
-                      <i class="cil-people"></i> Agent
+                      <i class="bi bi-people"></i> Agent
                     </label>
                     <div class="detail-value">{{ job?.agent || '-' }}</div>
                   </div>
@@ -372,7 +380,7 @@
             <div class="detail-section">
               <div class="detail-item">
                 <label class="detail-label">
-                  <i class="cil-notes"></i> Remarks
+                  <i class="bi bi-chat-left-text"></i> Remarks
                 </label>
                 <div class="detail-value remarks-box">
                   {{ job?.remarks || 'No remarks' }}
@@ -391,15 +399,16 @@
                   type="button"
                   (click)="toggleSection('charges')"
                   [attr.aria-expanded]="isSectionOpen('charges')">
-            <i class="cil-dollar me-2"></i>
-            Charges | Exepenses | Disbursements
+            <i class="bi bi-cash-coin me-2"></i>
+            Charges | Expenses | Disbursements
           </button>
         </h2>
         <div id="collapseCharges" 
-             class="accordion-collapse" 
+             class="accordion-collapse"
+             [class.collapse]="!isSectionOpen('charges')"
              [class.show]="isSectionOpen('charges')">
-          <div class="accordion-body">
-            <app-job-charges [charges]="charges" [jobGuid] = "jobGuid"></app-job-charges>
+          <div class="accordion-body p-0">
+            <app-job-charges [charges]="charges" [jobGuid]="jobGuid"></app-job-charges>
           </div>
         </div>
       </div>

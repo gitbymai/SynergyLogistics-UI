@@ -1,18 +1,10 @@
 export interface CreateChargeTransactionRequest {
   // Charge Details
-  chargeCode: string;
   chargeSubCategoryId: number;
   description?: string | null;
   amount: number;
-  currencyCode: string;
-  
-  // Job Reference
   jobId: number;
   
-  // Status
-  optionChargeStatusId: number;
-  chargeTransactionCategoryCode?: string | null;
-  isActive?: boolean | null;
 }
 
 export interface UpdateChargeTransactionRequest extends CreateChargeTransactionRequest {

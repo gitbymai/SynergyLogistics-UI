@@ -60,7 +60,6 @@ export class JoblistComponent implements OnInit {
 
         if (response.success && response.data?.length) {
 
-          console.log(response.data);
           this.jobs = response.data
             .filter(c => c.isActive)
             .sort((a, b) => b.jobId = a.jobId)

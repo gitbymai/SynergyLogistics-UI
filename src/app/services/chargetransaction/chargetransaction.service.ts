@@ -53,28 +53,14 @@ export class ChargeTransactionService extends ApiService {
    * Create a new charge transaction
    */
   createCharge(charge: CreateChargeTransactionRequest): Observable<ApiResponse<ChargeTransaction>> {
-    return this.http.post<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/charge`, charge);
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/job/jobtransaction/createcharge`, charge);
   }
 
   /**
    * Update an existing charge transaction
    */
   updateCharge(chargeGuid: string, charge: UpdateChargeTransactionRequest): Observable<ApiResponse<ChargeTransaction>> {
-    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/charge/${chargeGuid}`, charge);
-  }
-
-  /**
-   * Delete a charge transaction (soft delete)
-   */
-  deleteCharge(chargeGuid: string): Observable<ApiResponse<boolean>> {
-    return this.http.delete<ApiResponse<boolean>>(`${this.apiUrl}/charge/${chargeGuid}`);
-  }
-
-  /**
-   * Activate a charge transaction
-   */
-  activateCharge(chargeGuid: string): Observable<ApiResponse<ChargeTransaction>> {
-    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/charge/activate/${chargeGuid}`, {});
+    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/updatecharge/${chargeGuid}`, charge);
   }
 
   /**
@@ -122,8 +108,8 @@ export class ChargeTransactionService extends ApiService {
   /**
    * Cancel charge transaction
    */
-  cancelCharge(chargeGuid: string, cancelledBy: number): Observable<ApiResponse<ChargeTransaction>> {
-    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/charge/${chargeGuid}/cancel`, { cancelledBy });
+  cancelCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
+    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/cancelcharge/${tranGuid}`, {});
   }
 
   /**

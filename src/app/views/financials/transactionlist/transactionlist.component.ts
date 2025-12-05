@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { JobsService } from '../../../services/jobs/jobs.service';
 import { ChargeTransaction } from '../../../models/chargetransaction';
 import { AuthService } from '../../../services/auth.service';
+import { Configuration } from '../../../models/configuration';
 
 @Component({
   selector: 'app-transactionlist',
@@ -16,6 +17,9 @@ export class TransactionlistComponent implements OnInit {
 
   financials: ChargeTransaction[] = [];
   filteredFinancials: ChargeTransaction[] = [];
+  
+  filterChargeStatus: Configuration[] = [];
+  
   searchTerm = '';
   currentPage = 1;
   pageSize = 10;
@@ -38,6 +42,7 @@ export class TransactionlistComponent implements OnInit {
   ngOnInit(): void {
 
     this.loadChargeList();
+    this.loadFilterOptionFields();
 
   }
 
@@ -65,6 +70,31 @@ export class TransactionlistComponent implements OnInit {
       });
 
   }
+
+    loadFilterOptionFields() {
+
+    this.jobService.getAllConfigurations().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.setFilterChargeStatus(response.data);
+        } else {
+          console.error('API returned error:', response.message);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading configurations:', error);
+      }
+    });
+
+  }
+setFilterChargeStatus(chargeStatus: Configuration[]) {
+  if (chargeStatus?.length) {
+    this.filterChargeStatus = chargeStatus
+      .filter(term => term.category === 'FINANCIALSTATUS' && term.isActive)
+      .filter((term, index, self) => self.findIndex(t => t.value === term.value) === index)
+      .sort((a, b) => a.value.localeCompare(b.value));
+  }
+}
 
   onSearchChange(): void {
     const term = this.searchTerm.toLowerCase().trim();
@@ -166,11 +196,6 @@ export class TransactionlistComponent implements OnInit {
       if (this.filters.chargecode && tran.chargeCode !== this.filters.chargecode) {
         return false;
       }
-
-      if (this.filters.chargesubcategory && tran.chargeCategoryName !== this.filters.chargesubcategory) {
-        return false;
-      }
-
       if (this.filters.jobcode && tran.jobCode !== this.filters.jobcode) {
         return false;
       }

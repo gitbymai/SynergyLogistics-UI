@@ -72,12 +72,13 @@ export class JobmanagementComponent implements OnInit {
   }
 
   loadJobRelatedTransaction(jobGuid: string):void{
+    
+    this.jobGuid = jobGuid;
     this.jobService.getAllChargeTransactionByGuid(jobGuid).subscribe({
       next: (success) =>{
 
         this.jobGuid = jobGuid;
         this.charges = success.data;
-        console.log(success.data);
       },
       error: (error) => {
         
@@ -140,7 +141,23 @@ export class JobmanagementComponent implements OnInit {
     return result;
 
   }
-
+  getStatusIcon(status: string): string {
+    switch (status?.toLowerCase()) {
+      case 'active':
+      case 'completed':
+        return 'bi-check-circle';
+      case 'pending':
+        return 'bi-clock';
+      case 'cancelled':
+      case 'inactive':
+        return 'bi-x-circle';
+      case 'in progress':
+      case 'in-progress':
+        return 'bi-hourglass-split';
+      default:
+        return 'bi-question-circle';
+    }
+  }
   getStatusBadgeClass(status: string): string {
     switch (status?.toUpperCase()) {
       case 'COMPLETED':

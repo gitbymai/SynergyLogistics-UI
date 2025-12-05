@@ -37,23 +37,9 @@
           </label>
           <select class="form-select form-control-custom" [(ngModel)]="filters.status" (change)="applyFilters()">
             <option value="">All Statuses</option>
-            <option value="FOR APPROVAL">For Approval</option>
-            <option value="APPROVED">Approved</option>
-            <option value="COMPLETED">Completed</option>
-            <option value="REJECTED">Cancelled</option>
-          </select>
-        </div>
-
-        <div class="col-md-3">
-          <label class="form-label">
-            <i class="cil-airplane-mode me-1"></i> Transaction Name
-          </label>
-          <select class="form-select form-control-custom" [(ngModel)]="filters.chargesubcategory" (change)="applyFilters()">
-            <option value="">All Types</option>
-            <option value="AIR IMPORT">Air Import</option>
-            <option value="AIR EXPORT">Air Export</option>
-            <option value="SEA IMPORT">Sea Import</option>
-            <option value="SEA EXPORT">Sea Export</option>
+            @for(status of filterChargeStatus; track status.optionId){
+              <option [value]="status.value"> {{ status.value }}</option>
+            }
           </select>
         </div>
 
@@ -135,7 +121,7 @@
             <span class="job-code-text">{{ tran.jobCode }}</span>
           </td>
           <td>
-            <span class="date-text">{{ tran.createdDate | date:'MM/dd/yyyy' }}</span>
+            <span class="date-text">{{ tran.createdDate | date:'MMM dd, yyyy' }}</span>
           </td>
           <td class="text-center">
             <div class="action-buttons">
