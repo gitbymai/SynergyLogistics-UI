@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Charge Invoice - {{chargeCode}}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+
+    body {
+      padding: 20px;
+      background: white;
+      color: #333;
+    }
+
+    .invoice-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border: 2px solid #1565c0;
+    }
+
+    .invoice-header {
+      background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .invoice-header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    .invoice-header .invoice-code {
+      font-size: 18px;
+      font-weight: 600;
+      opacity: 0.9;
+      letter-spacing: 0.5px;
+    }
+
+    .invoice-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      padding: 30px;
+      border-bottom: 2px solid #e3f2fd;
+    }
+
+    .info-section h3 {
+      color: #1565c0;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 15px;
+      letter-spacing: 0.5px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: #666;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .info-value {
+      color: #333;
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .charge-details {
+      padding: 30px;
+      background: #f8f9fa;
+    }
+
+    .charge-details h3 {
+      color: #1565c0;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .detail-grid {
+      background: white;
+      border: 1px solid #e3f2fd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: #666;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .detail-value {
+      color: #333;
+      font-weight: 500;
+      text-align: right;
+      font-size: 14px;
+    }
+
+    .description-box {
+      background: white;
+      border: 1px solid #e3f2fd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .description-box h4 {
+      color: #1565c0;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .description-box p {
+      color: #666;
+      line-height: 1.6;
+      font-size: 13px;
+    }
+
+    .amount-summary {
+      padding: 30px;
+      background: white;
+    }
+
+    .amount-summary h3 {
+      color: #1565c0;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .summary-table tr {
+      border-bottom: 1px solid #e3f2fd;
+    }
+
+    .summary-table tr:last-child {
+      border-bottom: none;
+    }
+
+    .summary-table td {
+      padding: 12px;
+      font-size: 14px;
+    }
+
+    .summary-table .label {
+      color: #666;
+      font-weight: 600;
+      width: 60%;
+    }
+
+    .summary-table .value {
+      color: #333;
+      font-weight: 500;
+      text-align: right;
+      width: 40%;
+    }
+
+    .summary-table .total-row {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .summary-table .total-row .label {
+      color: #1565c0;
+    }
+
+    .summary-table .total-row .value {
+      color: #1565c0;
+      font-size: 20px;
+    }
+
+    .status-section {
+      padding: 20px 30px;
+      background: #f8f9fa;
+      border-top: 2px solid #e3f2fd;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-approved {
+      background: #28a745;
+      color: white;
+    }
+
+    .status-pending {
+      background: #ffc107;
+      color: #333;
+    }
+
+    .status-rejected {
+      background: #dc3545;
+      color: white;
+    }
+
+    .invoice-footer {
+      padding: 20px 30px;
+      text-align: center;
+      background: #f8f9fa;
+      border-top: 2px solid #e3f2fd;
+      color: #666;
+      font-size: 12px;
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        padding: 0;
+      }
+
+      .invoice-container {
+        border: none;
+        max-width: 100%;
+      }
+
+      .invoice-header {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .charge-details,
+      .status-section,
+      .invoice-footer {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .summary-table .total-row {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .status-badge {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="invoice-container">
+    <!-- Header -->
+    <div class="invoice-header">
+      <h1>CHARGE INVOICE</h1>
+      <div class="invoice-code">{{chargeCode}}</div>
+    </div>
+
+    <!-- Invoice Information -->
+    <div class="invoice-info">
+      <div class="info-section">
+        <h3>Billed To</h3>
+        <div class="info-row">
+          <span class="info-label">Client:</span>
+          <span class="info-value">{{client}}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Job Code:</span>
+          <span class="info-value">{{jobCode}}</span>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <h3>Invoice Details</h3>
+        <div class="info-row">
+          <span class="info-label">Transaction Date:</span>
+          <span class="info-value">{{transactionDate}}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Due Date:</span>
+          <span class="info-value">{{dueDate}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charge Details -->
+    <div class="charge-details">
+      <h3>Charge Details</h3>
+      <div class="detail-grid">
+        <div class="detail-row">
+          <span class="detail-label">Charge Type:</span>
+          <span class="detail-value">{{chargeType}}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Category:</span>
+          <span class="detail-value">{{category}}</span>
+        </div>
+      </div>
+
+      <div class="description-box">
+        <h4>Description</h4>
+        <p>{{description}}</p>
+      </div>
+    </div>
+
+    <!-- Amount Summary -->
+    <div class="amount-summary">
+      <h3>Amount Summary</h3>
+      <table class="summary-table">
+        <tr>
+          <td class="label">Base Amount:</td>
+          <td class="value">{{amount}}</td>
+        </tr>
+        <tr>
+          <td class="label">Tax Rate:</td>
+          <td class="value">{{taxRate}}</td>
+        </tr>
+        <tr>
+          <td class="label">Tax Amount:</td>
+          <td class="value">{{taxAmount}}</td>
+        </tr>
+        <tr class="total-row">
+          <td class="label">TOTAL AMOUNT:</td>
+          <td class="value">{{totalAmount}}</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Status -->
+    <div class="status-section">
+      <strong>Status:</strong>
+      <span class="status-badge status-{{status | lowercase}}">{{status}}</span>
+    </div>
+
+    <!-- Footer -->
+    <div class="invoice-footer">
+      <p>{{printFooter}}</p>
+      <p style="margin-top: 10px;">This is a computer-generated invoice and requires no signature.</p>
+    </div>
+  </div>
+</body>
+</html>

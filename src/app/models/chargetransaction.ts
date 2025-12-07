@@ -40,6 +40,9 @@ export interface ChargeTransaction {
   jobId: number;
   jobGuid?: string | null;
   jobCode: string;
+  jobClientName: string;
+  jobPaymentType: string;
+  jobTransactionType: string;
   
   // Status
   optionChargeStatusId: number;
@@ -55,7 +58,7 @@ export interface ChargeTransaction {
   completedBy?: number | null;
   
   // Audit Fields
-  createdDate: string;
+  createdDate: Date;
   createdBy: number;
   modifiedDate?: string | null;
   modifiedBy?: number | null;

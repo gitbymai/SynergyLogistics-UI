@@ -75,9 +75,7 @@ export class JobchargesmanagementComponent implements OnInit {
 
   ngOnInit(): void {
     this.jobGuid = this.route.snapshot.paramMap.get('jobGuid') || '';
-    this.loadCharges();
     this.loadJobDetails();
-    this.loadDropdownOptions();
   }
 
   initializeForm(): void {
@@ -89,22 +87,23 @@ export class JobchargesmanagementComponent implements OnInit {
     });
   }
 
-loadJobDetails(): void {
-  this.jobService.getByGuid(this.jobGuid).subscribe({
-    next: (response) => {
-      if (!response) {
+  loadJobDetails(): void {
+    this.jobService.getByGuid(this.jobGuid).subscribe({
+      next: (response) => {
+        if (!response) {
+          this.router.navigate(['/dashboard']);
+          return;
+        }
+        this.jobDetails = response;
+        this.jobId = response.jobId;
+        this.loadCharges();
+      },
+      error: (error) => {
+        console.error('Error loading job details:', error);
         this.router.navigate(['/dashboard']);
-        return;
       }
-      this.jobDetails = response;
-      this.jobId = response.jobId;
-    },
-    error: (error) => {
-      console.error('Error loading job details:', error);
-      this.router.navigate(['/dashboard']);
-    }
-  });
-}
+    });
+  }
 
   loadCharges(): void {
     this.isLoading = true;
@@ -116,6 +115,7 @@ loadJobDetails(): void {
             this.charges = response.data;
             if (response.data.length) {
               this.jobCode = response.data[0].jobCode;
+              this.getChargeSubcategories();
             }
             this.applyFilters();
           } else {
@@ -129,30 +129,18 @@ loadJobDetails(): void {
       });
   }
 
-  loadDropdownOptions(): void {
+  getChargeSubcategories(): void {
+    if (this.charges && this.charges.length > 0) {
+      const uniqueMap = new Map<number, string>();
 
-    //this.chargeSubcategories = [];
-    // Load charge subcategories from service
-    // Example:
-    // this.chargeService.getChargeSubcategories().subscribe({
-    //   next: (response) => {
-    //     if (response.success && response.data) {
-    //       this.chargeSubcategories = response.data;
-    //     }
-    //   },
-    //   error: (error) => console.error('Error loading subcategories:', error)
-    // });
+      this.charges.forEach(charge => {
+        if (!uniqueMap.has(charge.chargeSubCategoryId)) {
+          uniqueMap.set(charge.chargeSubCategoryId, charge.chargeSubCategoryName!);
+        }
+      });
 
-    // Load charge statuses from service
-    // Example:
-    // this.chargeService.getChargeStatuses().subscribe({
-    //   next: (response) => {
-    //     if (response.success && response.data) {
-    //       this.chargeStatuses = response.data;
-    //     }
-    //   },
-    //   error: (error) => console.error('Error loading statuses:', error)
-    // });
+      this.chargeSubcategories = Array.from(uniqueMap, ([id, name]) => ({ id, name }));
+    }
   }
 
   applyFilters(): void {
@@ -165,10 +153,10 @@ loadJobDetails(): void {
         charge.chargeSubCategoryName?.toLowerCase().includes(term);
 
       const matchCategory = !this.selectedCategory ||
-        charge.chargeSubCategoryId?.toString() === this.selectedCategory;
+        charge.chargeSubCategoryName?.toString() === this.selectedCategory;
 
       const matchStatus = !this.selectedStatus ||
-        charge.optionChargeStatusId?.toString() === this.selectedStatus;
+        charge.chargeTransactionStatus!.toString() === this.selectedStatus;
 
       return matchSearch && matchCategory && matchStatus;
     });
@@ -326,12 +314,12 @@ loadJobDetails(): void {
       });
   }
 
-get total(): number {
-  const excludedStatuses = ['CANCELLED', 'REJECTED'];
-  return this.filteredCharges
-    .filter(charge => !excludedStatuses.includes(charge.chargeTransactionStatus!))
-    .reduce((sum, charge) => sum + (charge.amount || 0), 0);
-}
+  get total(): number {
+    const excludedStatuses = ['CANCELLED', 'REJECTED'];
+    return this.filteredCharges
+      .filter(charge => !excludedStatuses.includes(charge.chargeTransactionStatus!))
+      .reduce((sum, charge) => sum + (charge.amount || 0), 0);
+  }
 
   getStatusClass(status: string): string {
     switch (status?.toUpperCase()) {

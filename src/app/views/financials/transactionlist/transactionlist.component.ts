@@ -167,7 +167,7 @@ setFilterChargeStatus(chargeStatus: Configuration[]) {
   }
 
   viewJobFinancial(transaction: any) {
-    this.router.navigate(['/jobs/jobmanagement', transaction.chargeGuid]);
+    this.router.navigate(['/jobs/financials/management', transaction.chargeGuid]);
   }
 
   getStatusBadgeClass(status: string): string {

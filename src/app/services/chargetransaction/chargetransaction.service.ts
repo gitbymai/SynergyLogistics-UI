@@ -28,11 +28,9 @@ export class ChargeTransactionService extends ApiService {
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/${jobGuid}/charges`);
   }
 
-  /**
-   * Get charge transaction by charge GUID
-   */
+
   getChargeByGuid(chargeGuid: string): Observable<ChargeTransaction> {
-    return this.http.get<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/charge/${chargeGuid}`).pipe(
+    return this.http.get<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/manage/${chargeGuid}`).pipe(
       map(response => {
         if (response.success && response.data) {
           return response.data;
