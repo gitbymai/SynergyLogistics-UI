@@ -1,0 +1,132 @@
+/* Grid Layout */
+.grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  grid-template-rows: auto auto;
+  gap: 1.5rem;
+  grid-template-areas:
+    "main right-top"
+    "main right-bottom";
+}
+
+.main-section {
+  grid-area: main;
+}
+
+.right-top-section {
+  grid-area: right-top;
+}
+
+.right-bottom-section {
+  grid-area: right-bottom;
+}
+
+/* Section Cards */
+.detail-section-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 1rem 1.5rem;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.section-title {
+  margin: 0;
+  color: #495057;
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+}
+
+.section-content {
+  padding: 1.5rem;
+}
+
+.section-subtitle {
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.detail-section {
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-section:last-child {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+/* Freight Type Badges */
+.freight-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.freight-type-badge.sea {
+  background: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid #90caf9;
+}
+
+.freight-type-badge.air {
+  background: #f3e5f5;
+  color: #7b1fa2;
+  border: 1px solid #ce93d8;
+}
+
+.empty-freight {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+}
+
+.empty-freight i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .grid-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "main"
+      "right-top"
+      "right-bottom";
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-layout {
+    gap: 1rem;
+  }
+  
+  .section-content {
+    padding: 1rem;
+  }
+  
+  .section-subtitle {
+    font-size: 0.9rem;
+  }
+}

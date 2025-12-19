@@ -228,13 +228,13 @@
   font-weight: 500;
 }
 
-/* Charge Code Cell */
-.charge-code-cell {
+/* Job Code Cell */
+.job-code-cell {
   display: flex;
   align-items: center;
 }
 
-.charge-code-badge {
+.job-code-badge {
   background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
   color: white;
   padding: 0.4rem 0.75rem;
@@ -243,10 +243,18 @@
   letter-spacing: 0.3px;
 }
 
-/* Category Cell */
-.category-cell {
+/* Customer Cell */
+.customer-cell {
   display: flex;
   align-items: center;
+}
+
+.customer-name {
+  color: #1565c0;
+  max-width: 150px;
+  // overflow: hidden;
+  // text-overflow: ellipsis;
+  // white-space: nowrap;
 }
 
 /* Transaction Badge */
@@ -258,23 +266,26 @@
   font-size: 0.75rem;
   letter-spacing: 0.2px;
   text-align: center;
-  color: white;
 }
 
 .transaction-air-import {
   background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+  color: white;
 }
 
 .transaction-air-export {
   background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+  color: white;
 }
 
 .transaction-sea-import {
   background: linear-gradient(135deg, #ffa726 0%, #ff8c00 100%);
+  color: white;
 }
 
 .transaction-sea-export {
   background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+  color: white;
 }
 
 /* Status Badge */
@@ -286,11 +297,14 @@
   display: inline-block;
 }
 
-/* Job Code Text */
-.job-code-text {
-  color: #1565c0;
-  font-weight: 600;
-  letter-spacing: 0.2px;
+/* Location Cell */
+.location-cell {
+  text-align: center;
+}
+
+.location-text {
+  color: #666;
+  font-weight: 500;
 }
 
 /* Amount Value */
@@ -427,11 +441,16 @@
     font-size: 0.7rem;
   }
 
-  .charge-code-badge,
+  .job-code-badge,
   .transaction-badge,
   .status-badge {
     padding: 0.3rem 0.5rem;
     font-size: 0.7rem;
+  }
+
+  .customer-name {
+    max-width: 100px;
+    text-align: center;
   }
 
   .action-buttons {
@@ -489,7 +508,11 @@
     display: none;
   }
 
-  .charge-code-badge {
+  .customer-name {
+    max-width: 80px;
+  }
+
+  .job-code-badge {
     padding: 0.25rem 0.4rem;
     font-size: 0.65rem;
   }
@@ -500,7 +523,7 @@
     font-size: 0.65rem;
   }
 
-  .job-code-text,
+  .location-text,
   .date-text,
   .amount-value {
     font-size: 0.7rem;

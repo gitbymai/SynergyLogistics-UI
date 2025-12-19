@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { JobsService } from '../../../services/jobs/jobs.service';
 import { ChargeTransaction } from '../../../models/chargetransaction';
 import { AuthService } from '../../../services/auth.service';
+import { JobTransactionType } from '../../../models/jobtransactiontype';
+import { Job } from '../../../models/job';
 import { Configuration } from '../../../models/configuration';
 
 @Component({
@@ -15,11 +17,14 @@ import { Configuration } from '../../../models/configuration';
 })
 export class TransactionlistComponent implements OnInit {
 
-  financials: ChargeTransaction[] = [];
-  filteredFinancials: ChargeTransaction[] = [];
-  
-  filterChargeStatus: Configuration[] = [];
-  
+  jobs: Job[] = [];
+  filterJobStatus: Configuration[] = [];
+
+  filterIncotermsList: Configuration[] = [];
+  filterJobTransactionTypeList: JobTransactionType[] = [];
+  filterPaymenTypeList: Configuration[] = [];
+
+  filteredJobs: Job[] = [];
   searchTerm = '';
   currentPage = 1;
   pageSize = 10;
@@ -27,12 +32,16 @@ export class TransactionlistComponent implements OnInit {
   sortDirection: 'asc' | 'desc' = 'asc';
 
   showFilters = false;
-
   filters = {
     status: '',
-    chargesubcategory: '',
-    jobcode: '',
-    chargecode: ''
+    transactionType: '',
+    paymentType: '',
+    incoterms: '',
+    customer: '',
+    origin: '',
+    destination: '',
+    dateFrom: '',
+    dateTo: ''
   };
 
   constructor(private router: Router, private jobService: JobsService, private authService: AuthService) {
@@ -41,42 +50,44 @@ export class TransactionlistComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.loadChargeList();
+    this.loadJobList();
     this.loadFilterOptionFields();
+    this.loadJobTransactionTypes();
 
   }
+  loadJobList() {
 
-  loadChargeList() {
+    this.jobService.getAllJobs().subscribe({
 
-    var currentRole = this.authService.getCurrentUserRole()?.toString() ?? '';
+      next: (response) => {
 
-      this.jobService.getChargeTransactionByRole(currentRole).subscribe({
+        if (response.success && response.data?.length) {
 
-        next: (res) => {
+          this.jobs = response.data
+            .filter(c => c.isActive)
+            .sort((a, b) => b.jobId = a.jobId)
 
-          if (res.success && res.data?.length) {
-
-            this.financials = res.data
-              .filter(a => a.isActive && a.amount > 0)
-              .sort((a, b) => b.chargeId = a.chargeId)
-
-            this.filteredFinancials = [...this.financials];
-          }
-
-        },
-        error: (e) => {
-          console.error('API returned error:', e.message);
+          this.filteredJobs = [...this.jobs];
         }
-      });
 
+      },
+      error: (error) => {
+        console.error('API returned error:', error.message);
+      }
+
+    });
   }
+  
 
+  
     loadFilterOptionFields() {
 
     this.jobService.getAllConfigurations().subscribe({
       next: (response) => {
         if (response.success) {
-          this.setFilterChargeStatus(response.data);
+          this.setFilterJobStatus(response.data);
+          this.setFilterIncotermsList(response.data);
+          this.setFilterPaymentTypeList(response.data);
         } else {
           console.error('API returned error:', response.message);
         }
@@ -87,36 +98,77 @@ export class TransactionlistComponent implements OnInit {
     });
 
   }
-setFilterChargeStatus(chargeStatus: Configuration[]) {
-  if (chargeStatus?.length) {
-    this.filterChargeStatus = chargeStatus
-      .filter(term => term.category === 'FINANCIALSTATUS' && term.isActive)
-      .filter((term, index, self) => self.findIndex(t => t.value === term.value) === index)
-      .sort((a, b) => a.value.localeCompare(b.value));
+
+  loadJobTransactionTypes(): void {
+    this.jobService.getJobTransactionTypes().subscribe({
+      next: (response) => {
+        if (response.success && response.data?.length) {
+          this.filterJobTransactionTypeList = response.data
+            .filter(type => type.isActive)
+            .sort((a, b) => a.jobTransactionType.localeCompare(b.jobTransactionType));
+        } else {
+          console.error('API returned error: ', response.message);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading job transaction types:', error);
+      }
+    })
   }
-}
+
+  
+  setFilterJobStatus(jobStatus: Configuration[]) {
+    if (jobStatus?.length) {
+      this.filterJobStatus = jobStatus
+        .filter(term => term.category === 'JOBSTATUS' && term.isActive)
+        .sort((a, b) => a.value.localeCompare(b.value));
+    }
+  }
+
+  setFilterIncotermsList(incoterms: Configuration[]): void {
+    if (incoterms?.length) {
+      this.filterIncotermsList = incoterms
+        .filter(term => term.category === 'INCOTERMS' && term.isActive)
+        .sort((a, b) => a.value.localeCompare(b.value));
+    }
+  }
+
+  setFilterPaymentTypeList(paymentTypes: Configuration[]): void {
+    if (paymentTypes?.length) {
+      this.filterPaymenTypeList = paymentTypes
+        .filter(type => type.category === 'JOBPAYMENTTYPE' && type.isActive)
+        .sort((a, b) => a.value.localeCompare(b.value));
+    }
+  }
 
   onSearchChange(): void {
     const term = this.searchTerm.toLowerCase().trim();
 
-    this.filteredFinancials = term
-      ? this.financials.filter(a => {
+    this.filteredJobs = term
+      ? this.jobs.filter(job => {
         const searchableFields = [
-          a.chargeTransactionStatus,
-          a.chargeSubCategoryName,
-          a.jobCode,
-          a.chargeCode
+          job.jobCode,
+          job.customerName,
+          job.transactionTypeName,
+          job.jobStatusName,
+          job.origin,
+          job.destination,
+          job.carrier,
+          job.vessel,
+          job.mbl,
+          job.hbl,
+          job.jobId.toString()
         ];
         return searchableFields.some(field =>
           field?.toLowerCase().includes(term)
         );
       })
-      : [...this.filteredFinancials];
+      : [...this.jobs];
 
     this.currentPage = 1;
   }
 
-  sortBy(column: keyof ChargeTransaction): void {
+  sortBy(column: keyof Job): void {
     if (this.sortColumn === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
@@ -124,7 +176,7 @@ setFilterChargeStatus(chargeStatus: Configuration[]) {
       this.sortDirection = 'asc';
     }
 
-    this.filteredFinancials.sort((a, b) => {
+    this.filteredJobs.sort((a, b) => {
       const valA = a[column];
       const valB = b[column];
 
@@ -150,14 +202,13 @@ setFilterChargeStatus(chargeStatus: Configuration[]) {
     });
   }
 
-
   get paginatedJobs() {
     const start = (this.currentPage - 1) * this.pageSize;
-    return this.filteredFinancials.slice(start, start + this.pageSize);
+    return this.filteredJobs.slice(start, start + this.pageSize);
   }
 
   totalPages(): number {
-    return Math.ceil(this.filteredFinancials.length / this.pageSize);
+    return Math.ceil(this.filteredJobs.length / this.pageSize);
   }
 
   goToPage(page: number): void {
@@ -166,8 +217,8 @@ setFilterChargeStatus(chargeStatus: Configuration[]) {
     }
   }
 
-  viewJobFinancial(transaction: any) {
-    this.router.navigate(['/jobs/financials/management', transaction.chargeGuid]);
+  viewJob(job: any) {
+    this.router.navigate(['/financials/chargelists/', job.jobGuid]);
   }
 
   getStatusBadgeClass(status: string): string {
@@ -180,26 +231,63 @@ setFilterChargeStatus(chargeStatus: Configuration[]) {
     }
   }
 
-
   toggleFilters(): void {
     this.showFilters = !this.showFilters;
   }
 
-
   applyFilters(): void {
-    this.filteredFinancials = this.financials.filter(tran => {
-
-      if (this.filters.status && tran.chargeTransactionStatus !== this.filters.status) {
+    this.filteredJobs = this.jobs.filter(job => {
+      // Status filter
+      if (this.filters.status && job.jobStatusName !== this.filters.status) {
         return false;
       }
 
-      if (this.filters.chargecode && tran.chargeCode !== this.filters.chargecode) {
-        return false;
-      }
-      if (this.filters.jobcode && tran.jobCode !== this.filters.jobcode) {
+      // Transaction Type filter
+      if (this.filters.transactionType && job.transactionTypeName !== this.filters.transactionType) {
         return false;
       }
 
+      // Payment Type filter
+      if (this.filters.paymentType && job.paymentTypeName !== this.filters.paymentType) {
+        return false;
+      }
+
+      // Incoterms filter
+      if (this.filters.incoterms && job.incotermsName !== this.filters.incoterms) {
+        return false;
+      }
+
+      // Customer filter
+      if (this.filters.customer && !job.customerName?.toLowerCase().includes(this.filters.customer.toLowerCase())) {
+        return false;
+      }
+
+      // Origin filter
+      if (this.filters.origin && !job.origin?.toLowerCase().includes(this.filters.origin.toLowerCase())) {
+        return false;
+      }
+
+      // Destination filter
+      if (this.filters.destination && !job.destination?.toLowerCase().includes(this.filters.destination.toLowerCase())) {
+        return false;
+      }
+
+      // Date range filter
+      if (this.filters.dateFrom) {
+        const jobDate = new Date(job.createdDate);
+        const fromDate = new Date(this.filters.dateFrom);
+        if (jobDate < fromDate) {
+          return false;
+        }
+      }
+
+      if (this.filters.dateTo) {
+        const jobDate = new Date(job.createdDate);
+        const toDate = new Date(this.filters.dateTo);
+        if (jobDate > toDate) {
+          return false;
+        }
+      }
       return true;
     });
 
@@ -210,31 +298,46 @@ setFilterChargeStatus(chargeStatus: Configuration[]) {
 
     this.currentPage = 1;
   }
-  clearFilters(): void {
 
+  clearFilters(): void {
     this.filters = {
       status: '',
-      chargecode: '',
-      chargesubcategory: '',
-      jobcode: ''
-
+      transactionType: '',
+      paymentType: '',
+      incoterms: '',
+      customer: '',
+      origin: '',
+      destination: '',
+      dateFrom: '',
+      dateTo: '',
     };
-    this.filteredFinancials = [...this.financials];
+    this.filteredJobs = [...this.jobs];
     this.currentPage = 1;
   }
 
   hasActiveFilters(): boolean {
     return this.filters.status !== '' ||
-      this.filters.chargecode !== '' ||
-      this.filters.chargesubcategory !== '' ||
-      this.filters.jobcode !== '';
+      this.filters.transactionType !== '' ||
+      this.filters.paymentType !== '' ||
+      this.filters.incoterms !== '' ||
+      this.filters.customer !== '' ||
+      this.filters.origin !== '' ||
+      this.filters.destination !== '' ||
+      this.filters.dateFrom !== '' ||
+      this.filters.dateTo !== '';
   }
+
   activeFilterCount(): number {
     let count = 0;
     if (this.filters.status) count++;
-    if (this.filters.chargecode) count++;
-    if (this.filters.chargesubcategory) count++;
-    if (this.filters.jobcode) count++;
+    if (this.filters.transactionType) count++;
+    if (this.filters.paymentType) count++;
+    if (this.filters.incoterms) count++;
+    if (this.filters.customer) count++;
+    if (this.filters.origin) count++;
+    if (this.filters.destination) count++;
+    if (this.filters.dateFrom) count++;
+    if (this.filters.dateTo) count++;
     return count;
   }
 

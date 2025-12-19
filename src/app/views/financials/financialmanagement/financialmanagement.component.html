@@ -8,7 +8,7 @@
         <span class="badge badge-code">{{ chargeTransaction?.chargeCode }}</span>
       </div>
       <div class="d-flex gap-2">
-        <button routerLink="/charges/list" class="btn btn-light-custom btn-sm">
+        <button routerLink="/jobs/financials" class="btn btn-light-custom btn-sm">
           <i class="bi bi-arrow-left me-1"></i>
           <span>Back to List</span>
         </button>
@@ -21,25 +21,20 @@
   </div>
 
   <div class="card-body job-details-body">
-    <div class="accordion accordion-custom" id="chargeDetailsAccordion">
+    <div class="grid-layout">
       
-      <!-- ======================= 1. JOB INFORMATION ======================== -->
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingJobInfo">
-          <button class="accordion-button" 
-                  [class.collapsed]="!isSectionOpen('jobInfo')"
-                  type="button" 
-                  (click)="toggleSection('jobInfo')"
-                  [attr.aria-expanded]="isSectionOpen('jobInfo')">
-            <i class="bi bi-briefcase me-2"></i>
-            Job Information
-          </button>
-        </h2>
-        <div id="collapseJobInfo" 
-             class="accordion-collapse"
-             [class.collapse]="!isSectionOpen('jobInfo')"
-             [class.show]="isSectionOpen('jobInfo')">
-          <div class="accordion-body">
+      <!-- ======================= LEFT SECTION (MAIN) ======================== -->
+      <div class="main-section">
+        
+        <!-- JOB INFORMATION -->
+        <div class="detail-section-card mb-4">
+          <div class="section-header">
+            <h5 class="section-title">
+              <i class="bi bi-briefcase me-2"></i>
+              Job Information
+            </h5>
+          </div>
+          <div class="section-content">
             <div class="detail-section">
               <div class="row g-4">
                 <div class="col-md-8">
@@ -92,25 +87,16 @@
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- ======================= 2. CHARGE DETAILS ======================== -->
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingChargeDetails">
-          <button class="accordion-button" 
-                  [class.collapsed]="!isSectionOpen('chargeDetails')"
-                  type="button" 
-                  (click)="toggleSection('chargeDetails')"
-                  [attr.aria-expanded]="isSectionOpen('chargeDetails')">
-            <i class="bi bi-receipt-cutoff me-2"></i>
-            Charge Details
-          </button>
-        </h2>
-        <div id="collapseChargeDetails" 
-             class="accordion-collapse"
-             [class.collapse]="!isSectionOpen('chargeDetails')"
-             [class.show]="isSectionOpen('chargeDetails')">
-          <div class="accordion-body">
+        <!-- CHARGE DETAILS -->
+        <div class="detail-section-card mb-4">
+          <div class="section-header">
+            <h5 class="section-title">
+              <i class="bi bi-receipt-cutoff me-2"></i>
+              Charge Details
+            </h5>
+          </div>
+          <div class="section-content">
             <div class="detail-section">
               <div class="row g-4">
                 <div class="col-md-6">
@@ -134,7 +120,7 @@
 
             <div class="detail-section">
               <div class="row g-4">
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <div class="detail-item highlight-box">
                     <label class="detail-label">
                       <i class="bi bi-currency-dollar"></i> Amount
@@ -142,7 +128,7 @@
                     <div class="detail-value-large">₱{{ chargeTransaction?.amount | number:'1.2-2' }}</div>
                   </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <div class="detail-item highlight-box">
                     <label class="detail-label">
                       <i class="bi bi-cash-stack"></i> Total Amount
@@ -190,127 +176,17 @@
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- ======================= 3. STATUS & WORKFLOW ======================== -->
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingStatus">
-          <button class="accordion-button" 
-                  [class.collapsed]="!isSectionOpen('status')"
-                  type="button" 
-                  (click)="toggleSection('status')"
-                  [attr.aria-expanded]="isSectionOpen('status')">
-            <i class="bi bi-diagram-3 me-2"></i>
-            Status & Workflow
-          </button>
-        </h2>
-        <div id="collapseStatus" 
-             class="accordion-collapse"
-             [class.collapse]="!isSectionOpen('status')"
-             [class.show]="isSectionOpen('status')">
-          <div class="accordion-body">
-            <div class="detail-section">
-              <div class="row g-4">
-                <div class="col-md-6">
-                  <div class="detail-item">
-                    <label class="detail-label">
-                      <i class="bi bi-flag"></i> Current Status
-                    </label>
-                    <div class="detail-value">
-                      <span [class]="'badge status-badge ' + getStatusBadgeClass(chargeTransaction?.chargeTransactionStatus || '')">
-                        <i class="bi me-1" [ngClass]="getStatusIcon(chargeTransaction?.chargeTransactionStatus || '')"></i>
-                        {{ chargeTransaction?.chargeTransactionStatus || 'Pending' }}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="detail-item">
-                    <label class="detail-label">
-                      <i class="bi bi-person-check"></i> Approved By
-                    </label>
-                    <div class="detail-value">{{ chargeTransaction?.createdBy || 'Not yet approved' }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="detail-section">
-              <div class="row g-4">
-                <div class="col-md-6">
-                  <div class="detail-item">
-                    <label class="detail-label">
-                      <i class="bi bi-calendar-check"></i> Approval Date
-                    </label>
-                    <div class="detail-value">{{ chargeTransaction?.createdDate ? (chargeTransaction!.createdDate | date:'MMM dd, yyyy') : '-' }}</div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="detail-item">
-                    <label class="detail-label">
-                      <i class="bi bi-person-gear"></i> Last Modified By
-                    </label>
-                    <div class="detail-value">{{ chargeTransaction?.modifiedBy || '-' }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="detail-section" *ngIf="canManageTransaction()">
-              <div class="section-subtitle">
-                <i class="bi bi-lightning-charge"></i>
-                Available Actions
-              </div>
-              <div class="action-buttons-grid">
-                <button class="btn btn-success btn-action" 
-                        *ngIf="canApprove()"
-                        (click)="approveTransaction()">
-                  <i class="bi bi-check-circle me-2"></i>
-                  Approve
-                </button>
-                <button class="btn btn-danger btn-action" 
-                        *ngIf="canReject()"
-                        (click)="rejectTransaction()">
-                  <i class="bi bi-x-circle me-2"></i>
-                  Reject
-                </button>
-                <button class="btn btn-info btn-action" 
-                        *ngIf="canRelease()"
-                        (click)="releaseTransaction()">
-                  <i class="bi bi-send me-2"></i>
-                  For Releasing
-                </button>
-                <button class="btn btn-warning btn-action" 
-                        *ngIf="canLiquidate()"
-                        (click)="liquidateTransaction()">
-                  <i class="bi bi-cash-coin me-2"></i>
-                  For Liquidation
-                </button>
-              </div>
-            </div>
+        <!-- COMMENTS & NOTES -->
+        <div class="detail-section-card mb-4">
+          <div class="section-header">
+            <h5 class="section-title">
+              <i class="bi bi-chat-left-dots me-2"></i>
+              Comments & Notes
+              <span class="badge bg-secondary ms-2">{{ comments.length }}</span>
+            </h5>
           </div>
-        </div>
-      </div>
-
-      <!-- ======================= 4. COMMENTS & NOTES ======================== -->
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingComments">
-          <button class="accordion-button" 
-                  [class.collapsed]="!isSectionOpen('comments')"
-                  type="button" 
-                  (click)="toggleSection('comments')"
-                  [attr.aria-expanded]="isSectionOpen('comments')">
-            <i class="bi bi-chat-left-dots me-2"></i>
-            Comments & Notes
-            <span class="badge bg-light text-dark ms-2">{{ comments.length }}</span>
-          </button>
-        </h2>
-        <div id="collapseComments" 
-             class="accordion-collapse"
-             [class.collapse]="!isSectionOpen('comments')"
-             [class.show]="isSectionOpen('comments')">
-          <div class="accordion-body">
+          <div class="section-content">
             <!-- Add Comment Form -->
             <div class="comment-form mb-4">
               <div class="section-subtitle">
@@ -361,26 +237,119 @@
             </div>
           </div>
         </div>
+
       </div>
 
-      <!-- ======================= 5. AUDIT TRAIL ======================== -->
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingTrail">
-          <button class="accordion-button" 
-                  [class.collapsed]="!isSectionOpen('trail')"
-                  type="button" 
-                  (click)="toggleSection('trail')"
-                  [attr.aria-expanded]="isSectionOpen('trail')">
-            <i class="bi bi-clock-history me-2"></i>
-            Audit Trail
-            <span class="badge bg-light text-dark ms-2">{{ auditTrail.length }}</span>
-          </button>
-        </h2>
-        <div id="collapseTrail" 
-             class="accordion-collapse"
-             [class.collapse]="!isSectionOpen('trail')"
-             [class.show]="isSectionOpen('trail')">
-          <div class="accordion-body">
+      <!-- ======================= RIGHT SECTION (TOP) ======================== -->
+      <div class="right-top-section">
+        
+        <!-- STATUS & WORKFLOW -->
+        <div class="detail-section-card h-100">
+          <div class="section-header">
+            <h5 class="section-title">
+              <i class="bi bi-diagram-3 me-2"></i>
+              Status & Workflow
+            </h5>
+          </div>
+          <div class="section-content">
+            <div class="detail-section">
+              <div class="row g-4">
+                <div class="col-12">
+                  <div class="detail-item">
+                    <label class="detail-label">
+                      <i class="bi bi-flag"></i> Current Status
+                    </label>
+                    <div class="detail-value">
+                      <span [class]="'badge status-badge ' + getStatusBadgeClass(chargeTransaction?.chargeTransactionStatus || '')">
+                        <i class="bi me-1" [ngClass]="getStatusIcon(chargeTransaction?.chargeTransactionStatus || '')"></i>
+                        {{ chargeTransaction?.chargeTransactionStatus || 'Pending' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="detail-item">
+                    <label class="detail-label">
+                      <i class="bi bi-person-check"></i> Approved By
+                    </label>
+                    <div class="detail-value">{{ chargeTransaction?.createdBy || 'Not yet approved' }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <div class="row g-4">
+                <div class="col-12">
+                  <div class="detail-item">
+                    <label class="detail-label">
+                      <i class="bi bi-calendar-check"></i> Approval Date
+                    </label>
+                    <div class="detail-value">{{ chargeTransaction?.createdDate ? (chargeTransaction!.createdDate | date:'MMM dd, yyyy') : '-' }}</div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="detail-item">
+                    <label class="detail-label">
+                      <i class="bi bi-person-gear"></i> Last Modified By
+                    </label>
+                    <div class="detail-value">{{ chargeTransaction?.modifiedBy || '-' }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="detail-section" *ngIf="canManageTransaction()">
+              <div class="section-subtitle">
+                <i class="bi bi-lightning-charge"></i>
+                Available Actions
+              </div>
+              <div class="action-buttons-grid">
+                <button class="btn btn-success btn-action w-100 mb-2" 
+                        *ngIf="canApprove()"
+                        (click)="approveTransaction()">
+                  <i class="bi bi-check-circle me-2"></i>
+                  Approve
+                </button>
+                <button class="btn btn-danger btn-action w-100 mb-2" 
+                        *ngIf="canReject()"
+                        (click)="rejectTransaction()">
+                  <i class="bi bi-x-circle me-2"></i>
+                  Reject
+                </button>
+                <button class="btn btn-info btn-action w-100 mb-2" 
+                        *ngIf="canRelease()"
+                        (click)="releaseTransaction()">
+                  <i class="bi bi-send me-2"></i>
+                  For Releasing
+                </button>
+                <button class="btn btn-warning btn-action w-100" 
+                        *ngIf="canLiquidate()"
+                        (click)="liquidateTransaction()">
+                  <i class="bi bi-cash-coin me-2"></i>
+                  For Liquidation
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ======================= RIGHT SECTION (BOTTOM) ======================== -->
+      <div class="right-bottom-section">
+        
+        <!-- AUDIT TRAIL -->
+        <div class="detail-section-card h-100">
+          <div class="section-header">
+            <h5 class="section-title">
+              <i class="bi bi-clock-history me-2"></i>
+              Audit Trail
+              <span class="badge bg-secondary ms-2">{{ auditTrail.length }}</span>
+            </h5>
+          </div>
+          <div class="section-content">
             <div class="section-subtitle">
               <i class="bi bi-list-check"></i>
               Transaction History
@@ -418,6 +387,7 @@
             </div>
           </div>
         </div>
+
       </div>
 
     </div>

@@ -139,6 +139,18 @@ export const routes: Routes = [
               roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales']
             },
             canActivate: [AuthGuard]
+          },
+          {
+            path:'financials/chargelists/:jobGuid',
+            loadComponent: () =>
+              import('./views/financials/chargelist/chargelist.component').then(
+                m => m.ChargelistComponent
+              ),
+            data: {
+              title: 'Charge List',
+              roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales']
+            },
+            canActivate: [AuthGuard]
           }
         ],
       },

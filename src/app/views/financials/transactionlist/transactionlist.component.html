@@ -2,13 +2,13 @@
   <div class="card-header bg-primary text-white">
     <div class="d-flex justify-content-between align-items-center">
       <h4 class="mb-0">
-        <i class="cil-dollar me-2"></i> Financial List
+        <i class="cil-briefcase me-2"></i> Job Transaction List
       </h4>
       <div class="d-flex gap-2 align-items-center">
         <div class="search-wrapper" style="width: 250px;">
           <i class="cil-search search-icon"></i>
           <input type="text" class="form-control form-control-custom search-input" 
-            placeholder="Search transactions..." [(ngModel)]="searchTerm" (input)="onSearchChange()" />
+            placeholder="Search jobs..." [(ngModel)]="searchTerm" (input)="onSearchChange()" />
         </div>
         <button class="btn btn-light btn-sm filter-btn-compact" (click)="toggleFilters()">
           <i class="cil-filter" style="font-size: 11px;"></i> 
@@ -37,7 +37,7 @@
           </label>
           <select class="form-select form-control-custom" [(ngModel)]="filters.status" (change)="applyFilters()">
             <option value="">All Statuses</option>
-            @for(status of filterChargeStatus; track status.optionId){
+            @for(status of filterJobStatus; track status.optionId){
               <option [value]="status.value"> {{ status.value }}</option>
             }
           </select>
@@ -45,87 +45,133 @@
 
         <div class="col-md-3">
           <label class="form-label">
-            <i class="cil-briefcase me-1"></i> Job Code
+            <i class="cil-airplane-mode me-1"></i> Transaction Type
+          </label>
+          <select class="form-select form-control-custom" [(ngModel)]="filters.transactionType" (change)="applyFilters()">
+            <option value="">All Types</option>
+            @for(type of filterJobTransactionTypeList; track type.jobTransactionTypeId){
+              <option [value]="type.jobTransactionType" 
+                                [attr.data-freight-type]="type.jobTransactionTypePrefix">
+                                {{ type.jobTransactionType }}
+                            </option>
+            }
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-credit-card me-1"></i> Payment Type
+          </label>
+          <select class="form-select form-control-custom" [(ngModel)]="filters.paymentType" (change)="applyFilters()">
+            <option value="">All Payment Types</option>
+             @for (payment of filterPaymenTypeList; track payment.optionId){
+                            <option [value]="payment.value">
+                                {{ payment.value }}
+                            </option>
+                            }
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-tags me-1"></i> Incoterms
+          </label>
+          <select class="form-select form-control-custom" [(ngModel)]="filters.incoterms" (change)="applyFilters()">
+            <option value="">All Incoterms</option>
+            @for(term of filterIncotermsList; track term.optionId){
+                            <option [value]="term.value">
+                                {{ term.value }}
+                            </option>
+                            }
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-user me-1"></i> Customer
           </label>
           <input type="text" class="form-control form-control-custom" 
-            placeholder="Enter Job Code" 
-            [(ngModel)]="filters.jobcode" 
+            placeholder="Enter customer name" 
+            [(ngModel)]="filters.customer" 
             (input)="applyFilters()" />
         </div>
 
         <div class="col-md-3">
           <label class="form-label">
-            <i class="cil-credit-card me-1"></i> Charge Code
+            <i class="cil-calendar me-1"></i> Date From
           </label>
-          <input type="text" class="form-control form-control-custom" 
-            placeholder="Enter Charge Code" 
-            [(ngModel)]="filters.chargecode" 
-            (input)="applyFilters()" />
+          <input type="date" class="form-control form-control-custom" 
+            [(ngModel)]="filters.dateFrom" 
+            (change)="applyFilters()" />
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-calendar me-1"></i> Date To
+          </label>
+          <input type="date" class="form-control form-control-custom" 
+            [(ngModel)]="filters.dateTo" 
+            (change)="applyFilters()" />
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Financial Table -->
+  <!-- Jobs Table -->
   <div class="table-responsive">
     <table class="table table-custom">
       <thead>
-        <tr>
-          <th (click)="sortBy('chargeCode')" class="sortable">
-            <i class="cil-credit-card me-2"></i> Charge Code
-          </th>
-          <th (click)="sortBy('chargeSubCategoryName')" class="sortable">
-            <i class="cil-list me-2"></i> Category
-          </th>
-          <th (click)="sortBy('amount')" class="sortable text-end">
-            <i class="cil-dollar me-2"></i> Amount
-          </th>
-          <th (click)="sortBy('chargeTransactionStatus')" class="sortable">
-            <i class="cil-info me-2"></i> Status
-          </th>
+        <tr class="text-center">
           <th (click)="sortBy('jobCode')" class="sortable">
-            <i class="cil-briefcase me-2"></i> Ref Job Code
+            <i class="me-2"></i> Job Code
           </th>
+          <th (click)="sortBy('customerName')" class="sortable">
+            <i class="me-2"></i> Customer
+          </th>
+          <th (click)="sortBy('transactionTypeName')" class="sortable">
+            <i class="me-2"></i> Transaction
+          </th>
+          <th (click)="sortBy('jobStatusName')" class="sortable">
+            <i class="me-2"></i> Status
+          </th>
+
           <th (click)="sortBy('createdDate')" class="sortable">
-            <i class="cil-calendar me-2"></i> Created Date
+            <i class="me-2"></i>Created Date
           </th>
           <th class="text-center">
-            <i class="cil-settings me-2"></i> Actions
+            <i class="me-2"></i> Actions
           </th>
         </tr>
       </thead>
 
-      <tbody class="text-center">
-        <tr *ngFor="let tran of paginatedJobs">
+      <tbody>
+        <tr *ngFor="let job of paginatedJobs" class="text-center">
           <td>
-            <div>
-              <strong class="charge-code-badge">{{ tran.chargeCode }}</strong>
+            <div class="job-code-cell">
+              <strong class="job-code-badge">{{ job.jobCode }}</strong>
             </div>
           </td>
           <td>
-            <div class="category-cell">
-              <span>
-                {{ tran.chargeSubCategoryName }}
-              </span>
+            <div class="customer-cell">
+              <strong class="customer-name">{{ job.customerName }}</strong>
             </div>
           </td>
-          <td class="text-end">
-            <span class="amount-value">{{ tran.amount | currency:'PHP':'symbol':'1.2-2' }}</span>
-          </td>
           <td>
-            <span [class]="'badge status-badge ' + getStatusBadgeClass(tran.chargeTransactionStatus ?? '')">
-              {{ tran.chargeTransactionStatus }}
+            <span>
+              {{ job.transactionTypeName }}
             </span>
           </td>
           <td>
-            <span class="job-code-text">{{ tran.jobCode }}</span>
+            <span [class]="'badge status-badge ' + getStatusBadgeClass(job.jobStatusName)">
+              {{ job.jobStatusName }}
+            </span>
           </td>
           <td>
-            <span class="date-text">{{ tran.createdDate | date:'MMM dd, yyyy' }}</span>
+            <span class="date-text">{{ job.createdDate | date:'MMM dd, yyyy' }}</span>
           </td>
           <td class="text-center">
             <div class="action-buttons">
-              <button class="btn btn-sm btn-info-outline" (click)="viewJobFinancial(tran)" title="View Financial Details">
+              <button class="btn btn-sm btn-info-outline" (click)="viewJob(job)" title="View Job Details">
                 <i class="cil-magnifying-glass"></i>
               </button>
             </div>
@@ -133,9 +179,9 @@
         </tr>
 
         <tr *ngIf="paginatedJobs.length === 0">
-          <td colspan="7" class="text-center py-4 text-muted">
+          <td colspan="9" class="text-center py-4 text-muted">
             <i class="cil-search" style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>
-            <div>No transactions found</div>
+            <div>No jobs found</div>
           </td>
         </tr>
       </tbody>
@@ -167,7 +213,7 @@
   <!-- Card Footer -->
   <div class="card-footer d-flex justify-content-between align-items-center">
     <div class="footer-info small">
-      Showing <strong>{{ paginatedJobs.length }}</strong> of <strong>{{ filteredFinancials.length }}</strong> transactions
+      Showing <strong>{{ paginatedJobs.length }}</strong> of <strong>{{ filteredJobs.length }}</strong> jobs
     </div>
   </div>
 </div>
