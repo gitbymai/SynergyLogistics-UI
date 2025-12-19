@@ -1,12 +1,12 @@
 // unauthorized.component.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-unauthorized',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="unauthorized-container">
       <h1>403 - Unauthorized</h1>

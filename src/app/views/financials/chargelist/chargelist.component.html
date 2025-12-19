@@ -49,8 +49,6 @@
                                         <div class="detail-value">
                                             <span
                                                 [class]="'badge status-badge ' + getStatusBadgeClass(job?.jobStatusName || '')">
-                                                <i class="bi me-1"
-                                                    [ngClass]="getStatusIcon(job?.jobStatusName || '')"></i>
                                                 {{ job?.jobStatusName || 'Pending' }}
                                             </span>
                                         </div>

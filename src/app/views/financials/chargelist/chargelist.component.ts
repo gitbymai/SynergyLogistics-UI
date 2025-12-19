@@ -5,11 +5,12 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { JobChargesComponent } from '../../jobs/jobcharges/jobcharges.component';
 import { JobsService } from '../../../services/jobs/jobs.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-chargelist',
   standalone: true,
-  imports: [JobChargesComponent],
+  imports: [JobChargesComponent, CommonModule],
   templateUrl: './chargelist.component.html',
   styleUrl: './chargelist.component.scss'
 })

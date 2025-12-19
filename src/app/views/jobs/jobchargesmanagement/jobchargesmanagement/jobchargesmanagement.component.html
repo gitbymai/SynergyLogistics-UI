@@ -23,317 +23,346 @@
             <i class="bi bi-search search-icon"></i>
             <input type="text" class="form-control form-control-custom search-input"
               placeholder="Search by code, description, or category..." [(ngModel)]="searchTerm" (input)="onSearch()">
+            </div>
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label class="form-label">
+              <i class="bi bi-tag me-1"></i> Category
+            </label>
+            <select class="form-select form-control-custom" [(ngModel)]="selectedCategory">
+              <option value="">All Categories</option>
+              @for (cat of chargeSubcategories; track cat) {
+                <option [value]="cat.name">
+                  {{ cat.name }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label class="form-label">
+              <i class="bi bi-check-circle me-1"></i> Status
+            </label>
+            <select class="form-select form-control-custom" [(ngModel)]="selectedStatus" (change)="onSearch()">
+              <option value="">All Status</option>
+              <option value="APPROVED">APPROVED</option>
+              <option value="CANCELLED">CANCELLED</option>
+              <option value="CLEARED">CLEARED</option>
+              <option value="FOR APPROVAL">CANCELLED</option>
+              <option value="FOR LIQUIDATION">CANCELLED</option>
+              <option value="FOR RELEASING">CANCELLED</option>
+            </select>
           </div>
         </div>
+      </div>
 
-        <div class="col-md-3 mb-3">
-          <label class="form-label">
-            <i class="bi bi-tag me-1"></i> Category
-          </label>
-          <select class="form-select form-control-custom" [(ngModel)]="selectedCategory">
-            <option value="">All Categories</option>
-            <option *ngFor="let cat of chargeSubcategories" [value]="cat.name">
-              {{ cat.name }}
-            </option>
-          </select>
+      <!-- Loading Spinner -->
+      @if (isLoading) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      }
+
+      <!-- Charges Table -->
+      @if (!isLoading) {
+        <div class="table-responsive">
+          <table class="table table-hover table-custom mb-0">
+            <thead>
+              <tr>
+                <th>
+                  <i class="bi bi-hash me-2"></i> Code
+                </th>
+                <th>
+                  <i class="bi bi-card-text me-2"></i> Description
+                </th>
+                <th>
+                  <i class="bi bi-tag me-2"></i> Category
+                </th>
+                <th>
+                  <i class="bi bi-flag me-2"></i> Status
+                </th>
+                <th class="text-end">
+                  <i class="bi bi-currency-exchange me-2"></i> Amount
+                </th>
+                <th>
+                  <i class="bi bi-calendar me-2"></i> Created Date
+                </th>
+                <th class="text-center">
+                  <i class="bi bi-gear me-2"></i> Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (charge of filteredCharges; track charge) {
+                <tr>
+                  <td>
+                    <div class="code-cell">
+                      <span class="badge badge-code">{{ charge.chargeCode }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="description-cell">
+                      {{ charge.description || 'N/A' }}
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge badge-category">
+                      {{ charge.chargeSubCategoryName }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="status-badge-wrapper">
+                      <span class="badge" [ngClass]="getStatusClass(charge.chargeTransactionStatus || '')">
+                        <i class="bi me-1" [ngClass]="getStatusIcon(charge.chargeTransactionStatus || '')"></i>
+                        {{ charge.chargeTransactionStatus }}
+                      </span>
+                    </div>
+                  </td>
+                  <td class="text-end">
+                    <strong class="amount-text">{{ charge.currencyCode }} {{ charge.amount | number:'1.2-2' }}</strong>
+                  </td>
+                  <td>
+                    <span class="date-text">{{ charge.createdDate | date:'MMM dd, yyyy' }}</span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="btn btn-sm btn-primary-outline" (click)="openEditModal(charge)" title="Edit Charge"
+                        [disabled]="charge.chargeTransactionStatus !== 'APPROVED'"
+                        [style.opacity]="charge.chargeTransactionStatus !== 'APPROVED' ? '0.5' : '1'"
+                        [style.pointer-events]="charge.chargeTransactionStatus !== 'APPROVED' ? 'none' : 'auto'">
+                        <i class="cil-pencil"></i>
+                      </button>
+                      <button class="btn btn-sm btn-danger-outline" (click)="deleteCharge(charge)" title="Cancel Charge"
+                        [disabled]="charge.chargeTransactionStatus !== 'APPROVED'"
+                        [style.opacity]="charge.chargeTransactionStatus !== 'APPROVED' ? '0.5' : '1'"
+                        [style.pointer-events]="charge.chargeTransactionStatus !== 'APPROVED' ? 'none' : 'auto'">
+                        <i class="cil-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+              @if (filteredCharges.length === 0) {
+                <tr>
+                  <td colspan="7" class="text-center text-muted py-4">
+                    <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                    <div class="mt-2">No charges found</div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+            @if (filteredCharges.length > 0) {
+              <tfoot>
+                <tr>
+                  <td colspan="4" class="text-end fw-bold total-label">Total:</td>
+                  <td class="text-end fw-bold total-amount">₱{{ total | number:'1.2-2' }}</td>
+                  <td colspan="2"></td>
+                </tr>
+              </tfoot>
+            }
+          </table>
+        </div>
+      }
+
+      <!-- Summary Badge -->
+      @if (!isLoading) {
+        <div class="mt-3 d-flex justify-content-between align-items-center">
+          <span class="badge bg-secondary fs-6">
+            {{ filteredCharges.length }} charge(s) found
+          </span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  @if (showModal) {
+    <div class="modal-backdrop" (click)="closeModal()"></div>
+  }
+  <div class="modal custom-modal" [class.show]="showModal" [class.d-block]="showModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">
+            @if (isEditMode) {
+              <i class="bi bi-pencil me-2"></i> Edit Charge
+            }
+            @if (!isEditMode) {
+              <i class="bi bi-plus-circle me-2"></i> Add New Charge
+            }
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeModal()" aria-label="Close"></button>
         </div>
 
-        <div class="col-md-3 mb-3">
-          <label class="form-label">
-            <i class="bi bi-check-circle me-1"></i> Status
-          </label>
-          <select class="form-select form-control-custom" [(ngModel)]="selectedStatus" (change)="onSearch()">
-            <option value="">All Status</option>
-            <option value="APPROVED">APPROVED</option>
-            <option value="CANCELLED">CANCELLED</option>
-            <option value="CLEARED">CLEARED</option>
-            <option value="FOR APPROVAL">CANCELLED</option>
-            <option value="FOR LIQUIDATION">CANCELLED</option>
-            <option value="FOR RELEASING">CANCELLED</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <!-- Loading Spinner -->
-    <div *ngIf="isLoading" class="text-center py-5">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-    </div>
-
-    <!-- Charges Table -->
-    <div *ngIf="!isLoading" class="table-responsive">
-      <table class="table table-hover table-custom mb-0">
-        <thead>
-          <tr>
-            <th>
-              <i class="bi bi-hash me-2"></i> Code
-            </th>
-            <th>
-              <i class="bi bi-card-text me-2"></i> Description
-            </th>
-            <th>
-              <i class="bi bi-tag me-2"></i> Category
-            </th>
-            <th>
-              <i class="bi bi-flag me-2"></i> Status
-            </th>
-            <th class="text-end">
-              <i class="bi bi-currency-exchange me-2"></i> Amount
-            </th>
-            <th>
-              <i class="bi bi-calendar me-2"></i> Created Date
-            </th>
-            <th class="text-center">
-              <i class="bi bi-gear me-2"></i> Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let charge of filteredCharges">
-            <td>
-              <div class="code-cell">
-                <span class="badge badge-code">{{ charge.chargeCode }}</span>
+        <div class="modal-body">
+          <form [formGroup]="chargeFormGroup" class="form-professional">
+            <div class="row mb-3">
+              <!-- Charge Subcategory -->
+              <div class="col-md-6">
+                <label class="form-label">
+                  <i class="bi bi-tag me-1"></i> Category <span class="text-danger">*</span>
+                </label>
+                <select class="form-select form-control-custom" formControlName="chargeSubCategoryId"
+                  [class.disabled-select]="isEditMode" [style.pointer-events]="isEditMode ? 'none' : 'auto'"
+                  [style.background-color]="isEditMode ? '#e9ecef' : null" [style.opacity]="isEditMode ? '0.6' : '1'">
+                  <option [value]="0">Select category...</option>
+                  <option value="19">ADMINISTRATIVE FEE</option>
+                  <option value="29">BROKERAGE FEE</option>
+                  <option value="15">CUSTOMS CLEARANCE FEE</option>
+                  <option value="11">DELIVERY CHARGE</option>
+                  <option value="28">RECEIPTED FEE</option>
+                  <option value="12">TRUCKING FEE</option>
+                  <option value="16">WAREHOUSE STORAGE FEE</option>
+                </select>
+                @if (chargeFormGroup.get('chargeSubCategoryId')?.invalid && chargeFormGroup.get('chargeSubCategoryId')?.touched) {
+                  <div
+                    class="text-danger small mt-1">
+                    Category is required
+                  </div>
+                }
               </div>
-            </td>
-            <td>
-              <div class="description-cell">
-                {{ charge.description || 'N/A' }}
+              <!-- Amount -->
+              <div class="col-md-6">
+                <label class="form-label">
+                  <i class="bi bi-cash me-1"></i> Amount <span class="text-danger">*</span>
+                </label>
+                <input type="number" class="form-control form-control-custom" formControlName="amount" step="0.01" min="0"
+                  placeholder="0.00">
+                  @if (chargeFormGroup.get('amount')?.invalid && chargeFormGroup.get('amount')?.touched) {
+                    <div
+                      class="text-danger small mt-1">
+                      Valid amount is required
+                    </div>
+                  }
+                </div>
               </div>
-            </td>
-            <td>
-              <span class="badge badge-category">
-                {{ charge.chargeSubCategoryName }}
-              </span>
-            </td>
-            <td>
-              <div class="status-badge-wrapper">
-                <span class="badge" [ngClass]="getStatusClass(charge.chargeTransactionStatus || '')">
-                  <i class="bi me-1" [ngClass]="getStatusIcon(charge.chargeTransactionStatus || '')"></i>
-                  {{ charge.chargeTransactionStatus }}
+              <!-- Description -->
+              <div class="row mb-3">
+                <div class="col-12">
+                  <label class="form-label">
+                    <i class="bi bi-card-text me-1"></i> Description
+                  </label>
+                  <textarea class="form-control form-control-custom" rows="3" formControlName="description"
+                    placeholder="Enter charge description..." [class.disabled-select]="isEditMode"
+                    [style.pointer-events]="isEditMode ? 'none' : 'auto'"
+                    [style.background-color]="isEditMode ? '#e9ecef' : null"
+                  [style.opacity]="isEditMode ? '0.6' : '1'"></textarea>
+                </div>
+              </div>
+
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">
+              <i class="bi bi-x me-2"></i> Cancel
+            </button>
+            <button type="button" class="btn btn-primary" (click)="onSubmit()"
+              [disabled]="!chargeFormGroup.valid || isSubmitting">
+              @if (!isSubmitting) {
+                <span>
+                  <i class="bi bi-check me-2"></i> {{ isEditMode ? 'Update Charge' : 'Create Charge' }}
                 </span>
-              </div>
-            </td>
-            <td class="text-end">
-              <strong class="amount-text">{{ charge.currencyCode }} {{ charge.amount | number:'1.2-2' }}</strong>
-            </td>
-            <td>
-              <span class="date-text">{{ charge.createdDate | date:'MMM dd, yyyy' }}</span>
-            </td>
-            <td>
-              <div class="action-buttons">
-                <button class="btn btn-sm btn-primary-outline" (click)="openEditModal(charge)" title="Edit Charge"
-                  [disabled]="charge.chargeTransactionStatus !== 'APPROVED'"
-                  [style.opacity]="charge.chargeTransactionStatus !== 'APPROVED' ? '0.5' : '1'"
-                  [style.pointer-events]="charge.chargeTransactionStatus !== 'APPROVED' ? 'none' : 'auto'">
-                  <i class="cil-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-danger-outline" (click)="deleteCharge(charge)" title="Cancel Charge"
-                  [disabled]="charge.chargeTransactionStatus !== 'APPROVED'"
-                  [style.opacity]="charge.chargeTransactionStatus !== 'APPROVED' ? '0.5' : '1'"
-                  [style.pointer-events]="charge.chargeTransactionStatus !== 'APPROVED' ? 'none' : 'auto'">
-                  <i class="cil-trash"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr *ngIf="filteredCharges.length === 0">
-            <td colspan="7" class="text-center text-muted py-4">
-              <i class="bi bi-inbox" style="font-size: 2rem;"></i>
-              <div class="mt-2">No charges found</div>
-            </td>
-          </tr>
-        </tbody>
-        <tfoot *ngIf="filteredCharges.length > 0">
-          <tr>
-            <td colspan="4" class="text-end fw-bold total-label">Total:</td>
-            <td class="text-end fw-bold total-amount">₱{{ total | number:'1.2-2' }}</td>
-            <td colspan="2"></td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-
-    <!-- Summary Badge -->
-    <div class="mt-3 d-flex justify-content-between align-items-center" *ngIf="!isLoading">
-      <span class="badge bg-secondary fs-6">
-        {{ filteredCharges.length }} charge(s) found
-      </span>
-    </div>
-  </div>
-</div>
-
-<!-- Add/Edit Modal -->
-<div class="modal-backdrop" *ngIf="showModal" (click)="closeModal()"></div>
-<div class="modal custom-modal" [class.show]="showModal" [class.d-block]="showModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
-    <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">
-          <ng-container *ngIf="isEditMode">
-            <i class="bi bi-pencil me-2"></i> Edit Charge
-          </ng-container>
-          <ng-container *ngIf="!isEditMode">
-            <i class="bi bi-plus-circle me-2"></i> Add New Charge
-          </ng-container>
-        </h5>
-        <button type="button" class="btn-close btn-close-white" (click)="closeModal()" aria-label="Close"></button>
+              }
+              @if (isSubmitting) {
+                <span>
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                  Submitting...
+                </span>
+              }
+            </button>
+          </div>
+        </div>
       </div>
+    </div>
 
-      <div class="modal-body">
-        <form [formGroup]="chargeFormGroup" class="form-professional">
-          <div class="row mb-3">
-            <!-- Charge Subcategory -->
-            <div class="col-md-6">
-              <label class="form-label">
-                <i class="bi bi-tag me-1"></i> Category <span class="text-danger">*</span>
-              </label>
-              <select class="form-select form-control-custom" formControlName="chargeSubCategoryId"
-                [class.disabled-select]="isEditMode" [style.pointer-events]="isEditMode ? 'none' : 'auto'"
-                [style.background-color]="isEditMode ? '#e9ecef' : null" [style.opacity]="isEditMode ? '0.6' : '1'">
-                <option [value]="0">Select category...</option>
-                <option value="19">ADMINISTRATIVE FEE</option>
-                <option value="29">BROKERAGE FEE</option>
-                <option value="15">CUSTOMS CLEARANCE FEE</option>
-                <option value="11">DELIVERY CHARGE</option>
-                <option value="28">RECEIPTED FEE</option>
-                <option value="12">TRUCKING FEE</option>
-                <option value="16">WAREHOUSE STORAGE FEE</option>
-              </select>
-              <div
-                *ngIf="chargeFormGroup.get('chargeSubCategoryId')?.invalid && chargeFormGroup.get('chargeSubCategoryId')?.touched"
-                class="text-danger small mt-1">
-                Category is required
-              </div>
+    <!-- Delete Confirmation Modal -->
+    @if (showDeleteConfirmModal) {
+      <div class="modal-backdrop" (click)="closeDeleteConfirm()"></div>
+    }
+    <div class="modal custom-modal" [class.show]="showDeleteConfirmModal" [class.d-block]="showDeleteConfirmModal"
+      tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">
+              <i class="bi bi-exclamation-triangle me-2"></i> Cancel Charge
+            </h5>
+            <button type="button" class="btn-close btn-close-white" (click)="closeDeleteConfirm()"
+            aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-danger" role="alert">
+              <i class="bi bi-exclamation-triangle me-2"></i>
+              This action cannot be undone!
             </div>
-            <!-- Amount -->
-            <div class="col-md-6">
-              <label class="form-label">
-                <i class="bi bi-cash me-1"></i> Amount <span class="text-danger">*</span>
-              </label>
-              <input type="number" class="form-control form-control-custom" formControlName="amount" step="0.01" min="0"
-                placeholder="0.00">
-              <div *ngIf="chargeFormGroup.get('amount')?.invalid && chargeFormGroup.get('amount')?.touched"
-                class="text-danger small mt-1">
-                Valid amount is required
+            <p class="mb-2">
+              Are you sure you want to cancel the charge <strong>{{ selectedCharge?.chargeCode }}</strong>?
+            </p>
+            <p class="text-muted small mb-0">
+              Amount: {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeDeleteConfirm()">
+              <i class="bi bi-x me-2"></i> Cancel
+            </button>
+            <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="isSubmitting">
+              @if (!isSubmitting) {
+                <span>
+                  <i class="bi bi-trash me-2"></i> Cancel Charge
+                </span>
+              }
+              @if (isSubmitting) {
+                <span>
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                  Deleting...
+                </span>
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+      <!-- Success Toast -->
+      <div class="toast align-items-center border-0" [class.show]="showSuccessToast" role="alert" aria-live="assertive"
+        aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body bg-success text-white rounded">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-check-circle me-2" style="font-size: 1.5rem;"></i>
+              <div>
+                <strong class="d-block">Success!</strong>
+                <span>{{ successMessage }}</span>
               </div>
             </div>
           </div>
-          <!-- Description -->
-          <div class="row mb-3">
-            <div class="col-12">
-              <label class="form-label">
-                <i class="bi bi-card-text me-1"></i> Description
-              </label>
-              <textarea class="form-control form-control-custom" rows="3" formControlName="description"
-                placeholder="Enter charge description..." [class.disabled-select]="isEditMode"
-                [style.pointer-events]="isEditMode ? 'none' : 'auto'"
-                [style.background-color]="isEditMode ? '#e9ecef' : null"
-                [style.opacity]="isEditMode ? '0.6' : '1'"></textarea>
-            </div>
-          </div>
-
-        </form>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeModal()">
-          <i class="bi bi-x me-2"></i> Cancel
-        </button>
-        <button type="button" class="btn btn-primary" (click)="onSubmit()"
-          [disabled]="!chargeFormGroup.valid || isSubmitting">
-          <span *ngIf="!isSubmitting">
-            <i class="bi bi-check me-2"></i> {{ isEditMode ? 'Update Charge' : 'Create Charge' }}
-          </span>
-          <span *ngIf="isSubmitting">
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            Submitting...
-          </span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Delete Confirmation Modal -->
-<div class="modal-backdrop" *ngIf="showDeleteConfirmModal" (click)="closeDeleteConfirm()"></div>
-<div class="modal custom-modal" [class.show]="showDeleteConfirmModal" [class.d-block]="showDeleteConfirmModal"
-  tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
-    <div class="modal-content">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title">
-          <i class="bi bi-exclamation-triangle me-2"></i> Cancel Charge
-        </h5>
-        <button type="button" class="btn-close btn-close-white" (click)="closeDeleteConfirm()"
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showSuccessToast = false"
           aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="alert alert-danger" role="alert">
-          <i class="bi bi-exclamation-triangle me-2"></i>
-          This action cannot be undone!
         </div>
-        <p class="mb-2">
-          Are you sure you want to cancel the charge <strong>{{ selectedCharge?.chargeCode }}</strong>?
-        </p>
-        <p class="text-muted small mb-0">
-          Amount: {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
-        </p>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeDeleteConfirm()">
-          <i class="bi bi-x me-2"></i> Cancel
-        </button>
-        <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="isSubmitting">
-          <span *ngIf="!isSubmitting">
-            <i class="bi bi-trash me-2"></i> Cancel Charge
-          </span>
-          <span *ngIf="isSubmitting">
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            Deleting...
-          </span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- Toast Notifications -->
-<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
-  <!-- Success Toast -->
-  <div class="toast align-items-center border-0" [class.show]="showSuccessToast" role="alert" aria-live="assertive"
-    aria-atomic="true">
-    <div class="d-flex">
-      <div class="toast-body bg-success text-white rounded">
-        <div class="d-flex align-items-center">
-          <i class="bi bi-check-circle me-2" style="font-size: 1.5rem;"></i>
-          <div>
-            <strong class="d-block">Success!</strong>
-            <span>{{ successMessage }}</span>
+      <!-- Error Toast -->
+      <div class="toast align-items-center border-0" [class.show]="showErrorToast" role="alert" aria-live="assertive"
+        aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body bg-danger text-white rounded">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-x-circle me-2" style="font-size: 1.5rem;"></i>
+              <div>
+                <strong class="d-block">Error</strong>
+                <span>{{ errorMessage }}</span>
+              </div>
+            </div>
           </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showErrorToast = false"
+          aria-label="Close"></button>
         </div>
       </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showSuccessToast = false"
-        aria-label="Close"></button>
     </div>
-  </div>
-
-  <!-- Error Toast -->
-  <div class="toast align-items-center border-0" [class.show]="showErrorToast" role="alert" aria-live="assertive"
-    aria-atomic="true">
-    <div class="d-flex">
-      <div class="toast-body bg-danger text-white rounded">
-        <div class="d-flex align-items-center">
-          <i class="bi bi-x-circle me-2" style="font-size: 1.5rem;"></i>
-          <div>
-            <strong class="d-block">Error</strong>
-            <span>{{ errorMessage }}</span>
-          </div>
-        </div>
-      </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showErrorToast = false"
-        aria-label="Close"></button>
-    </div>
-  </div>
-</div>

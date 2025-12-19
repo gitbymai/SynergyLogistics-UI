@@ -22,10 +22,10 @@
 
   <div class="card-body job-details-body">
     <div class="grid-layout">
-      
+
       <!-- ======================= LEFT SECTION (MAIN) ======================== -->
       <div class="main-section">
-        
+
         <!-- JOB INFORMATION -->
         <div class="detail-section-card mb-4">
           <div class="section-header">
@@ -45,7 +45,7 @@
                     <div class="detail-value">{{ job?.customerName || '-' }}</div>
                   </div>
                 </div>
-                
+
                 <div class="col-md-4">
                   <div class="detail-item">
                     <label class="detail-label">
@@ -194,9 +194,9 @@
                 Add New Comment
               </div>
               <div class="form-group">
-                <textarea 
-                  class="form-control comment-textarea" 
-                  rows="3" 
+                <textarea
+                  class="form-control comment-textarea"
+                  rows="3"
                   [(ngModel)]="newComment"
                   placeholder="Enter your comment here...">
                 </textarea>
@@ -213,27 +213,31 @@
                 <i class="bi bi-chat-text"></i>
                 Comment History
               </div>
-              
-              <div *ngIf="comments.length === 0" class="empty-state">
-                <i class="bi bi-chat-square-text"></i>
-                <p>No comments yet. Be the first to add a comment!</p>
-              </div>
 
-              <div *ngFor="let comment of comments" class="comment-item">
-                <div class="comment-header">
-                  <div class="comment-author">
-                    <i class="bi bi-person-circle me-2"></i>
-                    <strong>{{ comment.author }}</strong>
+              @if (comments.length === 0) {
+                <div class="empty-state">
+                  <i class="bi bi-chat-square-text"></i>
+                  <p>No comments yet. Be the first to add a comment!</p>
+                </div>
+              }
+
+              @for (comment of comments; track comment) {
+                <div class="comment-item">
+                  <div class="comment-header">
+                    <div class="comment-author">
+                      <i class="bi bi-person-circle me-2"></i>
+                      <strong>{{ comment.author }}</strong>
+                    </div>
+                    <div class="comment-date">
+                      <i class="bi bi-clock me-1"></i>
+                      {{ comment.createdDate | date:'MMM dd, yyyy HH:mm' }}
+                    </div>
                   </div>
-                  <div class="comment-date">
-                    <i class="bi bi-clock me-1"></i>
-                    {{ comment.createdDate | date:'MMM dd, yyyy HH:mm' }}
+                  <div class="comment-body">
+                    {{ comment.text }}
                   </div>
                 </div>
-                <div class="comment-body">
-                  {{ comment.text }}
-                </div>
-              </div>
+              }
             </div>
           </div>
         </div>
@@ -242,7 +246,7 @@
 
       <!-- ======================= RIGHT SECTION (TOP) ======================== -->
       <div class="right-top-section">
-        
+
         <!-- STATUS & WORKFLOW -->
         <div class="detail-section-card h-100">
           <div class="section-header">
@@ -300,38 +304,44 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="detail-section" *ngIf="canManageTransaction()">
-              <div class="section-subtitle">
-                <i class="bi bi-lightning-charge"></i>
-                Available Actions
+            @if (canManageTransaction()) {
+              <div class="detail-section">
+                <div class="section-subtitle">
+                  <i class="bi bi-lightning-charge"></i>
+                  Available Actions
+                </div>
+                <div class="action-buttons-grid">
+                  @if (canApprove()) {
+                    <button class="btn btn-success btn-action w-100 mb-2"
+                      (click)="approveTransaction()">
+                      <i class="bi bi-check-circle me-2"></i>
+                      Approve
+                    </button>
+                  }
+                  @if (canReject()) {
+                    <button class="btn btn-danger btn-action w-100 mb-2"
+                      (click)="rejectTransaction()">
+                      <i class="bi bi-x-circle me-2"></i>
+                      Reject
+                    </button>
+                  }
+                  @if (canRelease()) {
+                    <button class="btn btn-info btn-action w-100 mb-2"
+                      (click)="releaseTransaction()">
+                      <i class="bi bi-send me-2"></i>
+                      For Releasing
+                    </button>
+                  }
+                  @if (canLiquidate()) {
+                    <button class="btn btn-warning btn-action w-100"
+                      (click)="liquidateTransaction()">
+                      <i class="bi bi-cash-coin me-2"></i>
+                      For Liquidation
+                    </button>
+                  }
+                </div>
               </div>
-              <div class="action-buttons-grid">
-                <button class="btn btn-success btn-action w-100 mb-2" 
-                        *ngIf="canApprove()"
-                        (click)="approveTransaction()">
-                  <i class="bi bi-check-circle me-2"></i>
-                  Approve
-                </button>
-                <button class="btn btn-danger btn-action w-100 mb-2" 
-                        *ngIf="canReject()"
-                        (click)="rejectTransaction()">
-                  <i class="bi bi-x-circle me-2"></i>
-                  Reject
-                </button>
-                <button class="btn btn-info btn-action w-100 mb-2" 
-                        *ngIf="canRelease()"
-                        (click)="releaseTransaction()">
-                  <i class="bi bi-send me-2"></i>
-                  For Releasing
-                </button>
-                <button class="btn btn-warning btn-action w-100" 
-                        *ngIf="canLiquidate()"
-                        (click)="liquidateTransaction()">
-                  <i class="bi bi-cash-coin me-2"></i>
-                  For Liquidation
-                </button>
-              </div>
-            </div>
+            }
           </div>
         </div>
 
@@ -339,7 +349,7 @@
 
       <!-- ======================= RIGHT SECTION (BOTTOM) ======================== -->
       <div class="right-bottom-section">
-        
+
         <!-- AUDIT TRAIL -->
         <div class="detail-section-card h-100">
           <div class="section-header">
@@ -355,35 +365,41 @@
               Transaction History
             </div>
 
-            <div *ngIf="auditTrail.length === 0" class="empty-state">
-              <i class="bi bi-journal-x"></i>
-              <p>No audit trail records found.</p>
-            </div>
+            @if (auditTrail.length === 0) {
+              <div class="empty-state">
+                <i class="bi bi-journal-x"></i>
+                <p>No audit trail records found.</p>
+              </div>
+            }
 
             <div class="timeline">
-              <div *ngFor="let trail of auditTrail; let i = index" class="timeline-item">
-                <div class="timeline-marker" [class]="getTrailMarkerClass(trail.action)">
-                  <i class="bi" [ngClass]="getTrailIcon(trail.action)"></i>
-                </div>
-                <div class="timeline-content">
-                  <div class="timeline-header">
-                    <span class="timeline-action">{{ trail.action }}</span>
-                    <span class="timeline-date">
-                      <i class="bi bi-clock me-1"></i>
-                      {{ trail.timestamp | date:'MMM dd, yyyy HH:mm' }}
-                    </span>
+              @for (trail of auditTrail; track trail; let i = $index) {
+                <div class="timeline-item">
+                  <div class="timeline-marker" [class]="getTrailMarkerClass(trail.action)">
+                    <i class="bi" [ngClass]="getTrailIcon(trail.action)"></i>
                   </div>
-                  <div class="timeline-body">
-                    <div class="timeline-user">
-                      <i class="bi bi-person me-1"></i>
-                      {{ trail.user }}
+                  <div class="timeline-content">
+                    <div class="timeline-header">
+                      <span class="timeline-action">{{ trail.action }}</span>
+                      <span class="timeline-date">
+                        <i class="bi bi-clock me-1"></i>
+                        {{ trail.timestamp | date:'MMM dd, yyyy HH:mm' }}
+                      </span>
                     </div>
-                    <div class="timeline-description" *ngIf="trail.description">
-                      {{ trail.description }}
+                    <div class="timeline-body">
+                      <div class="timeline-user">
+                        <i class="bi bi-person me-1"></i>
+                        {{ trail.user }}
+                      </div>
+                      @if (trail.description) {
+                        <div class="timeline-description">
+                          {{ trail.description }}
+                        </div>
+                      }
                     </div>
                   </div>
                 </div>
-              </div>
+              }
             </div>
           </div>
         </div>
