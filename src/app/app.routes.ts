@@ -126,7 +126,6 @@ export const routes: Routes = [
             },
             canActivate: [AuthGuard]
           },
-
           {
             path: 'financials/management/:chargeGuid',
             loadComponent: () =>
@@ -141,7 +140,7 @@ export const routes: Routes = [
             canActivate: [AuthGuard]
           },
           {
-            path:'financials/chargelists/:jobGuid',
+            path: 'job/financials/chargelists/:jobGuid',
             loadComponent: () =>
               import('./views/financials/chargelist/chargelist.component').then(
                 m => m.ChargelistComponent

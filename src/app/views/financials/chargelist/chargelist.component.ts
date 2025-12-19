@@ -35,7 +35,7 @@ export class ChargelistComponent {
       console.error('Job GUID not provided in route');
       this.errorMessage = 'Job identifier not found';
       this.isLoading = false;
-      this.router.navigate(['/jobs/list']);
+      this.router.navigate(['/jobs/list']);s
       return;
     }
 
