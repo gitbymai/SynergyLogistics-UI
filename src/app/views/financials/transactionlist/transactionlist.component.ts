@@ -218,7 +218,7 @@ export class TransactionlistComponent implements OnInit {
   }
 
   viewJob(job: any) {
-    this.router.navigate(['/financials/chargelists/', job.jobGuid]);
+    this.router.navigate(['/jobs/financials/chargelists/', job.jobGuid]);
   }
 
   getStatusBadgeClass(status: string): string {

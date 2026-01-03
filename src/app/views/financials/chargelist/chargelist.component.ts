@@ -6,11 +6,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { JobChargesComponent } from '../../jobs/jobcharges/jobcharges.component';
 import { JobsService } from '../../../services/jobs/jobs.service';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../services/auth.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-chargelist',
   standalone: true,
-  imports: [JobChargesComponent, CommonModule],
+  imports: [JobChargesComponent, CommonModule, RouterModule],
   templateUrl: './chargelist.component.html',
   styleUrl: './chargelist.component.scss'
 })
@@ -18,19 +20,20 @@ export class ChargelistComponent {
   job: Job | null = null;
   charges: ChargeTransaction[] = [];
   jobGuid: string = "";
+  userRole: string = "";
   isLoading = true;
   errorMessage = '';
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router,
-    private jobService: JobsService
+    private jobService: JobsService,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
     const jobGuid = this.route.snapshot.paramMap.get('jobGuid');
 
-    
     if (!jobGuid) {
       console.error('Job GUID not provided in route');
       this.errorMessage = 'Job identifier not found';
@@ -39,6 +42,7 @@ export class ChargelistComponent {
       return;
     }
 
+    this.userRole = this.authService.getCurrentUserRole() || ''
     this.loadJobDetails(jobGuid);
   }
 

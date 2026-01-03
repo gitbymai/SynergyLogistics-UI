@@ -8,11 +8,12 @@ import {
 } from '@coreui/angular';
 import { IconModule } from '@coreui/icons-angular';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { JobChargesComponent } from '../../jobs/jobcharges/jobcharges.component';
 import { JobsService } from '../../../services/jobs/jobs.service';
 import { Job } from '../../../models/job';
 import { ChargeTransaction } from '../../../models/chargetransaction';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-jobmanagement',
@@ -25,7 +26,6 @@ import { ChargeTransaction } from '../../../models/chargetransaction';
     BadgeModule,
     IconModule,
     RouterModule,
-    HttpClientModule,
     JobChargesComponent
   ],
   templateUrl: './jobmanagement.component.html',
@@ -37,6 +37,7 @@ export class JobmanagementComponent implements OnInit {
   jobGuid: string = "";
   isLoading = true;
   errorMessage = '';
+  userRole: string = "";
 
   openSection: string = 'jobInfo'; // Default to first section open
 
@@ -45,11 +46,13 @@ export class JobmanagementComponent implements OnInit {
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router,
-    private jobService: JobsService
+    private jobService: JobsService,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
     const jobGuid = this.route.snapshot.paramMap.get('jobGuid');
+
 
     
     if (!jobGuid) {
@@ -60,6 +63,7 @@ export class JobmanagementComponent implements OnInit {
       return;
     }
 
+    this.userRole = this.authService.getCurrentUserRole() || '';
     this.loadJobDetails(jobGuid);
   }
 

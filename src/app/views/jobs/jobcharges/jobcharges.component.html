@@ -5,9 +5,12 @@
         <i class="bi bi-cash-stack me-2"></i>Financial Transactions
         <span class="badge bg-light text-muted ms-2">{{ charges?.length || 0 }}</span>
       </h6>
+      @if (userRole === 'ADMIN' || userRole == 'FINANCE' || userRole === 'SALES') {
+
       <button class="btn btn-outline-primary btn-sm" [routerLink]="['/jobs/jobmanagement', jobGuid, 'charges']">
         <i class="bi bi-gear"></i> Manage
       </button>
+      }
     </div>
   </div>
 
@@ -24,44 +27,44 @@
       </thead>
       <tbody>
         @for (charge of charges; track charge) {
-          <tr>
-            <td>
-              <span class="code-text">{{ charge.chargeCode }}</span>
-            </td>
-            <td>
-              <span class="badge badge-item">{{ charge.chargeSubCategoryName }}</span>
-            </td>
-            <td class="description-cell">{{ charge.description || 'N/A' }}</td>
-            <td>
+        <tr>
+          <td>
+            <span class="code-text">{{ charge.chargeCode }}</span>
+          </td>
+          <td>
+            <span class="badge badge-item">{{ charge.chargeSubCategoryName }}</span>
+          </td>
+          <td class="description-cell">{{ charge.description || 'N/A' }}</td>
+          <td>
             <span class="badge" [ngClass]="{
               'badge-approved': charge.chargeTransactionStatus === 'APPROVED',
               'badge-pending': charge.chargeTransactionStatus === 'PENDING',
               'badge-cancelled': charge.chargeTransactionStatus === 'CANCELLED',
               'badge-completed': charge.chargeTransactionStatus === 'COMPLETED'
             }">
-                {{ charge.chargeTransactionStatus }}
-              </span>
-            </td>
-            <td class="text-end amount-cell">
-              {{ charge.currencyCode }} {{ charge.amount | number:'1.2-2' }}
-            </td>
-          </tr>
+              {{ charge.chargeTransactionStatus }}
+            </span>
+          </td>
+          <td class="text-end amount-cell">
+            {{ charge.currencyCode }} {{ charge.amount | number:'1.2-2' }}
+          </td>
+        </tr>
         }
         @if (!charges || charges.length === 0) {
-          <tr>
-            <td colspan="5" class="text-center text-muted py-3">
-              <i class="bi bi-inbox"></i> No charges found.
-            </td>
-          </tr>
+        <tr>
+          <td colspan="5" class="text-center text-muted py-3">
+            <i class="bi bi-inbox"></i> No charges found.
+          </td>
+        </tr>
         }
       </tbody>
       @if (charges && charges.length > 0) {
-        <tfoot>
-          <tr>
-            <td colspan="4" class="text-end">Total:</td>
-            <td class="text-end total-amount">₱{{ total | number:'1.2-2' }}</td>
-          </tr>
-        </tfoot>
+      <tfoot>
+        <tr>
+          <td colspan="4" class="text-end">Total:</td>
+          <td class="text-end total-amount">₱{{ total | number:'1.2-2' }}</td>
+        </tr>
+      </tfoot>
       }
     </table>
   </div>

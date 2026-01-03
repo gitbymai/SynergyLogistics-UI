@@ -140,7 +140,7 @@ export const routes: Routes = [
             canActivate: [AuthGuard]
           },
           {
-            path: 'job/financials/chargelists/:jobGuid',
+            path: 'financials/chargelists/:jobGuid',
             loadComponent: () =>
               import('./views/financials/chargelist/chargelist.component').then(
                 m => m.ChargelistComponent

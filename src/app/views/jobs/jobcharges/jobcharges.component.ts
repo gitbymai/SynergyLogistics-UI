@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CardModule, TableModule } from '@coreui/angular';
@@ -19,31 +19,8 @@ get total(): number {
     .filter(charge => !excludedStatuses.includes(charge.chargeTransactionStatus!))
     .reduce((sum, charge) => sum + (charge.amount || 0), 0);
 }
-  @Input() jobGuid: string = ''; // Add this Input
+  @Input() jobGuid: string = ''; 
+  @Input() userRole: string = ''; 
   @Input() charges: ChargeTransaction[] = [];
 
-
-  onManageCharges() {
-    console.log('Manage charges clicked');
-  }
-
-    getStatusClass(status: string): string {
-    switch (status?.toUpperCase()) {
-      case 'APPROVED': return 'status-approved';
-      case 'PENDING': return 'status-pending';
-      case 'CANCELLED': return 'status-cancelled';
-      case 'COMPLETED': return 'status-completed';
-      default: return 'status-default';
-    }
-  }
-
-  getStatusIcon(status: string): string {
-    switch (status?.toUpperCase()) {
-      case 'APPROVED': return 'bi-check-circle';
-      case 'PENDING': return 'bi-clock';
-      case 'CANCELLED': return 'bi-x-circle';
-      case 'COMPLETED': return 'bi-check-all';
-      default: return 'bi-question-circle';
-    }
-  }
 }

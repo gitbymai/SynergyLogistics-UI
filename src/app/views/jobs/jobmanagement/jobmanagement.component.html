@@ -411,7 +411,7 @@
           [class.collapse]="!isSectionOpen('charges')"
           [class.show]="isSectionOpen('charges')">
           <div class="accordion-body p-0">
-            <app-job-charges [charges]="charges" [jobGuid]="jobGuid"></app-job-charges>
+            <app-job-charges [charges]="charges" [jobGuid]="jobGuid" [userRole]="userRole"></app-job-charges>
           </div>
         </div>
       </div>

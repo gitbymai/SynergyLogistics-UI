@@ -374,7 +374,7 @@ export class NewjobComponent implements OnInit {
         console.error('Error creating job:', error);
         this.isSubmitting = false;
         
-        this.errorMessage = error.message || 'Failed to create job. Please try again.';
+        this.errorMessage = error.error.Message || 'Failed to create job. Please try again.';
         this.displayErrorToast(this.errorMessage);
       }
     });

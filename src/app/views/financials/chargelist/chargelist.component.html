@@ -17,141 +17,88 @@
     </div>
 
     <div class="card-body job-details-body">
-        <div class="grid-layout">
 
-            <!-- ======================= LEFT SECTION (MAIN) ======================== -->
-            <div class="main-section">
+        <!-- Two Column Layout -->
+        <div class="row g-4">
 
-                <!-- JOB INFORMATION -->
-                <div class="detail-section-card mb-4">
-                    <div class="section-header">
-                        <h5 class="section-title">
-                            <i class="bi bi-briefcase me-2"></i>
-                            Job Information
-                        </h5>
+            <!-- LEFT COLUMN -->
+            <div class="col-lg-6">
+
+
+                        <!-- Client & Status -->
+                        <div class="info-card mb-3">
+                            <div class="info-card-header">
+                                <i class="bi bi-person-circle"></i>
+                                <span>Client Information</span>
+                            </div>
+                            <div class="info-card-body">
+                                <div class="info-row">
+                                    <label>Client</label>
+                                    <span>{{ job?.customerName || '-' }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <label>Status</label>
+                                    <span
+                                        [class]="'badge status-badge ' + getStatusBadgeClass(job?.jobStatusName || '')">
+                                        {{ job?.jobStatusName || 'Pending' }}
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <label>Transaction Type</label>
+                                    <span>{{ job?.transactionTypeName || '-' }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <label>Incoterms</label>
+                                    <span>{{ job?.incotermsName || '-' }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <label>Payment Type</label>
+                                    <span>{{ job?.paymentTypeName || '-' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="col-lg-6">
+                <!-- Remarks -->
+                <div class="info-card mb-3">
+                    <div class="info-card-header">
+                        <i class="bi bi-chat-left-text"></i>
+                        <span>Remarks</span>
                     </div>
-                    <div class="section-content">
-                        <div class="detail-section">
-                            <div class="row g-4">
-                                <div class="col-md-8">
-                                    <div class="detail-item">
-                                        <label class="detail-label">
-                                            <i class="bi bi-person"></i> Client
-                                        </label>
-                                        <div class="detail-value">{{ job?.customerName || '-' }}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="detail-item">
-                                        <label class="detail-label">
-                                            <i class="bi bi-info-circle"></i> Status
-                                        </label>
-                                        <div class="detail-value">
-                                            <span
-                                                [class]="'badge status-badge ' + getStatusBadgeClass(job?.jobStatusName || '')">
-                                                {{ job?.jobStatusName || 'Pending' }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="info-card-body">
+                        <div class="remarks-content">
+                            {{ job?.remarks || 'No remarks' }}
                         </div>
 
-                        <div class="detail-section">
-                            <div class="row g-4">
-                                <div class="col-md-4">
-                                    <div class="detail-item">
-                                        <label class="detail-label">
-                                            <i class="bi bi-arrow-left-right"></i> Transaction Type
-                                        </label>
-                                        <div class="detail-value">{{ job?.transactionTypeName || '-' }}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="detail-item">
-                                        <label class="detail-label">
-                                            <i class="bi bi-tags"></i> Incoterms
-                                        </label>
-                                        <div class="detail-value">{{ job?.incotermsName || '-' }}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="detail-item">
-                                        <label class="detail-label">
-                                            <i class="bi bi-credit-card"></i> Payment Type
-                                        </label>
-                                        <div class="detail-value">{{ job?.paymentTypeName || '-' }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="detail-section">
-                            <div class="row g-4">
-                                <div class="col-md-6">
-                                    <div class="detail-item highlight-box">
-                                        <label class="detail-label">
-                                            <i class="bi bi-currency-dollar"></i> Amount
-                                        </label>
-                                        <div class="detail-value-large">₱{{ job?.amount | number:'1.2-2' }}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <label class="detail-label">
-                                            <i class="bi bi-calendar"></i> Created Date
-                                        </label>
-                                        <div class="detail-value">{{ job?.createdDate | date:'MMM dd, yyyy' }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="detail-section">
-                            <div class="row g-4">
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <label class="detail-label">
-                                            <i class="bi bi-people"></i> Agent
-                                        </label>
-                                        <div class="detail-value">{{ job?.agent || '-' }}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <label class="detail-label">Booking No.</label>
-                                        <div class="detail-value">{{ job?.bookingNo || '-' }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="detail-section">
-                            <div class="detail-item">
-                                <label class="detail-label">
-                                    <i class="bi bi-chat-left-text"></i> Remarks
-                                </label>
-                                <div class="detail-value remarks-box">
-                                    {{ job?.remarks || 'No remarks' }}
-                                </div>
-                            </div>
+                        <div class="info-row">
+                            <label>Created Date</label>
+                            <span>{{ job?.createdDate | date:'MMM dd, yyyy' }}</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- CHARGES & DISBURSEMENTS -->
-                <div class="detail-section-card mb-4">
-                    <div class="section-header">
-                        <h5 class="section-title">
-                            <i class="bi bi-cash-coin me-2"></i>
-                            Charges | Expenses | Disbursements
-                        </h5>
+            </div>
+
+        </div>
+
+        <!-- Full Width Charges Section -->
+        <div class="row">
+            <div class="col-12">
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Charges</span>
                     </div>
-                    <div class="section-content p-0">
-                        <app-job-charges [charges]="charges" [jobGuid]="jobGuid"></app-job-charges>
+                    <div class="info-card-body p-0">
+                        <app-job-charges  [charges]="charges" [jobGuid]="jobGuid" [userRole]="userRole"></app-job-charges>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
