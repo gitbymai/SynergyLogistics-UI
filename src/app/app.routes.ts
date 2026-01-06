@@ -30,15 +30,15 @@ export const routes: Routes = [
       },
       {
         path: 'admin',
-        canActivate:[AuthGuard],
+        canActivate: [AuthGuard],
         data: {
           title: 'Admin',
-          roles:['admin']
+          roles: ['admin']
         },
-        children:[
+        children: [
           {
-            path:'users',
-          
+            path: 'users',
+
             loadComponent: () =>
               import('./views/admin/manage-users/manage-users.component').then(
                 m => m.ManageUsersComponent
@@ -51,7 +51,14 @@ export const routes: Routes = [
           }
         ]
       },
-
+      {
+        path: 'cash-advance-requests',
+        loadComponent: () => import('./views/cashadvancerequest/lists/lists.component').then(m => m.ListsComponent),
+        data: {
+          title: 'Cash Advance Requests',
+          roles: ['admin', 'cashier', 'finance', 'treasurer']
+        },
+      },
       {
         path: 'jobs',
         canActivate: [AuthGuard],
@@ -98,7 +105,7 @@ export const routes: Routes = [
                 ),
             data: {
               title: 'Job Management',
-              roles: ['sales', 'admin']
+              roles: ['sales', 'admin','finance', 'treasurer']
             },
             canActivate: [AuthGuard]
           },

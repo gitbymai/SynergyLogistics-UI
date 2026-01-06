@@ -73,9 +73,9 @@
             <td>
               <div class="status-badge-wrapper">
                 <span class="badge" [ngClass]="getStatusClass(charge.chargeTransactionStatus || '')">
-                  <i class="bi me-1" [ngClass]="getStatusIcon(charge.chargeTransactionStatus || '')"></i>
-                  {{ charge.chargeTransactionStatus }}
-                </span>
+  <i class="bi me-1" [ngClass]="getStatusIcon(charge.chargeTransactionStatus || '')"></i>
+  {{ charge.chargeTransactionStatus }}
+</span>
               </div>
             </td>
             <td>
@@ -451,6 +451,7 @@
     </div>
   </div>
 </div>
+
 <!-- Toast Notifications -->
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
   <!-- Success Toast -->

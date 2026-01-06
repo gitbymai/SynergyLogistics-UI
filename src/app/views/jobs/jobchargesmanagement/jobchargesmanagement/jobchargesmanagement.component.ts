@@ -375,25 +375,35 @@ export class JobchargesmanagementComponent implements OnInit {
       .reduce((sum, charge) => sum + (charge.amountSelling || 0), 0);
   }
 
-  getStatusClass(status: string): string {
-    switch (status?.toUpperCase()) {
-      case 'APPROVED': return 'status-approved';
-      case 'PENDING': return 'status-pending';
-      case 'CANCELLED': return 'status-cancelled';
-      case 'COMPLETED': return 'status-completed';
-      default: return 'status-default';
-    }
+ getStatusClass(status: string): string {
+  switch (status?.toUpperCase()) {
+    case 'FOR APPROVAL': return 'status-for-approval';
+    case 'FOR CLEARING': return 'status-released';
+    case 'CLEARED': return 'status-cleared';
+    case 'REJECTED': return 'status-rejected';
+    case 'COMPLETED': return 'status-completed';
+    case 'FOR RELEASING': return 'status-for-releasing';
+    case 'CASH RECEIVED - FOR LIQUIDATION': return 'status-for-liquidation';
+    case 'CANCELLED': return 'status-cancelled';
+    case 'APPROVED': return 'status-approved';
+    default: return 'status-default';
   }
+}
 
-  getStatusIcon(status: string): string {
-    switch (status?.toUpperCase()) {
-      case 'APPROVED': return 'bi-check-circle';
-      case 'PENDING': return 'bi-clock';
-      case 'CANCELLED': return 'bi-x-circle';
-      case 'COMPLETED': return 'bi-check-all';
-      default: return 'bi-question-circle';
-    }
+getStatusIcon(status: string): string {
+  switch (status?.toUpperCase()) {
+    case 'FOR APPROVAL': return 'bi-clock-history';
+    case 'FOR CLEARING': return 'bi-send-check';
+    case 'CLEARED': return 'bi-check2-circle';
+    case 'REJECTED': return 'bi-x-circle';
+    case 'COMPLETED': return 'bi-check-circle-fill';
+    case 'FOR RELEASING': return 'bi-box-arrow-right';
+    case 'CASH RECEIVED - FOR LIQUIDATION': return 'bi-currency-dollar';
+    case 'CANCELLED': return 'bi-dash-circle';
+    case 'APPROVED': return 'bi-check-circle';
+    default: return 'bi-question-circle';
   }
+}
 
   private showSuccess(message: string): void {
     this.successMessage = message;

@@ -46,7 +46,7 @@ export class ChargelistComponent {
     this.loadJobDetails(jobGuid);
   }
 
-    loadJobDetails(jobGuid: string): void {
+  loadJobDetails(jobGuid: string): void {
     this.isLoading = true;
     this.errorMessage = '';
 
@@ -68,22 +68,22 @@ export class ChargelistComponent {
     });
   }
 
-    loadJobRelatedTransaction(jobGuid: string):void{
-    
+  loadJobRelatedTransaction(jobGuid: string): void {
+
     this.jobGuid = jobGuid;
     this.jobService.getAllChargeTransactionByGuid(jobGuid).subscribe({
-      next: (success) =>{
+      next: (success) => {
 
         this.jobGuid = jobGuid;
         this.charges = success.data;
       },
       error: (error) => {
-        
+
         console.error('Error loading job details:', error);
       }
     })
   }
-    getStatusBadgeClass(status: string): string {
+  getStatusBadgeClass(status: string): string {
     switch (status.toUpperCase()) {
       case 'FOR APPROVAL': return 'bg-warning text-dark';
       case 'APPROVED': return 'bg-success';

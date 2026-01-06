@@ -20,10 +20,15 @@ export class JobChargesComponent implements OnInit, OnChanges {
 
   jobCode: string = '';
 
+
   // Loading & Modal States
   isLoading: boolean = false;
   isSubmitting: boolean = false;
   showModal: boolean = false;
+
+  showCashReleasingConfirmModal = false;
+  showCashReleaseConfirmModal = false;
+  selectedCharge: any = null;
 
   // Reactive Form
   chargeFormGroup!: FormGroup;
@@ -59,6 +64,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
   @Input() userRole: string = '';
   @Input() jobStatus: string = '';
   @Input() charges: ChargeTransaction[] = [];
+  @Input() viewSummary: boolean = false;
 
   ngOnInit() {
 
@@ -67,7 +73,21 @@ export class JobChargesComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
 
-    if (this.userRole === 'PROCESSOR' || this.userRole === 'OPSMGR') {
+    if (this.viewSummary) {
+      if ((this.userRole === 'ADMIN' || this.userRole === 'FINANCE' || this.userRole === 'TREASURER')) {
+
+        this.filteredCharges = this.charges;
+      }
+      else {
+        if (changes['charges'] && changes['charges'].currentValue) {
+          this.filteredCharges = this.charges.filter(charge => {
+            return charge.isForProcessing === true
+              && charge.isActive === true
+              && charge.amount > 0;
+          });
+        }
+      }
+    } else {
 
       if (changes['charges'] && changes['charges'].currentValue) {
         this.filteredCharges = this.charges.filter(charge => {
@@ -76,9 +96,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
             && charge.amount > 0;
         });
       }
-    }
-    else {
-      this.filteredCharges = this.charges;
+
     }
   }
   get totalChargeAmount(): number {
@@ -117,7 +135,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
 
   canProcessCharges(): boolean {
 
-    return ['ADMIN', 'PROCESSOR', 'OPSMGR'].includes(this.userRole);
+    return ['ADMIN', 'PROCESSOR', 'OPSMGR', 'CASHIER', 'TREASURER', 'FINANCE'].includes(this.userRole);
   }
 
   processCharge(charge: ChargeTransaction) {
@@ -191,7 +209,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
     this.showModal = true;
   }
 
-  private markFormGroupTouched(): void {
+  markFormGroupTouched(): void {
     Object.keys(this.chargeFormGroup.controls).forEach(key => {
       this.chargeFormGroup.get(key)?.markAsTouched();
     });
@@ -209,7 +227,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
     this.createCharge();
   }
 
-  private createCharge(): void {
+  createCharge(): void {
     const createRequest: CreateChargeTransactionRequest = {
       chargeSubCategoryId: this.chargeFormGroup.value.chargeSubCategoryId,
       description: this.chargeFormGroup.value.description,
@@ -247,6 +265,82 @@ export class JobChargesComponent implements OnInit, OnChanges {
   closeModal(): void {
     this.showModal = false;
     this.chargeFormGroup.reset();
+  }
+
+  openCashReleasingConfirmation(charge: any) {
+    this.selectedCharge = charge;
+    this.showCashReleasingConfirmModal = true;
+  }
+
+  closeCashReleasingConfirmModal() {
+    if (!this.isSubmitting) {
+      this.showCashReleasingConfirmModal = false;
+      this.selectedCharge = null;
+    }
+  }
+
+  proceedToReview() {
+
+    if (!this.selectedCharge) return;
+
+    this.isSubmitting = true;
+
+    this.chargeService.releaseCashCharge(this.selectedCharge.chargeGuid).subscribe({
+      next: (response) => {
+
+        this.isSubmitting = false;
+        this.showCashReleasingConfirmModal = false;
+
+        if (response.data) {
+          this.loadCharges();
+          this.showSuccess('Charge has been released for cashing!');
+          this.closeCashReleasingConfirmModal();
+        }
+        else {
+          this.showError(response.message || 'Failed to release charge for cashing');
+        }
+      },
+      error: (error) => {
+        console.error('Error releasing charge for cashing:', error);
+        this.showError(error?.error?.Message || 'Failed to release charge for cashing');
+      }
+    });
+  }
+
+  openCashReleaseConfirmation(charge: any) {
+    this.selectedCharge = charge;
+    this.showCashReleaseConfirmModal = true;
+  }
+
+  // Close cash release confirmation modal
+  closeCashReleaseConfirmModal() {
+    if (!this.isSubmitting) {
+      this.showCashReleaseConfirmModal = false;
+      this.selectedCharge = null;
+    }
+  }
+  confirmCashRelease() {
+    this.isSubmitting = true;
+
+    this.chargeService.confirmCashReleaseCharge(this.selectedCharge.chargeGuid).subscribe({
+      next: (response) => {
+        this.isSubmitting = false;
+        this.showCashReleaseConfirmModal = false;
+
+        if (response.data) {
+          this.loadCharges();
+          this.showSuccess('Cash has been released to processor!');
+          this.closeCashReleaseConfirmModal();
+        }
+        else {
+          this.showError(response.message || 'Failed to release charge for cashing');
+        }
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+        this.showError(error?.error?.Message || 'Failed to release charge for cashing');
+      }
+    });
   }
 
 

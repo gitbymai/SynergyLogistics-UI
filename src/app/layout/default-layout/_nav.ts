@@ -26,15 +26,15 @@ export const navItems = [
         name: 'Transactions',
         url: '/jobs/financials',
         iconComponent: { name: 'cil-notes' },
-        roles: ['admin','cashier','finance','treasurer','opsmgr','processor','sales']
+        roles: ['admin','opsmgr','processor']
       }
     ]
   },
   {
     name: 'Cash Advance Requests',
-    url: '/billing',
-    iconComponent: { name: 'cil-description' },
-    roles: ['admin','finance','treasurer']
+    url: '/cash-advance-requests',
+    iconComponent: { name: 'cil-dollar' },
+    roles: ['admin','finance','treasurer','cashier']
   },
   {
     name: 'Billing',

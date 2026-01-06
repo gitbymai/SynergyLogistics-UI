@@ -8,13 +8,16 @@ import { JobTransactionType } from '../../../models/jobtransactiontype';
 import { Job } from '../../../models/job';
 import { Configuration } from '../../../models/configuration';
 
+
 @Component({
-  selector: 'app-transactionlist',
+  selector: 'app-lists',
   imports: [CommonModule, FormsModule],
-  templateUrl: './transactionlist.component.html',
-  styleUrl: './transactionlist.component.scss'
+  templateUrl: './lists.component.html',
+  styleUrl: './lists.component.scss',
 })
-export class TransactionlistComponent implements OnInit {
+
+export class ListsComponent implements OnInit {
+
 
   jobs: Job[] = [];
   filterJobStatus: Configuration[] = [];
@@ -277,5 +280,4 @@ export class TransactionlistComponent implements OnInit {
     if (this.filters.dateTo) count++;
     return count;
   }
-
 }

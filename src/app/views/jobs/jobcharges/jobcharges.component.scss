@@ -420,3 +420,94 @@
     margin: 0.5rem;
   }
 }
+
+.badge-code {
+  background-color: #2196f3;
+  color: white;
+  padding: 0.4em 0.8em;
+  font-size: 0.95em;
+  border-radius: 4px;
+}
+
+.badge {
+  padding: 0.4em 0.8em;
+  font-size: 0.85em;
+  font-weight: 600;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+/* FOR APPROVAL - Yellow/Warning */
+.badge-for-approval {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+}
+
+/* RELEASED - Blue */
+.badge-released {
+  background-color: #cfe2ff;
+  color: #084298;
+  border: 1px solid #0d6efd;
+}
+
+/* CLEARED - Teal/Cyan */
+.badge-cleared {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #17a2b8;
+}
+
+/* REJECTED - Red */
+.badge-rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #dc3545;
+}
+
+/* COMPLETED - Green */
+.badge-completed {
+  background-color: #d1f2eb;
+  color: #0f5132;
+  border: 1px solid #20c997;
+}
+
+/* FOR RELEASING - Orange */
+.badge-for-releasing {
+  background-color: #ffe5d0;
+  color: #cc5200;
+  border: 1px solid #fd7e14;
+}
+
+/* FOR LIQUIDATION - Purple */
+.badge-for-liquidation {
+  background-color: #e0cffc;
+  color: #59359a;
+  border: 1px solid #6f42c1;
+}
+
+/* CANCELLED - Gray */
+.badge-cancelled {
+  background-color: #e9ecef;
+  color: #495057;
+  border: 1px solid #6c757d;
+}
+
+/* APPROVED - Success Green */
+.badge-approved {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #28a745;
+}
+
+.status-for-liquidation {
+  background-color: #e0cffc;
+  color: #59359a;
+  border: 1px solid #6f42c1;
+  padding: 0.4em 0.8em;
+  font-size: 0.85em;
+  font-weight: 600;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+}
