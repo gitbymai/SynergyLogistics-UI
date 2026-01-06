@@ -3,8 +3,9 @@ export interface CreateChargeTransactionRequest {
   chargeSubCategoryId: number;
   description?: string | null;
   amount: number;
+  amountSelling: number;
   jobId: number;
-  
+  isForProcessing?: boolean | false;
 }
 
 export interface UpdateChargeTransactionRequest extends CreateChargeTransactionRequest {
@@ -34,6 +35,7 @@ export interface ChargeTransaction {
   // Charge Details
   description?: string | null;
   amount: number;
+  amountSelling: number;
   currencyCode: string;
   
   // Job Reference
@@ -63,4 +65,7 @@ export interface ChargeTransaction {
   modifiedDate?: string | null;
   modifiedBy?: number | null;
   isActive?: boolean | null;
+  isForProcessing?: boolean | null;
+  isForDisbursement?: boolean | null;
+  chargeCategoryId?: number | null;
 }

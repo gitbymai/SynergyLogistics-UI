@@ -55,6 +55,7 @@ export class TransactionlistComponent implements OnInit {
     this.loadJobTransactionTypes();
 
   }
+
   loadJobList() {
 
     this.jobService.getAllJobs().subscribe({
@@ -64,7 +65,7 @@ export class TransactionlistComponent implements OnInit {
         if (response.success && response.data?.length) {
 
           this.jobs = response.data
-            .filter(c => c.isActive)
+            .filter(c => c.isActive && c.jobStatusName !== 'FOR APPROVAL' && c.jobStatusName !== 'CANCELLED')
             .sort((a, b) => b.jobId = a.jobId)
 
           this.filteredJobs = [...this.jobs];

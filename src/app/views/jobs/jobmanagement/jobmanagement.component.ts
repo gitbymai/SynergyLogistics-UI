@@ -38,9 +38,15 @@ export class JobmanagementComponent implements OnInit {
   isLoading = true;
   errorMessage = '';
   userRole: string = "";
-
+  showApproveConfirmModal = false;
+  isSubmitting = false;
+  selectedJob: Job | null = null;
   openSection: string = 'jobInfo'; // Default to first section open
 
+  // Toast Notifications
+  showSuccessToast: boolean = false;
+  showErrorToast: boolean = false;
+  successMessage: string = '';
 
   constructor(
     private http: HttpClient,
@@ -53,8 +59,6 @@ export class JobmanagementComponent implements OnInit {
   ngOnInit(): void {
     const jobGuid = this.route.snapshot.paramMap.get('jobGuid');
 
-
-    
     if (!jobGuid) {
       console.error('Job GUID not provided in route');
       this.errorMessage = 'Job identifier not found';
@@ -75,17 +79,17 @@ export class JobmanagementComponent implements OnInit {
     return this.openSection === section;
   }
 
-  loadJobRelatedTransaction(jobGuid: string):void{
-    
+  loadJobRelatedTransaction(jobGuid: string): void {
+
     this.jobGuid = jobGuid;
     this.jobService.getAllChargeTransactionByGuid(jobGuid).subscribe({
-      next: (success) =>{
+      next: (success) => {
 
         this.jobGuid = jobGuid;
         this.charges = success.data;
       },
       error: (error) => {
-        
+
         console.error('Error loading job details:', error);
       }
     })
@@ -130,8 +134,8 @@ export class JobmanagementComponent implements OnInit {
   }
 
   isAirFreight(): boolean {
-    
-      const seaTransactionTypes = [
+
+    const seaTransactionTypes = [
       "CUSTOMS RELEASING (A)",
       "AIR EXPORT",
       "AIR IMPORT",
@@ -165,15 +169,12 @@ export class JobmanagementComponent implements OnInit {
   getStatusBadgeClass(status: string): string {
     switch (status?.toUpperCase()) {
       case 'COMPLETED':
+      case 'CLOSED':
         return 'bg-success';
       case 'FOR APPROVAL':
-      case 'PENDING':
         return 'bg-warning';
-      case 'APPROVED':
-        return 'bg-info';
-      case 'IN PROGRESS':
+      case 'ONGOING':
         return 'bg-primary';
-      case 'REJECTED':
       case 'CANCELLED':
         return 'bg-danger';
       default:
@@ -282,5 +283,84 @@ export class JobmanagementComponent implements OnInit {
           alert('Failed to load print template. Please try again.');
         }
       });
+  }
+
+
+  openApproveConfirm(job: any) {
+    this.selectedJob = job;
+    this.showApproveConfirmModal = true;
+  }
+
+  closeApproveConfirm() {
+    this.showApproveConfirmModal = false;
+  }
+
+  confirmApprove() {
+    this.isSubmitting = true;
+
+    this.jobService.approveJob(this.selectedJob!.jobGuid).subscribe({
+      next: (response) => {
+        this.loadJobDetails(this.selectedJob!.jobGuid);
+
+        this.showSuccess(`Job ${this.job!.jobCode} approved successfully`);
+        this.isSubmitting = false;
+        this.closeApproveConfirm();
+      },
+      error: (error) => {
+        console.error('Error approving job:', error);
+        this.showError(error.message || 'Failed to approve job. Please try again.');
+        this.isSubmitting = false;
+      }
+    });
+
+    this.closeApproveConfirm();
+  }
+
+  showDisapproveConfirmModal = false;
+
+  openDisapproveConfirm(job: any) {
+    this.selectedJob = job;
+    this.showDisapproveConfirmModal = true;
+  }
+
+  closeDisapproveConfirm() {
+    this.showDisapproveConfirmModal = false;
+  }
+
+  confirmDisapprove() {
+    this.isSubmitting = true;
+
+    this.jobService.disapproveJob(this.selectedJob!.jobGuid).subscribe({
+      next: (response) => {
+        this.loadJobDetails(this.selectedJob!.jobGuid);
+
+        this.showSuccess(`Job ${this.job!.jobCode} disapproved successfully`);
+        this.isSubmitting = false;
+        this.closeDisapproveConfirm();
+      },
+      error: (error) => {
+        console.error('Error disapproving job:', error);
+        this.showError(error.message || 'Failed to disapprove job. Please try again.');
+        this.isSubmitting = false;
+      }
+    });
+
+    this.closeDisapproveConfirm();
+  }
+
+  private showSuccess(message: string): void {
+    this.successMessage = message;
+    this.showSuccessToast = true;
+    setTimeout(() => {
+      this.showSuccessToast = false;
+    }, 4000);
+  }
+
+  private showError(message: string): void {
+    this.errorMessage = message;
+    this.showErrorToast = true;
+    setTimeout(() => {
+      this.showErrorToast = false;
+    }, 4000);
   }
 }

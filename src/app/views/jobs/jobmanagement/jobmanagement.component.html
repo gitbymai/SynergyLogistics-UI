@@ -26,18 +26,13 @@
       <!-- ======================= 1. JOB INFORMATION ======================== -->
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingJobInfo">
-          <button class="accordion-button"
-            [class.collapsed]="!isSectionOpen('jobInfo')"
-            type="button"
-            (click)="toggleSection('jobInfo')"
-            [attr.aria-expanded]="isSectionOpen('jobInfo')">
+          <button class="accordion-button" [class.collapsed]="!isSectionOpen('jobInfo')" type="button"
+            (click)="toggleSection('jobInfo')" [attr.aria-expanded]="isSectionOpen('jobInfo')">
             <i class="bi bi-briefcase me-2"></i>
             Job Information
           </button>
         </h2>
-        <div id="collapseJobInfo"
-          class="accordion-collapse"
-          [class.collapse]="!isSectionOpen('jobInfo')"
+        <div id="collapseJobInfo" class="accordion-collapse" [class.collapse]="!isSectionOpen('jobInfo')"
           [class.show]="isSectionOpen('jobInfo')">
           <div class="accordion-body">
             <div class="detail-section">
@@ -115,6 +110,29 @@
                 </div>
               </div>
             </div>
+
+
+            @if((userRole === 'SALES' || userRole === 'ADMIN') && job?.jobStatusName === 'FOR APPROVAL') {
+            <div class="detail-section">
+              <div class="row g-4">
+                <div class="col-md-8">
+
+                </div>
+                <div class="col-md-4">
+                  <div class="text-end">
+
+                    <button class="btn btn-approve me-2" (click)="openApproveConfirm(job)">
+                      <span>Approve</span>
+                    </button>
+                    <button class="btn btn-disapprove" (click)="openDisapproveConfirm(job)">
+                      <span>Disapprove</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            }
+
           </div>
         </div>
       </div>
@@ -122,18 +140,13 @@
       <!-- ======================= 2. CARGO & ROUTING DETAILS ======================== -->
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingCargo">
-          <button class="accordion-button"
-            [class.collapsed]="!isSectionOpen('cargo')"
-            type="button"
-            (click)="toggleSection('cargo')"
-            [attr.aria-expanded]="isSectionOpen('cargo')">
+          <button class="accordion-button" [class.collapsed]="!isSectionOpen('cargo')" type="button"
+            (click)="toggleSection('cargo')" [attr.aria-expanded]="isSectionOpen('cargo')">
             <i class="bi bi-box-seam me-2"></i>
             Cargo & Routing Details
           </button>
         </h2>
-        <div id="collapseCargo"
-          class="accordion-collapse"
-          [class.collapse]="!isSectionOpen('cargo')"
+        <div id="collapseCargo" class="accordion-collapse" [class.collapse]="!isSectionOpen('cargo')"
           [class.show]="isSectionOpen('cargo')">
           <div class="accordion-body">
             <div class="detail-section">
@@ -222,123 +235,118 @@
       <!-- ======================= 3. FREIGHT DETAILS ======================== -->
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingFreight">
-          <button class="accordion-button"
-            [class.collapsed]="!isSectionOpen('freight')"
-            type="button"
-            (click)="toggleSection('freight')"
-            [attr.aria-expanded]="isSectionOpen('freight')">
+          <button class="accordion-button" [class.collapsed]="!isSectionOpen('freight')" type="button"
+            (click)="toggleSection('freight')" [attr.aria-expanded]="isSectionOpen('freight')">
             <i class="bi bi-truck me-2"></i>
             Freight Details
           </button>
         </h2>
-        <div id="collapseFreight"
-          class="accordion-collapse"
-          [class.collapse]="!isSectionOpen('freight')"
+        <div id="collapseFreight" class="accordion-collapse" [class.collapse]="!isSectionOpen('freight')"
           [class.show]="isSectionOpen('freight')">
           <div class="accordion-body">
             @if (isSeaFreight()) {
-              <div class="freight-section">
-                <div class="freight-type-badge sea">
-                  <i class="bi bi-water"></i> Sea Freight
-                </div>
-                <div class="detail-section">
-                  <h6 class="section-subtitle">Bill of Lading References</h6>
-                  <div class="row g-4">
-                    <div class="col-md-6">
-                      <div class="detail-item">
-                        <label class="detail-label">MBL Reference</label>
-                        <div class="detail-value">{{ job?.mbl || '-' }}</div>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="detail-item">
-                        <label class="detail-label">HBL Reference</label>
-                        <div class="detail-value">{{ job?.hbl || '-' }}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="detail-section">
-                  <h6 class="section-subtitle">Vessel & Container Information</h6>
-                  <div class="row g-4">
-                    <div class="col-md-6">
-                      <div class="detail-item">
-                        <label class="detail-label">Vessel</label>
-                        <div class="detail-value">{{ job?.vessel || '-' }}</div>
-                      </div>
-                    </div>
-                    <div class="col-md-3">
-                      <div class="detail-item">
-                        <label class="detail-label">Container Size</label>
-                        <div class="detail-value">{{ job?.containerCount || '-' }}</div>
-                      </div>
-                    </div>
-                    <div class="col-md-3">
-                      <div class="detail-item">
-                        <label class="detail-label">Container Count</label>
-                        <div class="detail-value">{{ job?.containerCount || '-' }}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                @if (job?.containerCount) {
-                  <div class="detail-section">
-                    <div class="detail-item">
-                      <label class="detail-label">Container Numbers</label>
-                      <div class="detail-value">{{ job?.containerCount }}</div>
-                    </div>
-                  </div>
-                }
+            <div class="freight-section">
+              <div class="freight-type-badge sea">
+                <i class="bi bi-water"></i> Sea Freight
               </div>
+              <div class="detail-section">
+                <h6 class="section-subtitle">Bill of Lading References</h6>
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    <div class="detail-item">
+                      <label class="detail-label">MBL Reference</label>
+                      <div class="detail-value">{{ job?.mbl || '-' }}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="detail-item">
+                      <label class="detail-label">HBL Reference</label>
+                      <div class="detail-value">{{ job?.hbl || '-' }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="detail-section">
+                <h6 class="section-subtitle">Vessel & Container Information</h6>
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    <div class="detail-item">
+                      <label class="detail-label">Vessel</label>
+                      <div class="detail-value">{{ job?.vessel || '-' }}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="detail-item">
+                      <label class="detail-label">Container Size</label>
+                      <div class="detail-value">{{ job?.containerCount || '-' }}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="detail-item">
+                      <label class="detail-label">Container Count</label>
+                      <div class="detail-value">{{ job?.containerCount || '-' }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              @if (job?.containerCount) {
+              <div class="detail-section">
+                <div class="detail-item">
+                  <label class="detail-label">Container Numbers</label>
+                  <div class="detail-value">{{ job?.containerCount }}</div>
+                </div>
+              </div>
+              }
+            </div>
             }
 
             @if (isAirFreight()) {
-              <div class="freight-section">
-                <div class="freight-type-badge air">
-                  <i class="bi bi-airplane"></i> Air Freight
-                </div>
-                <div class="detail-section">
-                  <h6 class="section-subtitle">Air Waybill References</h6>
-                  <div class="row g-4">
-                    <div class="col-md-6">
-                      <div class="detail-item">
-                        <label class="detail-label">MAWB Reference</label>
-                        <div class="detail-value">{{ job?.mawb || '-' }}</div>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="detail-item">
-                        <label class="detail-label">HAWB Reference</label>
-                        <div class="detail-value">{{ job?.hawb || '-' }}</div>
-                      </div>
+            <div class="freight-section">
+              <div class="freight-type-badge air">
+                <i class="bi bi-airplane"></i> Air Freight
+              </div>
+              <div class="detail-section">
+                <h6 class="section-subtitle">Air Waybill References</h6>
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    <div class="detail-item">
+                      <label class="detail-label">MAWB Reference</label>
+                      <div class="detail-value">{{ job?.mawb || '-' }}</div>
                     </div>
                   </div>
-                </div>
-                <div class="detail-section">
-                  <h6 class="section-subtitle">Flight Information</h6>
-                  <div class="row g-4">
-                    <div class="col-md-6">
-                      <div class="detail-item">
-                        <label class="detail-label">Flight No.</label>
-                        <div class="detail-value">{{ job?.flightNo || '-' }}</div>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="detail-item">
-                        <label class="detail-label">Chargeable Weight</label>
-                        <div class="detail-value">{{ job?.chargeableWeight || '-' }} kg</div>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="detail-item">
+                      <label class="detail-label">HAWB Reference</label>
+                      <div class="detail-value">{{ job?.hawb || '-' }}</div>
                     </div>
                   </div>
                 </div>
               </div>
+              <div class="detail-section">
+                <h6 class="section-subtitle">Flight Information</h6>
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    <div class="detail-item">
+                      <label class="detail-label">Flight No.</label>
+                      <div class="detail-value">{{ job?.flightNo || '-' }}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="detail-item">
+                      <label class="detail-label">Chargeable Weight</label>
+                      <div class="detail-value">{{ job?.chargeableWeight || '-' }} kg</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             }
 
             @if (!isSeaFreight() && !isAirFreight()) {
-              <div class="empty-freight">
-                <i class="bi bi-question-circle"></i>
-                <p>No freight type specified</p>
-              </div>
+            <div class="empty-freight">
+              <i class="bi bi-question-circle"></i>
+              <p>No freight type specified</p>
+            </div>
             }
           </div>
         </div>
@@ -347,18 +355,13 @@
       <!-- ======================= 4. ADDITIONAL DETAILS ======================== -->
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingAdditional">
-          <button class="accordion-button"
-            [class.collapsed]="!isSectionOpen('additional')"
-            type="button"
-            (click)="toggleSection('additional')"
-            [attr.aria-expanded]="isSectionOpen('additional')">
+          <button class="accordion-button" [class.collapsed]="!isSectionOpen('additional')" type="button"
+            (click)="toggleSection('additional')" [attr.aria-expanded]="isSectionOpen('additional')">
             <i class="bi bi-journal-text me-2"></i>
             Additional Details
           </button>
         </h2>
-        <div id="collapseAdditional"
-          class="accordion-collapse"
-          [class.collapse]="!isSectionOpen('additional')"
+        <div id="collapseAdditional" class="accordion-collapse" [class.collapse]="!isSectionOpen('additional')"
           [class.show]="isSectionOpen('additional')">
           <div class="accordion-body">
             <div class="detail-section">
@@ -397,25 +400,152 @@
       <!-- ======================= 5. CHARGES & DISBURSEMENTS ======================== -->
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingCharges">
-          <button class="accordion-button"
-            [class.collapsed]="!isSectionOpen('charges')"
-            type="button"
-            (click)="toggleSection('charges')"
-            [attr.aria-expanded]="isSectionOpen('charges')">
+          <button class="accordion-button" [class.collapsed]="!isSectionOpen('charges')" type="button"
+            (click)="toggleSection('charges')" [attr.aria-expanded]="isSectionOpen('charges')">
             <i class="bi bi-cash-coin me-2"></i>
             Charges | Expenses | Disbursements
           </button>
         </h2>
-        <div id="collapseCharges"
-          class="accordion-collapse"
-          [class.collapse]="!isSectionOpen('charges')"
+        <div id="collapseCharges" class="accordion-collapse" [class.collapse]="!isSectionOpen('charges')"
           [class.show]="isSectionOpen('charges')">
           <div class="accordion-body p-0">
-            <app-job-charges [charges]="charges" [jobGuid]="jobGuid" [userRole]="userRole"></app-job-charges>
+            <app-job-charges [charges]="charges" [jobGuid]="jobGuid" [userRole]="userRole" [jobStatus]="job?.jobStatusName || ''"></app-job-charges>
           </div>
         </div>
       </div>
 
+    </div>
+  </div>
+</div>
+
+
+<!-- Approve Confirmation Modal -->
+@if (showApproveConfirmModal) {
+<div class="modal-backdrop" (click)="closeApproveConfirm()"></div>
+}
+<div class="modal custom-modal" [class.show]="showApproveConfirmModal" [class.d-block]="showApproveConfirmModal"
+  tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">
+          <i class="cil-check-circle me-2"></i> Approve Charge
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeApproveConfirm()"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-success" role="alert">
+          <i class="cil-info me-2"></i>
+          Please confirm your approval
+        </div>
+        <p class="mb-2">
+          Are you sure you want to approve the job <strong>{{ selectedJob?.jobCode }}</strong>?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeApproveConfirm()">
+          <i class="cil-x me-2"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-success" (click)="confirmApprove()" [disabled]="isSubmitting">
+          @if (!isSubmitting) {
+          <span>
+            <i class="cil-check-circle me-2"></i> Approve Job
+          </span>
+          }
+          @if (isSubmitting) {
+          <span>
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Approving...
+          </span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Disapprove Confirmation Modal -->
+@if (showDisapproveConfirmModal) {
+<div class="modal-backdrop" (click)="closeDisapproveConfirm()"></div>
+}
+<div class="modal custom-modal" [class.show]="showDisapproveConfirmModal" [class.d-block]="showDisapproveConfirmModal"
+  tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">
+          <i class="cil-x-circle me-2"></i> Disapprove Job
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeDisapproveConfirm()"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger" role="alert">
+          <i class="cil-warning me-2"></i>
+          Please confirm your disapproval
+        </div>
+        <p class="mb-2">
+          Are you sure you want to disapprove the job <strong>{{ selectedJob?.jobCode }}</strong>?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeDisapproveConfirm()">
+          <i class="cil-x me-2"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="confirmDisapprove()" [disabled]="isSubmitting">
+          @if (!isSubmitting) {
+          <span>
+            <i class="cil-x-circle me-2"></i> Disapprove Job
+          </span>
+          }
+          @if (isSubmitting) {
+          <span>
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Disapproving...
+          </span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notifications -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+  <!-- Success Toast -->
+  <div class="toast align-items-center border-0" [class.show]="showSuccessToast" role="alert" aria-live="assertive"
+    aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body bg-success text-white rounded">
+        <div class="d-flex align-items-center">
+          <i class="bi bi-check-circle me-2" style="font-size: 1.5rem;"></i>
+          <div>
+            <strong class="d-block">Success!</strong>
+            <span>{{ successMessage }}</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showSuccessToast = false"
+        aria-label="Close"></button>
+    </div>
+  </div>
+
+  <!-- Error Toast -->
+  <div class="toast align-items-center border-0" [class.show]="showErrorToast" role="alert" aria-live="assertive"
+    aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body bg-danger text-white rounded">
+        <div class="d-flex align-items-center">
+          <i class="bi bi-x-circle me-2" style="font-size: 1.5rem;"></i>
+          <div>
+            <strong class="d-block">Error</strong>
+            <span>{{ errorMessage }}</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showErrorToast = false"
+        aria-label="Close"></button>
     </div>
   </div>
 </div>

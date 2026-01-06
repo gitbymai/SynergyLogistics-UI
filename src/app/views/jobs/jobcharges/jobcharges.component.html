@@ -5,12 +5,21 @@
         <i class="bi bi-cash-stack me-2"></i>Financial Transactions
         <span class="badge bg-light text-muted ms-2">{{ charges?.length || 0 }}</span>
       </h6>
-      @if (userRole === 'ADMIN' || userRole == 'FINANCE' || userRole === 'SALES') {
-
-      <button class="btn btn-outline-primary btn-sm" [routerLink]="['/jobs/jobmanagement', jobGuid, 'charges']">
-        <i class="bi bi-gear"></i> Manage
+      @if ((userRole === 'ADMIN' || userRole === 'FINANCE' || userRole === 'SALES') && jobStatus !== 'COMPLETED' &&
+      jobStatus !== 'CANCELLED' && jobStatus !== 'CLOSED' && jobStatus !== 'FOR APPROVAL') {
+      <button class="btn btn-manage btn-sm" [routerLink]="['/jobs/jobmanagement', jobGuid, 'charges']">
+        <i class="bi bi-gear me-1"></i> Manage
       </button>
       }
+
+      @if ((userRole === 'ADMIN' || userRole === 'OPSMGR' || userRole === 'PROCESSOR') &&jobStatus !== 'COMPLETED' &&
+      jobStatus !== 'CANCELLED' && jobStatus !== 'CLOSED' && jobStatus !== 'FOR APPROVAL') {
+      <button class="btn btn-approve btn-sm">
+        <span>Request</span>
+      </button>
+      }
+
+
     </div>
   </div>
 
@@ -67,5 +76,95 @@
       </tfoot>
       }
     </table>
+  </div>
+</div>
+
+<!-- Request New Charge Modal -->
+@if (showModal) {
+  <div class="modal-backdrop" (click)="closeModal()"></div>
+}
+<div class="modal custom-modal" [class.show]="showModal" [class.d-block]="showModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="cil-plus me-2"></i> Request New Charge
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="chargeFormGroup" class="form-professional">
+          <div class="row mb-3">
+            <!-- Charge Subcategory -->
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="cil-tags me-1"></i> Category <span class="text-danger">*</span>
+              </label>
+              <select class="form-select form-control-custom" formControlName="chargeSubCategoryId">
+                <option [value]="0">Select category...</option>
+                <option value="19">ADMINISTRATIVE FEE</option>
+                <option value="29">BROKERAGE FEE</option>
+                <option value="15">CUSTOMS CLEARANCE FEE</option>
+                <option value="11">DELIVERY CHARGE</option>
+                <option value="28">RECEIPTED FEE</option>
+                <option value="12">TRUCKING FEE</option>
+                <option value="16">WAREHOUSE STORAGE FEE</option>
+              </select>
+              @if (chargeFormGroup.get('chargeSubCategoryId')?.invalid && chargeFormGroup.get('chargeSubCategoryId')?.touched) {
+                <div class="text-danger small mt-1">
+                  Category is required
+                </div>
+              }
+            </div>
+            
+            <!-- Amount -->
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="cil-dollar me-1"></i> Amount <span class="text-danger">*</span>
+              </label>
+              <input type="number" class="form-control form-control-custom" formControlName="amount" step="0.01" min="0"
+                placeholder="0.00">
+              @if (chargeFormGroup.get('amount')?.invalid && chargeFormGroup.get('amount')?.touched) {
+                <div class="text-danger small mt-1">
+                  Valid amount is required
+                </div>
+              }
+            </div>
+          </div>
+          
+          <!-- Description -->
+          <div class="row mb-3">
+            <div class="col-12">
+              <label class="form-label">
+                <i class="cil-description me-1"></i> Description
+              </label>
+              <textarea class="form-control form-control-custom" rows="3" formControlName="description"
+                placeholder="Enter charge description..."></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">
+          <i class="cil-x me-2"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="onSubmit()"
+          [disabled]="!chargeFormGroup.valid || isSubmitting">
+          @if (!isSubmitting) {
+            <span>
+              <i class="cil-check me-2"></i> Request Charge
+            </span>
+          }
+          @if (isSubmitting) {
+            <span>
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Submitting...
+            </span>
+          }
+        </button>
+      </div>
+    </div>
   </div>
 </div>

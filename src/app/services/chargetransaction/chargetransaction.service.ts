@@ -18,12 +18,10 @@ export class ChargeTransactionService extends ApiService {
   private apiUrl = `${this.baseUrl}`;
 
   constructor(http: HttpClient) {
-    super(http);  // Call parent constructor
+    super(http); 
   }
 
-  /**
-   * Get all charge transactions by job GUID
-   */
+
   getChargesByJobGuid(jobGuid: string): Observable<ApiResponse<ChargeTransaction[]>> {
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/${jobGuid}/charges`);
   }
@@ -40,82 +38,54 @@ export class ChargeTransactionService extends ApiService {
     );
   }
   
-  /**
-   * Get all charge transactions
-   */
+
   getAllCharges(): Observable<ApiResponse<ChargeTransaction[]>> {
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/charge`);
   }
 
-  /**
-   * Create a new charge transaction
-   */
   createCharge(charge: CreateChargeTransactionRequest): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}/job/jobtransaction/createcharge`, charge);
   }
 
-  /**
-   * Update an existing charge transaction
-   */
   updateCharge(chargeGuid: string, charge: UpdateChargeTransactionRequest): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/updatecharge/${chargeGuid}`, charge);
   }
 
-  /**
-   * Get charge subcategories (for dropdown)
-   */
+
   getChargeSubcategories(): Observable<ApiResponse<any[]>> {
-    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/chargesubcategory`);
+    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/devconfig/charge-subcategory`);
   }
 
-  /**
-   * Get charge statuses (for dropdown)
-   */
+
   getChargeStatuses(): Observable<ApiResponse<any[]>> {
     return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/configuration/chargestatus`);
   }
 
-  /**
-   * Get charge categories (for dropdown)
-   */
   getChargeCategories(): Observable<ApiResponse<any[]>> {
     return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/chargecategory`);
   }
 
-  /**
-   * Get charges by status
-   */
   getChargesByStatus(statusId: number): Observable<ApiResponse<ChargeTransaction[]>> {
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/charge/status/${statusId}`);
   }
 
-  /**
-   * Get charges by category
-   */
+ 
   getChargesByCategory(categoryId: number): Observable<ApiResponse<ChargeTransaction[]>> {
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/charge/category/${categoryId}`);
   }
 
-  /**
-   * Approve charge transaction
-   */
+
   approveCharge(chargeGuid: string): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/charge/${chargeGuid}/approve`, {});
   }
 
-  /**
-   * Cancel charge transaction
-   */
   cancelCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/cancelcharge/${tranGuid}`, {});
   }
 
-  /**
-   * Complete charge transaction
-   */
+
   completeCharge(chargeGuid: string, completedBy: number): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/charge/${chargeGuid}/complete`, { completedBy });
   }
-
 
 }

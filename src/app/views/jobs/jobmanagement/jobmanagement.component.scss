@@ -485,3 +485,31 @@
     print-color-adjust: exact;
   }
 }
+
+.btn-approve {
+  background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%) !important;
+  border: none;
+  color: white;
+  
+  &:hover {
+    background: linear-gradient(135deg, #218838 0%, #145523 100%) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.btn-disapprove {
+  background: linear-gradient(135deg, #dc3545 0%, #bd2130 100%) !important;
+  border: none;
+  color: white;
+  
+  &:hover {
+    background: linear-gradient(135deg, #c82333 0%, #a71d2a 100%) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.custom-modal + .modal-backdrop,
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px); // Optional: adds blur effect
+}

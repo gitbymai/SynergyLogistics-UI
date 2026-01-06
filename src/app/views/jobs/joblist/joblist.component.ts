@@ -216,12 +216,18 @@ export class JoblistComponent implements OnInit {
   }
 
   getStatusBadgeClass(status: string): string {
-    switch (status.toUpperCase()) {
-      case 'FOR APPROVAL': return 'bg-warning text-dark';
-      case 'APPROVED': return 'bg-success';
-      case 'REJECTED': return 'bg-danger';
-      case 'COMPLETED': return 'bg-info';
-      default: return 'bg-secondary';
+    switch (status?.toUpperCase()) {
+      case 'COMPLETED':
+      case 'CLOSED':
+        return 'bg-success';
+      case 'FOR APPROVAL':
+        return 'bg-warning';
+      case 'ONGOING':
+        return 'bg-primary';
+      case 'CANCELLED':
+        return 'bg-danger';
+      default:
+        return 'bg-secondary';
     }
   }
 

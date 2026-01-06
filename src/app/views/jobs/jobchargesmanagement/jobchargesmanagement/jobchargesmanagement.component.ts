@@ -7,16 +7,9 @@ import { ChargeTransaction, CreateChargeTransactionRequest, UpdateChargeTransact
 import { ChargeTransactionService } from '../../../../services/chargetransaction/chargetransaction.service';
 import { JobsService } from '../../../../services/jobs/jobs.service';
 import { Job } from '../../../../models/job';
+import { ChargeSubcategory } from '../../../../models/chargesubcategory';
 
-interface ChargeSubcategory {
-  id: number;
-  name: string;
-}
 
-interface ChargeStatus {
-  id: number;
-  name: string;
-}
 
 @Component({
   selector: 'app-jobchargesmanagement',
@@ -59,9 +52,7 @@ export class JobchargesmanagementComponent implements OnInit {
   errorMessage: string = '';
 
   // Dropdown options
-  chargeSubcategories: ChargeSubcategory[] = [];
-  chargeStatuses: ChargeStatus[] = [];
-  currencyCodes: string[] = ['PHP', 'USD', 'EUR', 'JPY', 'GBP', 'AUD', 'SGD'];
+  chargeSubCategories: ChargeSubcategory[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -83,6 +74,8 @@ export class JobchargesmanagementComponent implements OnInit {
       chargeSubCategoryId: [0, [Validators.required, Validators.min(1)]],
       description: ['', Validators.maxLength(500)],
       amount: [0, [Validators.required, Validators.min(0)]],
+      amountSelling: [0, [Validators.required, Validators.min(0)]],
+      isForProcessing: [false],
       jobId: [0]
     });
   }
@@ -115,7 +108,8 @@ export class JobchargesmanagementComponent implements OnInit {
             this.charges = response.data;
             if (response.data.length) {
               this.jobCode = response.data[0].jobCode;
-              this.getChargeSubcategories();
+              this.loadChargeSubCategories();
+              //this.getChargeSubcategories();
             }
             this.applyFilters();
           } else {
@@ -129,18 +123,21 @@ export class JobchargesmanagementComponent implements OnInit {
       });
   }
 
-  getChargeSubcategories(): void {
-    if (this.charges && this.charges.length > 0) {
-      const uniqueMap = new Map<number, string>();
+  loadChargeSubCategories() {
+    this.chargeService.getChargeSubcategories().subscribe({
+      next: (response) => {
+        if (response.data && response.data.length > 0) {
 
-      this.charges.forEach(charge => {
-        if (!uniqueMap.has(charge.chargeSubCategoryId)) {
-          uniqueMap.set(charge.chargeSubCategoryId, charge.chargeSubCategoryName!);
+          this.chargeSubCategories = response.data
+  .filter((item) => item.isActive === true && item.chargeCategoryId === 1)
+  .sort((a, b) => a.chargeSubCategoryName.localeCompare(b.chargeSubCategoryName));
         }
-      });
+      },
+      error: (error) => {
+        console.error('Error loading charge subcategories:', error);
+      }
+    });
 
-      this.chargeSubcategories = Array.from(uniqueMap, ([id, name]) => ({ id, name }));
-    }
   }
 
   applyFilters(): void {
@@ -172,10 +169,13 @@ export class JobchargesmanagementComponent implements OnInit {
     this.chargeFormGroup.reset({
       description: '',
       amount: 0,
+      amountSelling: 0,
       jobId: 0,
       optionChargeStatusId: 0,
+      isForProcessing: false,
     });
     this.chargeFormGroup.get('chargeCode')?.enable();
+    this.chargeFormGroup.get('isForProcessing')?.enable();
     this.showModal = true;
   }
 
@@ -187,11 +187,14 @@ export class JobchargesmanagementComponent implements OnInit {
       chargeSubCategoryId: charge.chargeSubCategoryId,
       description: charge.description || '',
       amount: charge.amount,
-      jobId: charge.jobId
+      amountSelling: charge.amountSelling || 0,
+      jobId: charge.jobId,
+      isForProcessing: charge.isForProcessing || false,
     });
 
     // Disable charge code in edit mode
     this.chargeFormGroup.get('chargeCode')?.disable();
+    this.chargeFormGroup.get('isForProcessing')?.disable();
     this.showModal = true;
   }
 
@@ -229,6 +232,8 @@ export class JobchargesmanagementComponent implements OnInit {
       chargeSubCategoryId: this.chargeFormGroup.value.chargeSubCategoryId,
       description: this.chargeFormGroup.value.description,
       amount: this.chargeFormGroup.value.amount,
+      amountSelling: this.chargeFormGroup.value.amountSelling,
+      isForProcessing: this.chargeFormGroup.value.isForProcessing,
       jobId: this.jobId,
     };
 
@@ -238,15 +243,14 @@ export class JobchargesmanagementComponent implements OnInit {
         next: (response) => {
           if (response.data) {
             this.loadCharges();
-            this.showSuccess(`Charge ${createRequest.chargeSubCategoryId} created successfully`);
+            this.showSuccess(`New charge has been created!`);
             this.closeModal();
           } else {
             this.showError(response.message || 'Failed to create charge');
           }
         },
         error: (error) => {
-          console.error('Error creating charge:', error);
-          this.showError(error?.error?.message || 'Failed to create charge');
+          this.showError(error?.error?.Message || 'Failed to create charge');
         }
       });
   }
@@ -260,6 +264,8 @@ export class JobchargesmanagementComponent implements OnInit {
       chargeSubCategoryId: this.chargeFormGroup.value.chargeSubCategoryId,
       description: this.chargeFormGroup.value.description,
       amount: this.chargeFormGroup.value.amount,
+      amountSelling: this.chargeFormGroup.value.amountSelling,
+      isForProcessing: this.chargeFormGroup.value.isForProcessing,
       jobId: this.chargeFormGroup.value.jobId
     };
 
@@ -270,7 +276,7 @@ export class JobchargesmanagementComponent implements OnInit {
         next: (response) => {
           if (response.data) {
             this.loadCharges();
-            this.showSuccess(`Charge ${updateRequest.chargeId} updated successfully`);
+            this.showSuccess(`Charge has been updated successfully`);
             this.closeModal();
           } else {
             this.showError(response.message || 'Failed to update charge');
@@ -314,11 +320,18 @@ export class JobchargesmanagementComponent implements OnInit {
       });
   }
 
-  get total(): number {
+  get totalChargeAmount(): number {
     const excludedStatuses = ['CANCELLED', 'REJECTED'];
     return this.filteredCharges
       .filter(charge => !excludedStatuses.includes(charge.chargeTransactionStatus!))
       .reduce((sum, charge) => sum + (charge.amount || 0), 0);
+  }
+
+  get totalSellingAmount(): number {
+    const excludedStatuses = ['CANCELLED', 'REJECTED'];
+    return this.filteredCharges
+      .filter(charge => !excludedStatuses.includes(charge.chargeTransactionStatus!))
+      .reduce((sum, charge) => sum + (charge.amountSelling || 0), 0);
   }
 
   getStatusClass(status: string): string {

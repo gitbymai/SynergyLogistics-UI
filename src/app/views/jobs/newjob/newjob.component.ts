@@ -295,8 +295,8 @@ export class NewjobComponent implements OnInit {
   }
 
   updateFreightFields(value: string): void {
-    this.isAirFreight = ['FAE', 'FAI', 'CRA', 'DFA'].includes(value);
-    this.isSeaFreight = ['FSE', 'FSI', 'CRS', 'DFS'].includes(value);
+    this.isAirFreight = ['AIO', 'AEO', 'DFA'].includes(value);
+    this.isSeaFreight = ['SIO', 'SEO', 'DFS'].includes(value);
 
     if (this.isAirFreight) {
       this.freightTypeLabel = 'Air Freight';

@@ -29,7 +29,7 @@ export class JobsService extends ApiService {
       })
     );
   }
-  
+
   getAllConfigurations(): Observable<ApiResponse<any[]>> {
     return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/configuration`);
   }
@@ -57,6 +57,14 @@ export class JobsService extends ApiService {
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}/job`, job);
   }
 
+  approveJob(jobGuid: string): Observable<ApiResponse<Job>> {
+    return this.http.put<ApiResponse<any>>(`${this.apiUrl}/job/approve/${jobGuid}`, {});
+  }
+
+  disapproveJob(jobGuid: string): Observable<ApiResponse<Job>> {
+    return this.http.put<ApiResponse<any>>(`${this.apiUrl}/job/disapprove/${jobGuid}`, {});
+  }
+
   getAllChargeTransactionByGuid(jobGuid: string): Observable<ApiResponse<ChargeTransaction[]>> {
 
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/${jobGuid}/charges`);
@@ -67,14 +75,17 @@ export class JobsService extends ApiService {
 
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/jobtransaction/charges`);
   }
+
   getAllChargeTransactionExpenses(): Observable<ApiResponse<ChargeTransaction[]>> {
 
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/jobtransaction/expenses`);
   }
+
   getAllChargeTransactionDisbursements(): Observable<ApiResponse<ChargeTransaction[]>> {
 
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/jobtransaction/disbursements`);
   }
+
   getChargeTransactionByRole(role: string): Observable<ApiResponse<ChargeTransaction[]>> {
 
     const params = new HttpParams().set('role', role);
