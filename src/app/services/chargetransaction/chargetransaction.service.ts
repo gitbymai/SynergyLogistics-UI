@@ -4,10 +4,10 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiService } from '../api.service';
 import { ApiResponse } from '../../models/api-response';
-import { 
-  ChargeTransaction, 
-  CreateChargeTransactionRequest, 
-  UpdateChargeTransactionRequest 
+import {
+  ChargeTransaction,
+  CreateChargeTransactionRequest,
+  UpdateChargeTransactionRequest
 } from '../../models/chargetransaction';
 
 @Injectable({
@@ -18,7 +18,7 @@ export class ChargeTransactionService extends ApiService {
   private apiUrl = `${this.baseUrl}`;
 
   constructor(http: HttpClient) {
-    super(http); 
+    super(http);
   }
 
 
@@ -65,7 +65,7 @@ export class ChargeTransactionService extends ApiService {
   getChargesByStatus(statusId: number): Observable<ApiResponse<ChargeTransaction[]>> {
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/charge/status/${statusId}`);
   }
- 
+
   getChargesByCategory(categoryId: number): Observable<ApiResponse<ChargeTransaction[]>> {
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/charge/category/${categoryId}`);
   }
@@ -73,7 +73,7 @@ export class ChargeTransactionService extends ApiService {
   approveCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/approvecharge/${tranGuid}`, {});
   }
-  
+
   rejectCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/rejectcharge/${tranGuid}`, {});
   }
@@ -90,8 +90,16 @@ export class ChargeTransactionService extends ApiService {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/releasecashcharge/${tranGuid}`, {});
   }
 
- confirmCashReleaseCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
+  confirmCashReleaseCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/actualcashrelease/${tranGuid}`, {});
   }
+
+  submitForClearingCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
+    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/forclearing/${tranGuid}`, {});
+  }
   
+  submitClearedCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
+    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/cleared/${tranGuid}`, {});
+  }
+
 }

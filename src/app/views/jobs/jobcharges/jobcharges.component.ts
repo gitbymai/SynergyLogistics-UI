@@ -26,6 +26,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
   isSubmitting: boolean = false;
   showModal: boolean = false;
 
+  showSubmitClearingConfirmModal = false;
   showCashReleasingConfirmModal = false;
   showCashReleaseConfirmModal = false;
   selectedCharge: any = null;
@@ -312,7 +313,6 @@ export class JobChargesComponent implements OnInit, OnChanges {
     this.showCashReleaseConfirmModal = true;
   }
 
-  // Close cash release confirmation modal
   closeCashReleaseConfirmModal() {
     if (!this.isSubmitting) {
       this.showCashReleaseConfirmModal = false;
@@ -343,7 +343,41 @@ export class JobChargesComponent implements OnInit, OnChanges {
     });
   }
 
+ openSubmitClearingConfirmation(charge: any) {
+    this.selectedCharge = charge;
+    this.showSubmitClearingConfirmModal = true;
+  }
 
+  closeSubmitClearingConfirmModal() {
+    if (!this.isSubmitting) {
+      this.showSubmitClearingConfirmModal = false;
+      this.selectedCharge = null;
+    }
+  }
+
+    confirmSubmitClearing() {
+    this.isSubmitting = true;
+    
+    this.chargeService.submitForClearingCharge(this.selectedCharge.chargeGuid).subscribe({
+      next: (response) => {
+        this.isSubmitting = false;
+        this.showSubmitClearingConfirmModal = false;
+    
+        if (response.data) {
+          this.loadCharges();
+          this.showSuccess('Cash has been released to processor!');
+          this.closeCashReleaseConfirmModal();
+        }
+        else {
+          this.showError(response.message || 'Failed to release charge for cashing');
+        }
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+        this.showError(error?.error?.Message || 'Failed to release charge for cashing');
+      }
+    });
+  }
   private showSuccess(message: string): void {
     this.successMessage = message;
     this.showSuccessToast = true;
