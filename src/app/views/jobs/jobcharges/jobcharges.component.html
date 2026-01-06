@@ -5,21 +5,22 @@
         <i class="bi bi-cash-stack me-2"></i>Financial Transactions
         <span class="badge bg-light text-muted ms-2">{{ charges?.length || 0 }}</span>
       </h6>
-      @if ((userRole === 'ADMIN' || userRole === 'FINANCE' || userRole === 'SALES') && jobStatus !== 'COMPLETED' &&
-      jobStatus !== 'CANCELLED' && jobStatus !== 'CLOSED' && jobStatus !== 'FOR APPROVAL') {
-      <button class="btn btn-manage btn-sm" [routerLink]="['/jobs/jobmanagement', jobGuid, 'charges']">
-        <i class="bi bi-gear me-1"></i> Manage
-      </button>
-      }
 
-      @if ((userRole === 'ADMIN' || userRole === 'OPSMGR' || userRole === 'PROCESSOR') &&jobStatus !== 'COMPLETED' &&
-      jobStatus !== 'CANCELLED' && jobStatus !== 'CLOSED' && jobStatus !== 'FOR APPROVAL') {
-      <button class="btn btn-approve btn-sm">
-        <span>Request</span>
-      </button>
-      }
+      <div class="d-flex gap-2">
+        @if ((userRole === 'ADMIN' || userRole === 'FINANCE' || userRole === 'SALES') && jobStatus !== 'COMPLETED' &&
+        jobStatus !== 'CANCELLED' && jobStatus !== 'CLOSED' && jobStatus !== 'FOR APPROVAL') {
+        <button class="btn btn-manage btn-sm" [routerLink]="['/jobs/jobmanagement', jobGuid, 'charges']">
+          <i class="bi bi-gear me-1"></i> Manage
+        </button>
+        }
 
-
+        @if ((userRole === 'ADMIN' || userRole === 'OPSMGR' || userRole === 'PROCESSOR') && jobStatus !== 'COMPLETED' &&
+        jobStatus !== 'CANCELLED' && jobStatus !== 'CLOSED' && jobStatus !== 'FOR APPROVAL') {
+        <button class="btn btn-approve btn-sm" type="button" (click)="openAddModal()">
+          <span>Request</span>
+        </button>
+        }
+      </div>
     </div>
   </div>
 
@@ -31,11 +32,17 @@
           <th>Item</th>
           <th>Description</th>
           <th>Status</th>
-          <th class="text-end">Amount</th>
+          <th class="text-end">Charge Amount</th>
+          @if (userRole === 'SALES' || userRole === 'FINANCE' || userRole === 'TREASURER' || userRole === 'ADMIN') {
+          <th class="text-end">Selling Amount</th>
+          }
+          @if (userRole === 'ADMIN' || userRole === 'PROCESSOR' || userRole === 'OPSMGR') {
+          <th class="text-center">Actions</th>
+          }
         </tr>
       </thead>
       <tbody>
-        @for (charge of charges; track charge) {
+        @for (charge of filteredCharges; track charge) {
         <tr>
           <td>
             <span class="code-text">{{ charge.chargeCode }}</span>
@@ -46,98 +53,129 @@
           <td class="description-cell">{{ charge.description || 'N/A' }}</td>
           <td>
             <span class="badge" [ngClass]="{
-              'badge-approved': charge.chargeTransactionStatus === 'APPROVED',
-              'badge-pending': charge.chargeTransactionStatus === 'PENDING',
-              'badge-cancelled': charge.chargeTransactionStatus === 'CANCELLED',
-              'badge-completed': charge.chargeTransactionStatus === 'COMPLETED'
-            }">
+            'badge-approved': charge.chargeTransactionStatus === 'APPROVED',
+            'badge-pending': charge.chargeTransactionStatus === 'FOR APPROVAL',
+            'badge-cancelled': charge.chargeTransactionStatus === 'CANCELLED',
+            'badge-completed': charge.chargeTransactionStatus === 'COMPLETED'
+          }">
               {{ charge.chargeTransactionStatus }}
             </span>
           </td>
           <td class="text-end amount-cell">
             {{ charge.currencyCode }} {{ charge.amount | number:'1.2-2' }}
           </td>
+          @if (canViewSellingAmount()) {
+          <td class="text-end amount-cell">
+            {{ charge.currencyCode }} {{ charge.amountSelling | number:'1.2-2' }}
+          </td>
+          }
+          @if (canProcessCharges()) {
+          <td class="text-center">
+            @if (charge.chargeTransactionStatus === 'APPROVED'){
+
+            <button class="btn btn-success btn-sm" (click)="processCharge(charge)" tooltip="Process Charge">
+              <i class="cil-tags" title="Process Charge"></i>
+            </button>
+            }
+          </td>
+          }
         </tr>
         }
-        @if (!charges || charges.length === 0) {
+        @if (!filteredCharges || filteredCharges.length === 0) {
         <tr>
-          <td colspan="5" class="text-center text-muted py-3">
+          <td [attr.colspan]="getColspan()" class="text-center text-muted py-3">
             <i class="bi bi-inbox"></i> No charges found.
           </td>
         </tr>
         }
       </tbody>
-      @if (charges && charges.length > 0) {
+      @if (filteredCharges && filteredCharges.length > 0) {
       <tfoot>
         <tr>
-          <td colspan="4" class="text-end">Total:</td>
-          <td class="text-end total-amount">₱{{ total | number:'1.2-2' }}</td>
+          <td [attr.colspan]="getFooterColspan()" class="text-end">Total Charge Amount:</td>
+          <td class="text-end total-amount">₱{{ totalChargeAmount | number:'1.2-2' }}</td>
+          @if (userRole === 'SALES' || userRole === 'FINANCE' || userRole === 'TREASURER' || userRole === 'ADMIN') {
+          <td class="text-end total-amount">₱{{ totalSellingAmount | number:'1.2-2' }}</td>
+          }
+          @if (userRole === 'ADMIN' || userRole === 'PROCESSOR' || userRole === 'OPSMGR') {
+          <td></td>
+          }
         </tr>
+        @if (canViewSellingAmount()) {
+        <tr>
+          <td [attr.colspan]="getFooterColspan()" class="text-end">Total Profit:</td>
+          <td class="text-end total-amount"
+            [style.color]="(totalSellingAmount - totalChargeAmount) >= 0 ? '#198754' : '#dc3545'">
+            ₱{{ (totalSellingAmount - totalChargeAmount) | number:'1.2-2' }}
+          </td>
+          <td class="text-end total-amount"></td>
+          @if (canProcessCharges()) {
+          <td></td>
+          }
+        </tr>
+        }
       </tfoot>
       }
     </table>
   </div>
 </div>
 
-<!-- Request New Charge Modal -->
+<!-- Add Charge Modal -->
 @if (showModal) {
-  <div class="modal-backdrop" (click)="closeModal()"></div>
+<div class="modal-backdrop" (click)="closeModal()"></div>
 }
 <div class="modal custom-modal" [class.show]="showModal" [class.d-block]="showModal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
       <div class="modal-header bg-primary text-white">
         <h5 class="modal-title">
-          <i class="cil-plus me-2"></i> Request New Charge
+          <i class="bi bi-plus-circle me-2"></i> Add New Charge
         </h5>
         <button type="button" class="btn-close btn-close-white" (click)="closeModal()" aria-label="Close"></button>
       </div>
-
       <div class="modal-body">
         <form [formGroup]="chargeFormGroup" class="form-professional">
           <div class="row mb-3">
             <!-- Charge Subcategory -->
             <div class="col-md-6">
               <label class="form-label">
-                <i class="cil-tags me-1"></i> Category <span class="text-danger">*</span>
+                <i class="bi bi-tag me-1"></i> Category <span class="text-danger">*</span>
               </label>
               <select class="form-select form-control-custom" formControlName="chargeSubCategoryId">
                 <option [value]="0">Select category...</option>
-                <option value="19">ADMINISTRATIVE FEE</option>
-                <option value="29">BROKERAGE FEE</option>
-                <option value="15">CUSTOMS CLEARANCE FEE</option>
-                <option value="11">DELIVERY CHARGE</option>
-                <option value="28">RECEIPTED FEE</option>
-                <option value="12">TRUCKING FEE</option>
-                <option value="16">WAREHOUSE STORAGE FEE</option>
+                @for (category of chargeSubCategories; track category.chargeSubCategoryId) {
+                <option [value]="category.chargeSubCategoryId">
+                  {{ category.chargeSubCategoryName }}
+                </option>
+                }
               </select>
-              @if (chargeFormGroup.get('chargeSubCategoryId')?.invalid && chargeFormGroup.get('chargeSubCategoryId')?.touched) {
-                <div class="text-danger small mt-1">
-                  Category is required
-                </div>
+              @if (chargeFormGroup.get('chargeSubCategoryId')?.invalid &&
+              chargeFormGroup.get('chargeSubCategoryId')?.touched) {
+              <div class="text-danger small mt-1">
+                Category is required
+              </div>
               }
             </div>
-            
             <!-- Amount -->
             <div class="col-md-6">
               <label class="form-label">
-                <i class="cil-dollar me-1"></i> Amount <span class="text-danger">*</span>
+                <i class="bi bi-cash me-1"></i> Charge Amount <span class="text-danger">*</span>
               </label>
-              <input type="number" class="form-control form-control-custom" formControlName="amount" step="0.01" min="0"
+              <input type="number" class="form-control form-control-custom" formControlName="amount" step="0.01"
                 placeholder="0.00">
               @if (chargeFormGroup.get('amount')?.invalid && chargeFormGroup.get('amount')?.touched) {
-                <div class="text-danger small mt-1">
-                  Valid amount is required
-                </div>
+              <div class="text-danger small mt-1">
+                Valid charge amount is required
+              </div>
               }
             </div>
           </div>
-          
+
           <!-- Description -->
           <div class="row mb-3">
             <div class="col-12">
               <label class="form-label">
-                <i class="cil-description me-1"></i> Description
+                <i class="bi bi-card-text me-1"></i> Description
               </label>
               <textarea class="form-control form-control-custom" rows="3" formControlName="description"
                 placeholder="Enter charge description..."></textarea>
@@ -148,23 +186,62 @@
 
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closeModal()">
-          <i class="cil-x me-2"></i> Cancel
+          <i class="bi bi-x me-2"></i> Cancel
         </button>
         <button type="button" class="btn btn-primary" (click)="onSubmit()"
           [disabled]="!chargeFormGroup.valid || isSubmitting">
           @if (!isSubmitting) {
-            <span>
-              <i class="cil-check me-2"></i> Request Charge
-            </span>
+          <span>
+            <i class="bi bi-check me-2"></i> Create Charge
+          </span>
           }
           @if (isSubmitting) {
-            <span>
-              <span class="spinner-border spinner-border-sm me-2"></span>
-              Submitting...
-            </span>
+          <span>
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Submitting...
+          </span>
           }
         </button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notifications -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+  <!-- Success Toast -->
+  <div class="toast align-items-center border-0" [class.show]="showSuccessToast" role="alert" aria-live="assertive"
+    aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body bg-success text-white rounded">
+        <div class="d-flex align-items-center">
+          <i class="bi bi-check-circle me-2" style="font-size: 1.5rem;"></i>
+          <div>
+            <strong class="d-block">Success!</strong>
+            <span>{{ successMessage }}</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showSuccessToast = false"
+        aria-label="Close"></button>
+    </div>
+  </div>
+
+  <!-- Error Toast -->
+  <div class="toast align-items-center border-0" [class.show]="showErrorToast" role="alert" aria-live="assertive"
+    aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body bg-danger text-white rounded">
+        <div class="d-flex align-items-center">
+          <i class="bi bi-x-circle me-2" style="font-size: 1.5rem;"></i>
+          <div>
+            <strong class="d-block">Error</strong>
+            <span>{{ errorMessage }}</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showErrorToast = false"
+        aria-label="Close"></button>
     </div>
   </div>
 </div>

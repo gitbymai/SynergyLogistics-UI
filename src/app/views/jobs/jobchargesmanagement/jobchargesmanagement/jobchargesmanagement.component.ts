@@ -45,6 +45,10 @@ export class JobchargesmanagementComponent implements OnInit {
   // Reactive Form
   chargeFormGroup!: FormGroup;
 
+  showReviewModal = false;
+  reviewRemarks = '';
+  reviewAction: 'approve' | 'reject' | null = null;
+
   // Toast Notifications
   showSuccessToast: boolean = false;
   showErrorToast: boolean = false;
@@ -106,12 +110,11 @@ export class JobchargesmanagementComponent implements OnInit {
         next: (response) => {
           if (response.data) {
             this.charges = response.data;
+            this.filteredCharges = this.charges;
             if (response.data.length) {
               this.jobCode = response.data[0].jobCode;
               this.loadChargeSubCategories();
-              //this.getChargeSubcategories();
             }
-            this.applyFilters();
           } else {
             this.charges = [];
             this.filteredCharges = [];
@@ -129,8 +132,8 @@ export class JobchargesmanagementComponent implements OnInit {
         if (response.data && response.data.length > 0) {
 
           this.chargeSubCategories = response.data
-  .filter((item) => item.isActive === true && item.chargeCategoryId === 1)
-  .sort((a, b) => a.chargeSubCategoryName.localeCompare(b.chargeSubCategoryName));
+            .filter((item) => item.isActive === true && item.chargeCategoryId === 1)
+            .sort((a, b) => a.chargeSubCategoryName.localeCompare(b.chargeSubCategoryName));
         }
       },
       error: (error) => {
@@ -139,30 +142,6 @@ export class JobchargesmanagementComponent implements OnInit {
     });
 
   }
-
-  applyFilters(): void {
-    const term = this.searchTerm.toLowerCase();
-
-    this.filteredCharges = this.charges.filter(charge => {
-      const matchSearch =
-        charge.chargeCode?.toLowerCase().includes(term) ||
-        charge.description?.toLowerCase().includes(term) ||
-        charge.chargeSubCategoryName?.toLowerCase().includes(term);
-
-      const matchCategory = !this.selectedCategory ||
-        charge.chargeSubCategoryName?.toString() === this.selectedCategory;
-
-      const matchStatus = !this.selectedStatus ||
-        charge.chargeTransactionStatus!.toString() === this.selectedStatus;
-
-      return matchSearch && matchCategory && matchStatus;
-    });
-  }
-
-  onSearch(): void {
-    this.applyFilters();
-  }
-
   openAddModal(): void {
     this.isEditMode = false;
     this.selectedCharge = null;
@@ -191,7 +170,7 @@ export class JobchargesmanagementComponent implements OnInit {
       jobId: charge.jobId,
       isForProcessing: charge.isForProcessing || false,
     });
-
+    
     // Disable charge code in edit mode
     this.chargeFormGroup.get('chargeCode')?.disable();
     this.chargeFormGroup.get('isForProcessing')?.disable();
@@ -204,7 +183,70 @@ export class JobchargesmanagementComponent implements OnInit {
     this.chargeFormGroup.reset();
     this.chargeFormGroup.get('chargeCode')?.enable();
   }
+  openReviewModal(charge: any) {
+    this.selectedCharge = charge;
+    this.reviewRemarks = '';
+    this.reviewAction = null;
+    this.showReviewModal = true;
+  }
 
+  closeReviewModal() {
+    this.showReviewModal = false;
+    this.selectedCharge = null;
+    this.reviewRemarks = '';
+    this.reviewAction = null;
+  }
+
+  approveCharge() {
+    if (!this.selectedCharge) return;
+
+    this.isSubmitting = true;
+    this.reviewAction = 'approve';
+
+    this.chargeService.approveCharge(this.selectedCharge.chargeGuid).subscribe({
+      next: (response) => {
+        this.isSubmitting = false;
+
+         if (response.data) {
+          this.loadCharges();
+          this.showSuccess(`Charge has been approved successfully`);
+          this.closeReviewModal();
+        } else {
+          this.showError(response.message || 'Failed to approve charge');
+        }
+      },
+      error: (error) => {
+        console.error('Error approving charge:', error);
+        this.showError(error?.error?.Message || 'Failed to approve charge');
+      }
+    });
+  }
+
+  rejectCharge() {
+    if (!this.selectedCharge) return;
+
+    this.isSubmitting = true;
+    this.reviewAction = 'reject';
+
+   this.chargeService.rejectCharge(this.selectedCharge.chargeGuid).subscribe({
+      next: (response) => {
+        this.isSubmitting = false;
+
+         if (response.data) {
+          this.loadCharges();
+          this.showSuccess(`Charge has been rejected`);
+          this.closeReviewModal();
+        } else {
+          this.showError(response.message || 'Failed to reject charge');
+        }
+      },
+      error: (error) => {
+        console.error('Error rejectinng charge:', error);
+        this.showError(error?.error?.Message || 'Failed to reject charge');
+      }
+    });
+  }
+  
   onSubmit(): void {
     if (!this.chargeFormGroup.valid) {
       this.showError('Please fill in all required fields correctly');
@@ -265,10 +307,9 @@ export class JobchargesmanagementComponent implements OnInit {
       description: this.chargeFormGroup.value.description,
       amount: this.chargeFormGroup.value.amount,
       amountSelling: this.chargeFormGroup.value.amountSelling,
-      isForProcessing: this.chargeFormGroup.value.isForProcessing,
-      jobId: this.chargeFormGroup.value.jobId
+      isForProcessing: this.selectedCharge.isForProcessing || false,
+      jobId: this.selectedCharge.jobId
     };
-
 
     this.chargeService.updateCharge(this.selectedCharge.chargeGuid, updateRequest)
       .pipe(finalize(() => this.isSubmitting = false))
@@ -284,7 +325,7 @@ export class JobchargesmanagementComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error updating charge:', error);
-          this.showError(error?.error?.message || 'Failed to update charge');
+          this.showError(error?.error?.Message || 'Failed to update charge');
         }
       });
   }
@@ -315,7 +356,7 @@ export class JobchargesmanagementComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error cancelling charge:', error);
-          this.showError(error?.error?.message || 'Failed to cancel charge');
+          this.showError(error?.error?.Message || 'Failed to cancel charge');
         }
       });
   }

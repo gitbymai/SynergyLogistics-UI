@@ -37,7 +37,6 @@ export class ChargeTransactionService extends ApiService {
       })
     );
   }
-  
 
   getAllCharges(): Observable<ApiResponse<ChargeTransaction[]>> {
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/charge`);
@@ -75,14 +74,17 @@ export class ChargeTransactionService extends ApiService {
   }
 
 
-  approveCharge(chargeGuid: string): Observable<ApiResponse<ChargeTransaction>> {
-    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/charge/${chargeGuid}/approve`, {});
+  approveCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
+    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/approvecharge/${tranGuid}`, {});
+  }
+  
+  rejectCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
+    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/rejectcharge/${tranGuid}`, {});
   }
 
   cancelCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/cancelcharge/${tranGuid}`, {});
   }
-
 
   completeCharge(chargeGuid: string, completedBy: number): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/charge/${chargeGuid}/complete`, { completedBy });

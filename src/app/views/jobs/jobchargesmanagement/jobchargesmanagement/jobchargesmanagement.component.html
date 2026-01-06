@@ -83,6 +83,12 @@
             </td>
             <td>
               <div class="action-buttons">
+                @if(charge.chargeTransactionStatus === 'FOR APPROVAL'){
+
+                <button class="btn btn-sm btn-success-outline" (click)="openReviewModal(charge)" title="Review Request">
+                  <i class="cil-list"></i>
+                </button>
+                }
                 <button class="btn btn-sm btn-primary-outline" (click)="openEditModal(charge)" title="Edit Charge"
                   [disabled]="charge.chargeTransactionStatus !== 'APPROVED'"
                   [style.opacity]="charge.chargeTransactionStatus !== 'APPROVED' ? '0.5' : '1'"
@@ -240,7 +246,7 @@
                 <div class="card-body py-3">
                   <div class="form-check">
                     <input class="form-check-input" type="checkbox" formControlName="isForProcessing"
-                      id="isForProcessingCheck" [disabled]="isEditMode" style="width: 1.25rem; height: 1.25rem;"
+                      id="isForProcessingCheck" style="width: 1.25rem; height: 1.25rem;"
                       [style.cursor]="isEditMode ? 'not-allowed' : 'pointer'">
                     <label class="form-check-label fw-semibold ms-2" for="isForProcessingCheck"
                       [class.text-muted]="isEditMode" [style.cursor]="isEditMode ? 'not-allowed' : 'pointer'"
@@ -331,6 +337,120 @@
   </div>
 </div>
 
+<!-- Review Charge Modal -->
+@if (showReviewModal) {
+<div class="modal-backdrop" (click)="closeReviewModal()"></div>
+}
+<div class="modal custom-modal" [class.show]="showReviewModal" [class.d-block]="showReviewModal"
+  tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-clipboard-check me-2"></i> Review Charge
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeReviewModal()"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Charge Details -->
+        <div class="card mb-3" style="background-color: #f8f9ff; border: 1px solid #bbdefb;">
+          <div class="card-body">
+            <h6 class="text-primary mb-3">
+              <i class="bi bi-info-circle me-2"></i> Charge Details
+            </h6>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <strong class="text-muted">Charge Code:</strong>
+              </div>
+              <div class="col-md-8">
+                <span class="badge badge-code">{{ selectedCharge?.chargeCode }}</span>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <strong class="text-muted">Category:</strong>
+              </div>
+              <div class="col-md-8">
+                {{ selectedCharge?.chargeSubCategoryName }}
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <strong class="text-muted">Amount:</strong>
+              </div>
+              <div class="col-md-8">
+                <strong class="text-primary">
+                  {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
+                </strong>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <strong class="text-muted">Amount Selling:</strong>
+              </div>
+              <div class="col-md-8">
+                <strong class="text-success">
+                  {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amountSelling | number:'1.2-2' }}
+                </strong>
+              </div>
+            </div>
+            @if (selectedCharge?.description) {
+            <div class="row">
+              <div class="col-md-4">
+                <strong class="text-muted">Description:</strong>
+              </div>
+              <div class="col-md-8">
+                <div class="remarks-content">
+                  {{ selectedCharge?.description }}
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- Warning Alert -->
+        <div class="alert alert-warning" role="alert">
+          <i class="bi bi-info-circle me-2"></i>
+          Please review the charge details carefully before making a decision.
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeReviewModal()">
+          <i class="bi bi-x me-2"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="rejectCharge()" [disabled]="isSubmitting">
+          @if (!isSubmitting || reviewAction !== 'reject') {
+          <span>
+            <i class="bi bi-x-circle me-2"></i> Reject
+          </span>
+          }
+          @if (isSubmitting && reviewAction === 'reject') {
+          <span>
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Rejecting...
+          </span>
+          }
+        </button>
+        <button type="button" class="btn btn-success" (click)="approveCharge()" [disabled]="isSubmitting">
+          @if (!isSubmitting || reviewAction !== 'approve') {
+          <span>
+            <i class="bi bi-check-circle me-2"></i> Approve
+          </span>
+          }
+          @if (isSubmitting && reviewAction === 'approve') {
+          <span>
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Approving...
+          </span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Toast Notifications -->
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
   <!-- Success Toast -->

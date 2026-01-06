@@ -31,6 +31,12 @@ export const navItems = [
     ]
   },
   {
+    name: 'Cash Advance Requests',
+    url: '/billing',
+    iconComponent: { name: 'cil-description' },
+    roles: ['admin','finance','treasurer']
+  },
+  {
     name: 'Billing',
     url: '/billing',
     iconComponent: { name: 'cil-description' },

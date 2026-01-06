@@ -25,38 +25,37 @@
             <div class="col-lg-6">
 
 
-                        <!-- Client & Status -->
-                        <div class="info-card mb-3">
-                            <div class="info-card-header">
-                                <i class="bi bi-person-circle"></i>
-                                <span>Client Information</span>
-                            </div>
-                            <div class="info-card-body">
-                                <div class="info-row">
-                                    <label>Client</label>
-                                    <span>{{ job?.customerName || '-' }}</span>
-                                </div>
-                                <div class="info-row">
-                                    <label>Status</label>
-                                    <span
-                                        [class]="'badge status-badge ' + getStatusBadgeClass(job?.jobStatusName || '')">
-                                        {{ job?.jobStatusName || 'Pending' }}
-                                    </span>
-                                </div>
-                                <div class="info-row">
-                                    <label>Transaction Type</label>
-                                    <span>{{ job?.transactionTypeName || '-' }}</span>
-                                </div>
-                                <div class="info-row">
-                                    <label>Incoterms</label>
-                                    <span>{{ job?.incotermsName || '-' }}</span>
-                                </div>
-                                <div class="info-row">
-                                    <label>Payment Type</label>
-                                    <span>{{ job?.paymentTypeName || '-' }}</span>
-                                </div>
-                            </div>
+                <!-- Client & Status -->
+                <div class="info-card mb-3">
+                    <div class="info-card-header">
+                        <i class="bi bi-person-circle"></i>
+                        <span>Client Information</span>
+                    </div>
+                    <div class="info-card-body">
+                        <div class="info-row">
+                            <label>Client</label>
+                            <span>{{ job?.customerName || '-' }}</span>
                         </div>
+                        <div class="info-row">
+                            <label>Status</label>
+                            <span [class]="'badge status-badge ' + getStatusBadgeClass(job?.jobStatusName || '')">
+                                {{ job?.jobStatusName || 'Pending' }}
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <label>Transaction Type</label>
+                            <span>{{ job?.transactionTypeName || '-' }}</span>
+                        </div>
+                        <div class="info-row">
+                            <label>Incoterms</label>
+                            <span>{{ job?.incotermsName || '-' }}</span>
+                        </div>
+                        <div class="info-row">
+                            <label>Payment Type</label>
+                            <span>{{ job?.paymentTypeName || '-' }}</span>
+                        </div>
+                    </div>
+                </div>
 
 
             </div>
@@ -73,7 +72,6 @@
                         <div class="remarks-content">
                             {{ job?.remarks || 'No remarks' }}
                         </div>
-
                         <div class="info-row">
                             <label>Created Date</label>
                             <span>{{ job?.createdDate | date:'MMM dd, yyyy' }}</span>
@@ -94,7 +92,8 @@
                         <span>Charges</span>
                     </div>
                     <div class="info-card-body p-0">
-                        <app-job-charges  [charges]="charges" [jobGuid]="jobGuid" [userRole]="userRole"></app-job-charges>
+                        <app-job-charges [charges]="charges" [jobGuid]="jobGuid" [userRole]="userRole" [job]="job"
+                            [jobStatus]="job?.jobStatusName || ''"></app-job-charges>
                     </div>
                 </div>
             </div>

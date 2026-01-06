@@ -1,4 +1,4 @@
-import { Component, input, Input, OnInit, SimpleChanges } from '@angular/core';
+import { Component, input, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CardModule, TableModule } from '@coreui/angular';
@@ -16,7 +16,7 @@ import { ChargeSubcategory } from '../../../models/chargesubcategory';
   templateUrl: './jobcharges.component.html',
   styleUrls: ['./jobcharges.component.scss']
 })
-export class JobChargesComponent implements OnInit {
+export class JobChargesComponent implements OnInit, OnChanges {
 
   jobCode: string = '';
 
@@ -37,7 +37,9 @@ export class JobChargesComponent implements OnInit {
 
 
   // Dropdown options
-  chargeSubcategories: ChargeSubcategory[] = [];
+  chargeSubCategories: ChargeSubcategory[] = [];
+
+  filteredCharges: ChargeTransaction[] = [];
 
   constructor(private fb: FormBuilder,
 
@@ -46,14 +48,13 @@ export class JobChargesComponent implements OnInit {
     this.initializeForm();
   }
 
-
   get total(): number {
     const excludedStatuses = ['CANCELLED', 'REJECTED'];
-    return this.charges
+    return this.filteredCharges
       .filter(charge => !excludedStatuses.includes(charge.chargeTransactionStatus!))
       .reduce((sum, charge) => sum + (charge.amount || 0), 0);
   }
-  @Input() job: Job = {} as Job;
+  @Input() job: Job | null = null;
   @Input() jobGuid: string = '';
   @Input() userRole: string = '';
   @Input() jobStatus: string = '';
@@ -64,20 +65,80 @@ export class JobChargesComponent implements OnInit {
     this.loadChargeSubCategories();
   }
 
+  ngOnChanges(changes: SimpleChanges) {
 
-  loadChargeSubCategories(): void{
+    if (this.userRole === 'PROCESSOR' || this.userRole === 'OPSMGR') {
+
+      if (changes['charges'] && changes['charges'].currentValue) {
+        this.filteredCharges = this.charges.filter(charge => {
+          return charge.isForProcessing === true
+            && charge.isActive === true
+            && charge.amount > 0;
+        });
+      }
+    }
+    else {
+      this.filteredCharges = this.charges;
+    }
+  }
+  get totalChargeAmount(): number {
+    const excludedStatuses = ['CANCELLED', 'REJECTED'];
+    return this.filteredCharges
+      .filter(charge => !excludedStatuses.includes(charge.chargeTransactionStatus!))
+      .reduce((sum, charge) => sum + (charge.amount || 0), 0);
+  }
+
+  get totalSellingAmount(): number {
+    const excludedStatuses = ['CANCELLED', 'REJECTED'];
+    return this.filteredCharges
+      .filter(charge => !excludedStatuses.includes(charge.chargeTransactionStatus!))
+      .reduce((sum, charge) => sum + (charge.amountSelling || 0), 0);
+  }
+
+  getColspan(): number {
+    let cols = 5;
+    if (this.userRole === 'SALES' || this.userRole === 'FINANCE' || this.userRole === 'TREASURER' || this.userRole === 'ADMIN') {
+      cols++; // Selling Amount
+    }
+    if (this.userRole === 'ADMIN' || this.userRole === 'PROCESSOR' || this.userRole === 'OPSMGR') {
+      cols++; // Actions
+    }
+    return cols;
+  }
+
+  getFooterColspan(): number {
+    return 4;
+  }
+
+  // In your component
+  canViewSellingAmount(): boolean {
+    return ['SALES', 'FINANCE', 'TREASURER', 'ADMIN'].includes(this.userRole);
+  }
+
+  canProcessCharges(): boolean {
+
+    return ['ADMIN', 'PROCESSOR', 'OPSMGR'].includes(this.userRole);
+  }
+
+  processCharge(charge: ChargeTransaction) {
+    // Your processing logic here
+  }
+
+  loadChargeSubCategories(): void {
     this.chargeService.getChargeSubcategories().subscribe({
       next: (response) => {
-        if (response.data) {
-          this.chargeSubcategories = response.data;
-        } else {
-          this.chargeSubcategories = [];
+        if (response.data && response.data.length > 0) {
+
+          this.chargeSubCategories = response.data
+            .filter((item) => item.isActive === true && item.chargeCategoryId === 1)
+            .sort((a, b) => a.chargeSubCategoryName.localeCompare(b.chargeSubCategoryName));
         }
       },
       error: (error) => {
         console.error('Error loading charge subcategories:', error);
       }
     });
+
   }
 
   initializeForm(): void {
@@ -85,18 +146,48 @@ export class JobChargesComponent implements OnInit {
       chargeSubCategoryId: [0, [Validators.required, Validators.min(1)]],
       description: ['', Validators.maxLength(500)],
       amount: [0, [Validators.required, Validators.min(0)]],
+      amountSelling: [0, [Validators.required, Validators.min(0)]],
+      isForProcessing: [false],
       jobId: [0]
     });
   }
 
-  openModal(): void {
+  loadCharges(): void {
+    this.isLoading = true;
+    this.chargeService.getChargesByJobGuid(this.jobGuid)
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (response) => {
+          if (response.data) {
+            this.charges = response.data;
+            if (response.data.length) {
+              this.jobCode = response.data[0].jobCode;
+              this.filteredCharges = this.charges.filter(charge => {
+                return charge.isForProcessing === true
+                  && charge.isActive === true
+                  && charge.amount > 0;
+              });
+            }
+          } else {
+            this.charges = [];
+            this.filteredCharges = [];
+          }
+        },
+        error: (error) => {
+          console.error('Error loading charges:', error);
+        }
+      });
+  }
+
+  openAddModal(): void {
     this.chargeFormGroup.reset({
       description: '',
       amount: 0,
+      amountSelling: 0,
       jobId: 0,
       optionChargeStatusId: 0,
+      isForProcessing: false,
     });
-    this.chargeFormGroup.get('chargeCode')?.enable();
     this.showModal = true;
   }
 
@@ -115,7 +206,6 @@ export class JobChargesComponent implements OnInit {
 
     this.isSubmitting = true;
 
-
     this.createCharge();
   }
 
@@ -124,17 +214,24 @@ export class JobChargesComponent implements OnInit {
       chargeSubCategoryId: this.chargeFormGroup.value.chargeSubCategoryId,
       description: this.chargeFormGroup.value.description,
       amount: this.chargeFormGroup.value.amount,
-      amountSelling: this.chargeFormGroup.value.amountSelling,
-      jobId: this.job.jobId,
+      amountSelling: 0,
+      isForProcessing: true,
+      jobId: this.job!.jobId,
     };
+
+    if (this.job?.jobId === undefined || this.job?.jobId === null) {
+      this.showError('Job ID is not available. Cannot create charge.');
+      this.isSubmitting = false;
+      return;
+    }
 
     this.chargeService.createCharge(createRequest)
       .pipe(finalize(() => this.isSubmitting = false))
       .subscribe({
         next: (response) => {
           if (response.data) {
-            // this.loadCharges();
-            this.showSuccess(`Charge ${createRequest.chargeSubCategoryId} created successfully`);
+            this.loadCharges();
+            this.showSuccess(`New charge has been created!`);
             this.closeModal();
           } else {
             this.showError(response.message || 'Failed to create charge');
@@ -142,51 +239,14 @@ export class JobChargesComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error creating charge:', error);
-          this.showError(error?.error?.message || 'Failed to create charge');
+          this.showError(error?.error?.Message || 'Failed to create charge');
         }
       });
   }
 
-  //   loadCharges(): void {
-  //   this.isLoading = true;
-  //   this.chargeService.getChargesByJobGuid(this.jobGuid)
-  //     .pipe(finalize(() => this.isLoading = false))
-  //     .subscribe({
-  //       next: (response) => {
-  //         if (response.data) {
-  //           this.charges = response.data;
-  //           if (response.data.length) {
-  //             this.jobCode = response.data[0].jobCode;
-  //             this.getChargeSubcategories();
-  //           }
-  //         } else {
-  //           this.charges = [];
-  //         }
-  //       },
-  //       error: (error) => {
-  //         console.error('Error loading charges:', error);
-  //       }
-  //     });
-  // }
-
-  // getChargeSubcategories(): void {
-  //   if (this.charges && this.charges.length > 0) {
-  //     const uniqueMap = new Map<number, string>();
-
-  //     this.charges.forEach(charge => {
-  //       if (!uniqueMap.has(charge.chargeSubCategoryId)) {
-  //         uniqueMap.set(charge.chargeSubCategoryId, charge.chargeSubCategoryName!);
-  //       }
-  //     });
-
-  //     this.chargeSubcategories = Array.from(uniqueMap, ([id, name]) => ({ id, name }));
-  //   }
-  // }
-
   closeModal(): void {
     this.showModal = false;
     this.chargeFormGroup.reset();
-    this.chargeFormGroup.get('chargeCode')?.enable();
   }
 
 

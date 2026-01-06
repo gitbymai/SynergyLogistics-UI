@@ -277,6 +277,32 @@
   transform: translateY(-1px);
 }
 
+.btn-success-outline {
+  background: white;
+  border-color: #47c771;
+  color: #25b148;
+}
+
+.btn-success-outline:hover {
+  background: #ffebee;
+  border-color: #17944b;
+  color: #249c42;
+  transform: translateY(-1px);
+}
+
+.btn-warning-outline {
+  background: white;
+  border-color: #f8e85a;
+  color: #dfd10f;
+}
+
+.btn-warning-outline:hover {
+  background: #ffebee;
+  border-color: #b9b032;
+  color: #c9cc2f;
+  transform: translateY(-1px);
+}
+
 /* Form Professional */
 .form-professional {
   max-width: 100%;
