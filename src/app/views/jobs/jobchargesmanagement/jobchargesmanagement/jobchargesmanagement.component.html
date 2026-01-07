@@ -28,27 +28,14 @@
       <table class="table table-hover table-custom mb-0">
         <thead>
           <tr>
-            <th>
-              <i class="bi bi-hash me-2"></i> Code
-            </th>
-            <th>
-              <i class="bi bi-tag me-2"></i> Category
-            </th>
-            <th class="text-end">
-              <i class="bi bi-currency-exchange me-2"></i> Charge Amount
-            </th>
-            <th class="text-end">
-              <i class="bi bi-currency-exchange me-2"></i> Selling Amount
-            </th>
-            <th>
-              <i class="bi bi-flag me-2"></i> Status
-            </th>
-            <th>
-              <i class="bi bi-calendar me-2"></i> Created Date
-            </th>
-            <th class="text-center">
-              <i class="bi bi-gear me-2"></i> Actions
-            </th>
+            <th>Code</th>
+            <th>Item</th>
+            <th>Status</th>
+            <th class="text-end">Charge Amount</th>
+            <th class="text-end">Selling Amount</th>
+            <th>Created By</th>
+            <th>Last Update</th>
+            <th class="text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -56,31 +43,35 @@
           <tr>
             <td>
               <div class="code-cell">
-                <span class="badge badge-code">{{ charge.chargeCode }}</span>
+                <span class="code-text">{{ charge.chargeCode }}</span>
               </div>
             </td>
             <td>
-              <span class="badge badge-category">
+              <span class="code-text">
                 {{ charge.chargeSubCategoryName }}
               </span>
-            </td>
-            <td class="text-end">
-              <strong class="amount-text">{{ charge.currencyCode }} {{ charge.amount | number:'1.2-2' }}</strong>
-            </td>
-            <td class="text-end">
-              <strong class="amount-text">{{ charge.currencyCode }} {{ charge.amountSelling | number:'1.2-2' }}</strong>
             </td>
             <td>
               <div class="status-badge-wrapper">
                 <span class="badge" [ngClass]="getStatusClass(charge.chargeTransactionStatus || '')">
-  <i class="bi me-1" [ngClass]="getStatusIcon(charge.chargeTransactionStatus || '')"></i>
   {{ charge.chargeTransactionStatus }}
 </span>
               </div>
             </td>
-            <td>
-              <span class="date-text">{{ charge.createdDate | date:'MMM dd, yyyy' }}</span>
+            <td class="text-end">
+              <span class="code-text">{{ charge.currencyCode }} {{ charge.amount | number:'1.2-2' }}</span>
             </td>
+            <td class="text-end">
+              <span class="code-text">{{ charge.currencyCode }} {{ charge.amountSelling | number:'1.2-2' }}</span>
+            </td>
+            <td>
+              <span class="code-text">{{ charge.createdByName }}</span>
+            </td>
+          <td>
+            <span class="code-text">
+            {{ (charge.modifiedDate || charge.createdDate) |  date:'MMM dd, yyyy' }}
+            </span>
+          </td>
             <td>
               <div class="action-buttons">
                 @if(charge.chargeTransactionStatus === 'FOR APPROVAL'){
@@ -119,12 +110,12 @@
           <tr class="table-light">
             <td colspan="4" class="text-end fw-bold total-label">Total Charge Amount:</td>
             <td class="text-end fw-bold total-amount">PHP {{ totalChargeAmount | number:'1.2-2' }}</td>
-            <td colspan="2"></td>
+            <td colspan="3"></td>
           </tr>
           <tr class="table-light">
             <td colspan="4" class="text-end fw-bold total-label">Total Selling Amount:</td>
             <td class="text-end fw-bold total-amount text-primary">PHP {{ totalSellingAmount | number:'1.2-2' }}</td>
-            <td colspan="2"></td>
+            <td colspan="3"></td>
           </tr>
           <tr class="table-secondary">
             <td colspan="4" class="text-end fw-bold total-label">Total Profit:</td>
@@ -132,7 +123,7 @@
               [style.color]="(totalSellingAmount - totalChargeAmount) >= 0 ? '#198754' : '#dc3545'">
               PHP {{ (totalSellingAmount - totalChargeAmount) | number:'1.2-2' }}
             </td>
-            <td colspan="2"></td>
+            <td colspan="3"></td>
           </tr>
         </tfoot>
         }

@@ -109,6 +109,7 @@ export class JobchargesmanagementComponent implements OnInit {
       .subscribe({
         next: (response) => {
           if (response.data) {
+
             this.charges = response.data;
             this.filteredCharges = this.charges;
             if (response.data.length) {
@@ -377,16 +378,18 @@ export class JobchargesmanagementComponent implements OnInit {
 
  getStatusClass(status: string): string {
   switch (status?.toUpperCase()) {
-    case 'FOR APPROVAL': return 'status-for-approval';
-    case 'FOR CLEARING': return 'status-released';
-    case 'CLEARED': return 'status-cleared';
-    case 'REJECTED': return 'status-rejected';
-    case 'COMPLETED': return 'status-completed';
-    case 'FOR RELEASING': return 'status-for-releasing';
-    case 'CASH RECEIVED - FOR LIQUIDATION': return 'status-for-liquidation';
-    case 'CANCELLED': return 'status-cancelled';
-    case 'APPROVED': return 'status-approved';
-    default: return 'status-default';
+    case 'FOR APPROVAL': return 'badge-for-approval';
+    case 'FOR CLEARING': return 'badge-released';
+    case 'CLEARED': return 'badge-cleared';
+    case 'REJECTED': return 'badge-rejected';
+    case 'COMPLETED': return 'badge-completed';
+    case 'FOR RELEASING': return 'badge-for-releasing';
+    case 'CASH RECEIVED - FOR LIQUIDATION': return 'badge-for-liquidation';
+    case 'CANCELLED': return 'badge-cancelled';
+    case 'APPROVED': return 'badge-approved';
+    case 'PENDING': return 'badge-pending';
+    case 'RELEASED': return 'badge-released';
+    default: return 'badge-default';
   }
 }
 

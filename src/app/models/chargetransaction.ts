@@ -68,4 +68,11 @@ export interface ChargeTransaction {
   isForProcessing?: boolean | null;
   isForDisbursement?: boolean | null;
   chargeCategoryId?: number | null;
+
+  closedByName?: string | null;
+  cancelledByName?: string | null;
+  completedByName?: string | null;
+  createdByName?: string | null;
+  modifiedByName?: string | null;
+  
 }

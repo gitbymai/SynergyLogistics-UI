@@ -29,6 +29,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
   showSubmitClearingConfirmModal = false;
   showCashReleasingConfirmModal = false;
   showCashReleaseConfirmModal = false;
+  showFinalClosingConfirmModal = false;
   selectedCharge: any = null;
 
   // Reactive Form
@@ -54,12 +55,6 @@ export class JobChargesComponent implements OnInit, OnChanges {
     this.initializeForm();
   }
 
-  get total(): number {
-    const excludedStatuses = ['CANCELLED', 'REJECTED'];
-    return this.filteredCharges
-      .filter(charge => !excludedStatuses.includes(charge.chargeTransactionStatus!))
-      .reduce((sum, charge) => sum + (charge.amount || 0), 0);
-  }
   @Input() job: Job | null = null;
   @Input() jobGuid: string = '';
   @Input() userRole: string = '';
@@ -100,6 +95,14 @@ export class JobChargesComponent implements OnInit, OnChanges {
 
     }
   }
+
+  get total(): number {
+    const excludedStatuses = ['CANCELLED', 'REJECTED'];
+    return this.filteredCharges
+      .filter(charge => !excludedStatuses.includes(charge.chargeTransactionStatus!))
+      .reduce((sum, charge) => sum + (charge.amount || 0), 0);
+  }
+  
   get totalChargeAmount(): number {
     const excludedStatuses = ['CANCELLED', 'REJECTED'];
     return this.filteredCharges
@@ -129,7 +132,6 @@ export class JobChargesComponent implements OnInit, OnChanges {
     return 4;
   }
 
-  // In your component
   canViewSellingAmount(): boolean {
     return ['SALES', 'FINANCE', 'TREASURER', 'ADMIN'].includes(this.userRole);
   }
@@ -319,6 +321,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
       this.selectedCharge = null;
     }
   }
+
   confirmCashRelease() {
     this.isSubmitting = true;
 
@@ -343,7 +346,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
     });
   }
 
- openSubmitClearingConfirmation(charge: any) {
+  openSubmitClearingConfirmation(charge: any) {
     this.selectedCharge = charge;
     this.showSubmitClearingConfirmModal = true;
   }
@@ -355,14 +358,51 @@ export class JobChargesComponent implements OnInit, OnChanges {
     }
   }
 
-    confirmSubmitClearing() {
+  openFinalClosingConfirmation(charge: any) {
+    this.selectedCharge = charge;
+    this.showFinalClosingConfirmModal = true;
+  }
+
+  closeFinalClosingConfirmModal() {
+    if (!this.isSubmitting) {
+      this.showFinalClosingConfirmModal = false;
+      this.selectedCharge = null;
+    }
+  }
+
+  confirmFinalClosing() {
     this.isSubmitting = true;
-    
+
+    this.chargeService.completeCharge(this.selectedCharge.chargeGuid).subscribe({
+      next: (response) => {
+        this.isSubmitting = false;
+        this.showSubmitClearingConfirmModal = false;
+
+        if (response.data) {
+          this.loadCharges();
+          this.showSuccess('Trannsaction completed!');
+          this.closeFinalClosingConfirmModal();
+        }
+        else {
+          this.showError(response.message || 'Failed to complete transaction');
+        }
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+        this.showError(error?.error?.Message || 'Failed to complete transaction');
+      }
+    });
+
+  }
+
+  confirmSubmitClearing() {
+    this.isSubmitting = true;
+
     this.chargeService.submitForClearingCharge(this.selectedCharge.chargeGuid).subscribe({
       next: (response) => {
         this.isSubmitting = false;
         this.showSubmitClearingConfirmModal = false;
-    
+
         if (response.data) {
           this.loadCharges();
           this.showSuccess('Cash has been released to processor!');
@@ -378,7 +418,8 @@ export class JobChargesComponent implements OnInit, OnChanges {
       }
     });
   }
-  private showSuccess(message: string): void {
+
+  showSuccess(message: string): void {
     this.successMessage = message;
     this.showSuccessToast = true;
     setTimeout(() => {
@@ -386,7 +427,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
     }, 4000);
   }
 
-  private showError(message: string): void {
+  showError(message: string): void {
     this.errorMessage = message;
     this.showErrorToast = true;
     setTimeout(() => {

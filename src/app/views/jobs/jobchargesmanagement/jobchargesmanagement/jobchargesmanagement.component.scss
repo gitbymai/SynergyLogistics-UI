@@ -145,16 +145,6 @@
   align-items: center;
 }
 
-.badge-code {
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-  color: #1565c0;
-  font-weight: 600;
-  padding: 0.4rem 0.75rem;
-  font-size: 0.8rem;
-  letter-spacing: 0.3px;
-  border: 1px solid #90caf9;
-}
-
 /* Description Cell */
 .description-cell {
   max-width: 200px;
@@ -194,13 +184,6 @@
 .status-badge-wrapper {
   display: flex;
   align-items: center;
-}
-
-.status-badge-wrapper .badge {
-  font-weight: 600;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.75rem;
-  letter-spacing: 0.2px;
 }
 
 /* Status Colors */
@@ -683,6 +666,33 @@
   }
 }
 
+
+/* Code */
+.code-text {
+  color: #1565c0;
+  font-weight: 800;
+  font-size: 0.7rem;
+  
+}
+
+
+/* Item Badge */
+.badge-item {
+  background: #e3f2fd;
+  color: #1565c0;
+  font-weight: 500;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.4rem;
+}
+
+.badge-code {
+  background-color: #2196f3;
+  color: white;
+  padding: 0.4em 0.8em;
+  font-size: 0.95em;
+  border-radius: 4px;
+}
+
 .badge {
   padding: 0.4em 0.8em;
   font-size: 0.85em;
@@ -691,6 +701,45 @@
   text-transform: uppercase;
   display: inline-flex;
   align-items: center;
+}
+/* ===== ONGOING/PENDING STATUSES - YELLOW ===== */
+.badge-for-approval,
+.badge-for-releasing,
+.badge-for-liquidation,
+.badge-pending {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+}
+
+/* ===== IN-PROGRESS STATUSES - BLUE ===== */
+.badge-released,
+.badge-cleared,
+.badge-approved {
+  background-color: #cfe2ff;
+  color: #084298;
+  border: 1px solid #0d6efd;
+}
+
+/* ===== FINAL/COMPLETED STATUSES - GREEN ===== */
+.badge-completed {
+  background-color: #d1f2eb;
+  color: #0f5132;
+  border: 1px solid #20c997;
+}
+
+/* ===== NEGATIVE STATUSES - RED ===== */
+.badge-rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #dc3545;
+}
+
+/* ===== INACTIVE STATUSES - GRAY ===== */
+.badge-cancelled {
+  background-color: #e9ecef;
+  color: #495057;
+  border: 1px solid #6c757d;
 }
 
 /* FOR APPROVAL - Yellow/Warning */

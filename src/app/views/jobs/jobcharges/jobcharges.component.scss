@@ -78,15 +78,6 @@
   font-size: 0.7rem;
 }
 
-/* Item Badge */
-.badge-item {
-  background: #e3f2fd;
-  color: #1565c0;
-  font-weight: 500;
-  font-size: 0.65rem;
-  padding: 0.2rem 0.4rem;
-}
-
 /* Description */
 .description-cell {
   max-width: 150px;
@@ -96,34 +87,6 @@
   color: #666;
 }
 
-/* Status Badges */
-.badge-approved {
-  background: #d4edda;
-  color: #155724;
-  font-size: 0.65rem;
-  padding: 0.2rem 0.4rem;
-}
-
-.badge-pending {
-  background: #fff3cd;
-  color: #856404;
-  font-size: 0.65rem;
-  padding: 0.2rem 0.4rem;
-}
-
-.badge-cancelled {
-  background: #f8d7da;
-  color: #721c24;
-  font-size: 0.65rem;
-  padding: 0.2rem 0.4rem;
-}
-
-.badge-completed {
-  background: #d1ecf1;
-  color: #0c5460;
-  font-size: 0.65rem;
-  padding: 0.2rem 0.4rem;
-}
 
 /* Amount */
 .amount-cell {
@@ -421,6 +384,15 @@
   }
 }
 
+/* Item Badge */
+.badge-item {
+  background: #e3f2fd;
+  color: #1565c0;
+  font-weight: 500;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.4rem;
+}
+
 .badge-code {
   background-color: #2196f3;
   color: white;
@@ -436,68 +408,55 @@
   border-radius: 4px;
   text-transform: uppercase;
 }
-
-/* FOR APPROVAL - Yellow/Warning */
-.badge-for-approval {
+/* ===== ONGOING/PENDING STATUSES - YELLOW ===== */
+.badge-for-approval,
+.badge-for-releasing,
+.badge-for-liquidation,
+.badge-pending {
   background-color: #fff3cd;
   color: #856404;
   border: 1px solid #ffc107;
 }
 
-/* RELEASED - Blue */
-.badge-released {
+/* ===== IN-PROGRESS STATUSES - BLUE ===== */
+.badge-released,
+.badge-cleared,
+.badge-approved {
   background-color: #cfe2ff;
   color: #084298;
   border: 1px solid #0d6efd;
 }
 
-/* CLEARED - Teal/Cyan */
-.badge-cleared {
-  background-color: #d1ecf1;
-  color: #0c5460;
-  border: 1px solid #17a2b8;
-}
-
-/* REJECTED - Red */
-.badge-rejected {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #dc3545;
-}
-
-/* COMPLETED - Green */
+/* ===== FINAL/COMPLETED STATUSES - GREEN ===== */
 .badge-completed {
   background-color: #d1f2eb;
   color: #0f5132;
   border: 1px solid #20c997;
 }
 
-/* FOR RELEASING - Orange */
-.badge-for-releasing {
-  background-color: #ffe5d0;
-  color: #cc5200;
-  border: 1px solid #fd7e14;
+/* ===== NEGATIVE STATUSES - RED ===== */
+.badge-rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #dc3545;
 }
 
-/* FOR LIQUIDATION - Purple */
-.badge-for-liquidation {
-  background-color: #e0cffc;
-  color: #59359a;
-  border: 1px solid #6f42c1;
-}
-
-/* CANCELLED - Gray */
+/* ===== INACTIVE STATUSES - GRAY ===== */
 .badge-cancelled {
   background-color: #e9ecef;
   color: #495057;
   border: 1px solid #6c757d;
 }
 
-/* APPROVED - Success Green */
-.badge-approved {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #28a745;
+/* Default badge styles */
+.badge {
+  padding: 0.4em 0.8em;
+  font-size: 0.85em;
+  font-weight: 600;
+  border-radius: 4px;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
 }
 
 .status-for-liquidation {
@@ -530,6 +489,18 @@
   font-weight: 600;
   border-radius: 4px;
   text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+}
+
+.status-completed {
+  background-color: #d1f2eb;
+  color: #0f5132;
+  border: 1px solid #20c997;
+  padding: 0.4em 0.8em;
+  font-size: 0.85em;
+  font-weight: 600;
+  border-radius: 4px;
   display: inline-flex;
   align-items: center;
 }

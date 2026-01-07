@@ -48,10 +48,10 @@
         @for (charge of filteredCharges; track charge) {
         <tr>
           <td>
-            <span class="code-text">{{ charge.chargeCode }}</span>
+            <span>{{ charge.chargeCode }}</span>
           </td>
           <td>
-            <span class="badge badge-item">{{ charge.chargeSubCategoryName }}</span>
+            <span class="code-text">{{ charge.chargeSubCategoryName }}</span>
           </td>
           <td class="description-cell">{{ charge.description || 'N/A' }}</td>
           <td>
@@ -119,10 +119,10 @@
             @if(charge.chargeTransactionStatus === 'FOR CLEARING' && (userRole === 'ADMIN' || userRole === 'CASHIER' ||
             userRole === 'TREASURER')) {
 
-            <button class="btn btn-success btn-sm btn-badge-style" tooltip="Clear Transaction" title="Clear Transaction"
-              (click)="openSubmitClearingConfirmation(charge)">
+            <button class="btn btn-success btn-sm btn-badge-style" tooltip="Close Transaction" title="Close Transaction"
+              (click)="openFinalClosingConfirmation(charge)">
               <i class="cil-check-circle me-1"></i>
-              Clear
+              Close
             </button>
             }
 
@@ -160,6 +160,9 @@
           </td>
           <td class="text-end total-amount"></td>
 
+          <td>
+            
+          </td>
           @if(!viewSummary){
 
           <td>
@@ -461,7 +464,7 @@
     <div class="modal-content">
       <div class="modal-header bg-success text-white">
         <h5 class="modal-title">
-          <i class="bi bi-check2-square me-2"></i> Submit for Clearing
+          <i class="bi bi-check2-square me-2"></i> Clear
         </h5>
         <button type="button" class="btn-close btn-close-white" (click)="closeSubmitClearingConfirmModal()"
           aria-label="Close"></button>
@@ -550,6 +553,113 @@
           <span>
             <span class="spinner-border spinner-border-sm me-2"></span>
             Submitting...
+          </span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Final Closing Confirmation Modal -->
+@if (showFinalClosingConfirmModal) {
+<div class="modal-backdrop" (click)="closeFinalClosingConfirmModal()"></div>
+}
+<div class="modal custom-modal" [class.show]="showFinalClosingConfirmModal"
+  [class.d-block]="showFinalClosingConfirmModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-check-circle-fill me-2"></i> Final Closing
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeFinalClosingConfirmModal()"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Info Message -->
+        <div class="alert alert-success mb-3" role="alert">
+          <i class="bi bi-check-circle me-2"></i>
+          Clearing has been verified and approved. This transaction will be marked as <strong>"COMPLETED"</strong>.
+        </div>
+
+        <!-- Charge Summary -->
+        <div class="card mb-3" style="background-color: #f0fff4; border: 1px solid #9ae6b4;">
+          <div class="card-body">
+            <h6 class="text-success mb-3">
+              <i class="bi bi-file-earmark-check me-2"></i> Transaction Details
+            </h6>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <strong class="text-muted">Charge Code:</strong>
+              </div>
+              <div class="col-md-8">
+                <span class="badge badge-code">{{ selectedCharge?.chargeCode }}</span>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <strong class="text-muted">Processor:</strong>
+              </div>
+              <div class="col-md-8">
+                {{ selectedCharge?.processorName || 'N/A' }}
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <strong class="text-muted">Category:</strong>
+              </div>
+              <div class="col-md-8">
+                {{ selectedCharge?.chargeSubCategoryName }}
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <strong class="text-muted">Amount:</strong>
+              </div>
+              <div class="col-md-8">
+                <strong class="text-success fs-5">
+                  {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
+                </strong>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4">
+                <strong class="text-muted">Final Status:</strong>
+              </div>
+              <div class="col-md-8">
+                <span class="badge status-completed">
+                  <i class="bi bi-check-circle-fill me-1"></i>
+                  COMPLETED
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirmation Message -->
+        <div class="alert alert-warning mb-0" role="alert">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Are you sure you want to close this transaction? This action cannot be undone.
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeFinalClosingConfirmModal()"
+          [disabled]="isSubmitting">
+          <i class="bi bi-x me-2"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-dark" (click)="confirmFinalClosing()" [disabled]="isSubmitting">
+          @if (!isSubmitting) {
+          <span>
+            <i class="bi bi-check-circle-fill me-2"></i> Complete Transaction
+          </span>
+          }
+          @if (isSubmitting) {
+          <span>
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Completing...
           </span>
           }
         </button>
