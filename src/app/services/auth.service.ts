@@ -85,14 +85,6 @@ export class AuthService {
     return localStorage.getItem('synToken');
   }
 
-  register(userData: {
-    name: string;
-    email: string;
-    password: string;
-  }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/account/register`, userData);
-  }
-
   isTokenExpired(): boolean {
     const token = this.getToken();
     if (!token) return true;

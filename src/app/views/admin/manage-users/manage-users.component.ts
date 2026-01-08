@@ -45,6 +45,9 @@ export class ManageUsersComponent implements OnInit {
   itemsPerPage = 10;
   totalItems = 0;
 
+  isResettingPassword = false;
+  resetPasswordSuccess = false;
+
   constructor(private fb: FormBuilder, private userManagementService: UsermanagementService) {
     this.initializeForm();
   }
@@ -61,17 +64,9 @@ export class ManageUsersComponent implements OnInit {
       phone: ['', [Validators.maxLength(20)]],
       department: ['', Validators.maxLength(100)],
       roleId: ['', Validators.required],
-      password: [''],
-      confirmPassword: [''],
       isActive: [true],
       accountLocked: [false]
-    }, { validators: this.passwordMatchValidator });
-  }
-
-  passwordMatchValidator(group: FormGroup): { [key: string]: any } | null {
-    const password = group.get('password')?.value;
-    const confirmPassword = group.get('confirmPassword')?.value;
-    return password === confirmPassword ? null : { passwordMismatch: true };
+    });
   }
 
   loadUsers(): void {
@@ -173,19 +168,44 @@ export class ManageUsersComponent implements OnInit {
       roleId: roleId,
     });
 
-    // Password fields optional in edit mode
-    this.userForm.get('password')?.clearValidators();
-    this.userForm.get('confirmPassword')?.clearValidators();
-    this.userForm.get('password')?.updateValueAndValidity();
-    this.userForm.get('confirmPassword')?.updateValueAndValidity();
-
     this.showUserModal = true;
+  }
+
+  forceResetPassword(): void {
+    if (!this.selectedUser) {
+      return;
+    }
+
+    this.isResettingPassword = true;
+    this.resetPasswordSuccess = false;
+
+    this.userManagementService.forcePasswordReset(this.selectedUser.accountGuid).subscribe({
+      next: (response) => {
+        this.isResettingPassword = false;
+        if (response.success) {
+          this.resetPasswordSuccess = true;
+          this.showSuccess('Password reset successfully');
+        } else {
+          this.showError(response.message || 'Failed to reset password');
+        }
+      },
+      error: (error) => {
+        this.isResettingPassword = false;
+        this.resetPasswordSuccess = false;
+        const errorMessage = error.error?.message || 'An error occurred while resetting password';
+        this.showError(errorMessage);
+        console.error('Reset password error:', error);
+      }
+    });
   }
 
   closeUserModal(): void {
     this.showUserModal = false;
     this.userForm.reset();
     this.selectedUser = null;
+    this.isEditMode = false;
+    this.resetPasswordSuccess = false;
+    this.isResettingPassword = false;
   }
 
   submitUserForm(): void {
@@ -203,7 +223,7 @@ export class ManageUsersComponent implements OnInit {
     }
   }
 
-  private createUser(): void {
+  createUser(): void {
     const createRequest: CreateAccountRequest = {
       accountName: this.userForm.value.accountName,
       email: this.userForm.value.email,
@@ -237,7 +257,7 @@ export class ManageUsersComponent implements OnInit {
       });
   }
 
-  private updateUser(): void {
+  updateUser(): void {
     if (!this.selectedUser) return;
 
     const updateRequest: UpdateAccountRequest = {
@@ -249,10 +269,6 @@ export class ManageUsersComponent implements OnInit {
       roleId: this.userForm.value.roleId,
       isActive: Boolean(this.userForm.value.isActive)
     };
-
-    if (this.userForm.value.password && this.userForm.value.password.trim() !== '') {
-      updateRequest.password = this.userForm.value.password;
-    }
 
     this.userManagementService.updateUser(updateRequest)
       .pipe(finalize(() => this.isSubmitting = false))
@@ -365,9 +381,11 @@ export class ManageUsersComponent implements OnInit {
   getRoleName(roleId: number): string {
     return this.rolesList.find(r => r.roleId === roleId)?.roleName || 'Unknown';
   }
+
   getPageNumbers(): number[] {
     return Array.from({ length: this.getTotalPages() }, (_, i) => i + 1);
   }
+
   getPagedUsers(): Account[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     return this.filteredUsers.slice(startIndex, startIndex + this.itemsPerPage);
@@ -389,7 +407,7 @@ export class ManageUsersComponent implements OnInit {
     }
   }
 
-  private showSuccess(message: string): void {
+  showSuccess(message: string): void {
     this.successMessage = message;
     this.showSuccessToast = true;
     setTimeout(() => {
@@ -397,7 +415,7 @@ export class ManageUsersComponent implements OnInit {
     }, 4000);
   }
 
-  private showError(message: string): void {
+  showError(message: string): void {
     this.errorMessage = message;
     this.showErrorToast = true;
     setTimeout(() => {

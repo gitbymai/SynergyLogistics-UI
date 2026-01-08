@@ -18,7 +18,7 @@
         loading="eager"
       />
       <img
-        src="assets/images/synergy-logo-sm.jpg"
+        src="assets/images/synergy-logo.jpg"
         alt="Synergy"
         class="sidebar-brand-narrow d-none"
         height="32"
@@ -51,6 +51,7 @@
   <!-- Application Header -->
   <app-default-header
     [fullName]="fullName"
+    [userRole]="currentUserRole"
     [cShadowOnScroll]="'sm'"
     class="mb-4 d-print-none header header-sticky p-0 shadow-sm"
     position="sticky"

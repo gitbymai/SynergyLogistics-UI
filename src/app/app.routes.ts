@@ -26,7 +26,18 @@ export const routes: Routes = [
           title: 'Dashboard',
           roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales']
         },
-
+      },
+      {
+        path: 'change-password',
+        loadComponent: () =>
+          import('./views/account/changepassword/changepassword.component').then(
+            m => m.ChangepasswordComponent
+          ),
+        data: {
+          title: 'Change Password',
+          roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales']
+        },
+        canActivate: [AuthGuard]
       },
       {
         path: 'admin',
@@ -38,7 +49,6 @@ export const routes: Routes = [
         children: [
           {
             path: 'users',
-
             loadComponent: () =>
               import('./views/admin/manage-users/manage-users.component').then(
                 m => m.ManageUsersComponent
@@ -99,10 +109,9 @@ export const routes: Routes = [
           {
             path: 'jobmanagement/:jobGuid',
             loadComponent: () =>
-              import('./views/jobs/jobmanagement/jobmanagement.component').then
-                (
-                  m => m.JobmanagementComponent
-                ),
+              import('./views/jobs/jobmanagement/jobmanagement.component').then(
+                m => m.JobmanagementComponent
+              ),
             data: {
               title: 'Job Management',
               roles: ['sales', 'admin','finance', 'treasurer']
@@ -136,10 +145,9 @@ export const routes: Routes = [
           {
             path: 'financials/management/:chargeGuid',
             loadComponent: () =>
-              import('./views/financials/financialmanagement/financialmanagement.component').then
-                (
-                  m => m.FinancialmanagementComponent
-                ),
+              import('./views/financials/financialmanagement/financialmanagement.component').then(
+                m => m.FinancialmanagementComponent
+              ),
             data: {
               title: 'Financial Management',
               roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales']

@@ -19,8 +19,6 @@ import {
 import { DefaultFooterComponent, DefaultHeaderComponent } from './';
 import { navItems } from './_nav';
 import { AuthService } from '../../services/auth.service';
-// Import your auth service
-// import { AuthService } from '../path-to-your-auth-service';
 
 function isOverflown(element: HTMLElement) {
   return (
