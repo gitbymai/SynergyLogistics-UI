@@ -41,7 +41,9 @@ export class JobmanagementComponent implements OnInit {
   showApproveConfirmModal = false;
   isSubmitting = false;
   selectedJob: Job | null = null;
-  openSection: string = 'jobInfo'; // Default to first section open
+  openSection: string = 'jobInfo';
+  
+  showDisapproveConfirmModal = false;
 
   // Toast Notifications
   showSuccessToast: boolean = false;
@@ -84,7 +86,6 @@ export class JobmanagementComponent implements OnInit {
     this.jobGuid = jobGuid;
     this.jobService.getAllChargeTransactionByGuid(jobGuid).subscribe({
       next: (success) => {
-
         this.jobGuid = jobGuid;
         this.charges = success.data;
       },
@@ -149,6 +150,7 @@ export class JobmanagementComponent implements OnInit {
     return result;
 
   }
+
   getStatusIcon(status: string): string {
     switch (status?.toLowerCase()) {
       case 'active':
@@ -166,6 +168,7 @@ export class JobmanagementComponent implements OnInit {
         return 'bi-question-circle';
     }
   }
+
   getStatusBadgeClass(status: string): string {
     switch (status?.toUpperCase()) {
       case 'COMPLETED':
@@ -285,7 +288,6 @@ export class JobmanagementComponent implements OnInit {
       });
   }
 
-
   openApproveConfirm(job: any) {
     this.selectedJob = job;
     this.showApproveConfirmModal = true;
@@ -315,8 +317,6 @@ export class JobmanagementComponent implements OnInit {
 
     this.closeApproveConfirm();
   }
-
-  showDisapproveConfirmModal = false;
 
   openDisapproveConfirm(job: any) {
     this.selectedJob = job;
@@ -348,7 +348,7 @@ export class JobmanagementComponent implements OnInit {
     this.closeDisapproveConfirm();
   }
 
-  private showSuccess(message: string): void {
+  showSuccess(message: string): void {
     this.successMessage = message;
     this.showSuccessToast = true;
     setTimeout(() => {
@@ -356,7 +356,7 @@ export class JobmanagementComponent implements OnInit {
     }, 4000);
   }
 
-  private showError(message: string): void {
+  showError(message: string): void {
     this.errorMessage = message;
     this.showErrorToast = true;
     setTimeout(() => {

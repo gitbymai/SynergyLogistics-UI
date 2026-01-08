@@ -504,3 +504,89 @@
   display: inline-flex;
   align-items: center;
 }
+
+.timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #dee2e6;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -26px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid white;
+  z-index: 1;
+}
+
+.timeline-marker.action-create {
+  background-color: #28a745;
+}
+
+.timeline-marker.action-update {
+  background-color: #007bff;
+}
+
+.timeline-marker.action-complete {
+  background-color: #6f42c1;
+}
+
+.timeline-marker.action-cancel {
+  background-color: #dc3545;
+}
+
+.timeline-marker.action-approve {
+  background-color: #20c997;
+}
+
+.timeline-content {
+  margin-left: 5px;
+}
+
+.badge-code-audit {
+  background-color: #e9ecef;
+  color: #495057;
+  font-family: monospace;
+  font-size: 0.75rem;
+  padding: 0.25em 0.5em;
+}
+
+.badge-sm {
+  font-size: 0.75rem;
+  padding: 0.25em 0.5em;
+}
+
+/* Scrollbar styling */
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

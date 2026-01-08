@@ -6,6 +6,7 @@ import { ApiService } from '../api.service';
 import { ApiResponse } from '../../models/api-response';
 import {
   ChargeTransaction,
+  ChargeTransactionAuditLog,
   CreateChargeTransactionRequest,
   UpdateChargeTransactionRequest
 } from '../../models/chargetransaction';
@@ -70,6 +71,9 @@ export class ChargeTransactionService extends ApiService {
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/charge/category/${categoryId}`);
   }
 
+  getChargeAuditLog(chargeId: number): Observable<ApiResponse<ChargeTransactionAuditLog[]>> {
+    return this.http.get<ApiResponse<ChargeTransactionAuditLog[]>>(`${this.apiUrl}/job/charges-audit/${chargeId}`);
+  }
   approveCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/approvecharge/${tranGuid}`, {});
   }
@@ -86,7 +90,6 @@ export class ChargeTransactionService extends ApiService {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/complete/${tranGuid}`, {});
   }
 
-
   releaseCashCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/releasecashcharge/${tranGuid}`, {});
   }
@@ -98,6 +101,6 @@ export class ChargeTransactionService extends ApiService {
   submitForClearingCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/forclearing/${tranGuid}`, {});
   }
-  
+
 
 }

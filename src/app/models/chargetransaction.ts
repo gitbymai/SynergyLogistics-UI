@@ -76,3 +76,17 @@ export interface ChargeTransaction {
   modifiedByName?: string | null;
   
 }
+
+export interface ChargeTransactionAuditLog {
+  id: number;
+  chargeId: number;
+  chargeCode: string;
+  amount: number;
+  previousStatus?: string | null;
+  newStatus: string;
+  actionType: string;
+  remarks?: string | null;
+  requestedBy?: string | null;
+  modifiedBy: string;
+  createdDate: Date;
+}

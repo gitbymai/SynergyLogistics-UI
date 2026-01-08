@@ -216,20 +216,19 @@ export class JoblistComponent implements OnInit {
   }
 
   getStatusBadgeClass(status: string): string {
-    switch (status?.toUpperCase()) {
-      case 'COMPLETED':
-      case 'CLOSED':
-        return 'bg-success';
-      case 'FOR APPROVAL':
-        return 'bg-warning';
-      case 'ONGOING':
-        return 'bg-primary';
-      case 'CANCELLED':
-        return 'bg-danger';
-      default:
-        return 'bg-secondary';
-    }
+  switch (status?.toUpperCase()) {
+    case 'FOR APPROVAL': return 'badge-for-approval';
+    case 'ONGOING': return 'badge-ongoing';
+    case 'REJECTED': return 'badge-rejected';
+    case 'COMPLETED': return 'badge-completed';
+    case 'PENDING': return 'badge-pending';
+    case 'ACTIVE': return 'badge-active';
+    case 'INACTIVE': return 'badge-inactive';
+    case 'APPROVED': return 'badge-approved';
+    case 'CANCELLED': return 'badge-cancelled';
+    default: return 'badge-default';
   }
+}
 
   toggleFilters(): void {
     this.showFilters = !this.showFilters;

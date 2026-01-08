@@ -2,7 +2,7 @@ import { Component, input, Input, OnChanges, OnInit, SimpleChanges } from '@angu
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CardModule, TableModule } from '@coreui/angular';
-import { ChargeTransaction, CreateChargeTransactionRequest } from '../../../models/chargetransaction';
+import { ChargeTransaction, ChargeTransactionAuditLog, CreateChargeTransactionRequest } from '../../../models/chargetransaction';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Job } from '../../../models/job';
 import { ChargeTransactionService } from '../../../services/chargetransaction/chargetransaction.service';
@@ -20,7 +20,6 @@ export class JobChargesComponent implements OnInit, OnChanges {
 
   jobCode: string = '';
 
-
   // Loading & Modal States
   isLoading: boolean = false;
   isSubmitting: boolean = false;
@@ -35,7 +34,6 @@ export class JobChargesComponent implements OnInit, OnChanges {
   // Reactive Form
   chargeFormGroup!: FormGroup;
 
-
   // Toast Notifications
   showSuccessToast: boolean = false;
   showErrorToast: boolean = false;
@@ -47,6 +45,10 @@ export class JobChargesComponent implements OnInit, OnChanges {
   chargeSubCategories: ChargeSubcategory[] = [];
 
   filteredCharges: ChargeTransaction[] = [];
+
+  showAuditLogModal = false;
+  isLoadingAuditLog = false;
+  auditLogs: ChargeTransactionAuditLog[] = [];
 
   constructor(private fb: FormBuilder,
 
@@ -70,7 +72,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
 
     if (this.viewSummary) {
-      if ((this.userRole === 'ADMIN' || this.userRole === 'FINANCE' || this.userRole === 'TREASURER')) {
+      if ((this.userRole === 'ADMIN' || this.userRole === 'FINANCE' || this.userRole === 'TREASURER' || this.userRole === 'SALES')) {
 
         this.filteredCharges = this.charges;
       }
@@ -102,7 +104,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
       .filter(charge => !excludedStatuses.includes(charge.chargeTransactionStatus!))
       .reduce((sum, charge) => sum + (charge.amount || 0), 0);
   }
-  
+
   get totalChargeAmount(): number {
     const excludedStatuses = ['CANCELLED', 'REJECTED'];
     return this.filteredCharges
@@ -130,6 +132,39 @@ export class JobChargesComponent implements OnInit, OnChanges {
 
   getFooterColspan(): number {
     return 4;
+  }
+
+  getActionTypeClass(actionType: string): string {
+    const type = actionType?.toLowerCase() || '';
+    if (type.includes('create')) return 'action-create';
+    if (type.includes('complete')) return 'action-complete';
+    if (type.includes('cancel')) return 'action-cancel';
+    if (type.includes('approve')) return 'action-approve';
+    return 'action-update';
+  }
+
+  getActionTypeBadge(actionType: string): string {
+    const type = actionType?.toLowerCase() || '';
+    if (type.includes('create')) return 'bg-success';
+    if (type.includes('complete')) return 'bg-purple';
+    if (type.includes('cancel')) return 'bg-danger';
+    if (type.includes('approve')) return 'bg-info';
+    return 'bg-primary';
+  }
+
+  getStatusBadgeClass(status: string): string {
+    switch (status?.toUpperCase()) {
+      case 'FOR APPROVAL': return 'badge-for-approval';
+      case 'ONGOING': return 'badge-ongoing';
+      case 'REJECTED': return 'badge-rejected';
+      case 'COMPLETED': return 'badge-completed';
+      case 'PENDING': return 'badge-pending';
+      case 'ACTIVE': return 'badge-active';
+      case 'INACTIVE': return 'badge-inactive';
+      case 'APPROVED': return 'badge-approved';
+      case 'CANCELLED': return 'badge-cancelled';
+      default: return 'badge-default';
+    }
   }
 
   canViewSellingAmount(): boolean {
@@ -419,6 +454,34 @@ export class JobChargesComponent implements OnInit, OnChanges {
     });
   }
 
+  openAuditLogModal(charge: ChargeTransaction): void {
+    this.selectedCharge = charge;
+    this.showAuditLogModal = true;
+    this.loadAuditLogs(charge.chargeId);
+  }
+
+  closeAuditLogModal(): void {
+    this.showAuditLogModal = false;
+    this.auditLogs = [];
+  }
+
+  loadAuditLogs(chargeId: number): void {
+    this.isLoadingAuditLog = true;
+    this.chargeService.getChargeAuditLog(chargeId).subscribe({
+      next: (response) => {
+        if (response.data && response.data.length > 0) {
+          this.auditLogs = response.data;
+
+        }
+        this.isLoadingAuditLog = false;
+      },
+      error: (error) => {
+        console.error('Error loading audit logs:', error);
+        this.isLoadingAuditLog = false;
+      }
+    });
+  }
+
   showSuccess(message: string): void {
     this.successMessage = message;
     this.showSuccessToast = true;
@@ -434,4 +497,5 @@ export class JobChargesComponent implements OnInit, OnChanges {
       this.showErrorToast = false;
     }, 4000);
   }
+
 }

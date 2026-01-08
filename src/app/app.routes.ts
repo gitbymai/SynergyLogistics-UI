@@ -143,18 +143,6 @@ export const routes: Routes = [
             canActivate: [AuthGuard]
           },
           {
-            path: 'financials/management/:chargeGuid',
-            loadComponent: () =>
-              import('./views/financials/financialmanagement/financialmanagement.component').then(
-                m => m.FinancialmanagementComponent
-              ),
-            data: {
-              title: 'Financial Management',
-              roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales']
-            },
-            canActivate: [AuthGuard]
-          },
-          {
             path: 'financials/chargelists/:jobGuid',
             loadComponent: () =>
               import('./views/financials/chargelist/chargelist.component').then(

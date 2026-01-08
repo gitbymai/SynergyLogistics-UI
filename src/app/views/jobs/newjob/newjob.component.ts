@@ -360,7 +360,6 @@ export class NewjobComponent implements OnInit {
 
     this.jobService.createJob(jobRequest).subscribe({
       next: (response) => {
-        console.log('Job created successfully:', response);
         this.isSubmitting = false;
         
         this.successMessage = `Job ${response.data?.jobCode || ''} created successfully!`;
