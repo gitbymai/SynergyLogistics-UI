@@ -1,0 +1,353 @@
+<div class="card my-4 shadow-sm">
+  <div class="card-header bg-primary text-white">
+    <div class="d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">
+        <i class="cil-wallet me-2"></i> Credit Management
+      </h4>
+      <button class="btn btn-light btn-sm" type="button" (click)="openNewResourceModal()">
+        <i class="cil-plus me-2"></i> Add Credits
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+      <div class="col-md-4 mb-3">
+        <div class="credit-summary-card total">
+          <div class="card-icon">
+            <i class="cil-layers"></i>
+          </div>
+          <div class="card-content">
+            <div class="card-label">Total Credits</div>
+            <div class="card-value">{{ getTotalCredits() | number:'1.0-0' }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="credit-summary-card used">
+          <div class="card-icon">
+            <i class="cil-chart-line"></i>
+          </div>
+          <div class="card-content">
+            <div class="card-label">Used Credits</div>
+            <div class="card-value">{{ getUsedCredits() | number:'1.0-0' }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="credit-summary-card remaining">
+          <div class="card-icon">
+            <i class="cil-battery-3"></i>
+          </div>
+          <div class="card-content">
+            <div class="card-label">Remaining Credits</div>
+            <div class="card-value">{{ getRemainingCredits() | number:'1.0-0' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resources Table -->
+    <div class="table-responsive">
+      <table class="table table-hover table-custom">
+        <thead>
+          <tr>
+            <th>
+              <i class="cil-tag me-2"></i> Resource Name
+            </th>
+            <th class="text-center">
+              <i class="cil-layers me-2"></i> Initial Amount
+            </th>
+            <th class="text-center">
+              <i class="cil-chart-pie me-2"></i> Current Amount
+            </th>
+            <th class="text-center">
+              <i class="cil-chart-line me-2"></i> Used Amount
+            </th>
+            <th class="text-center">
+              <i class="cil-calendar me-2"></i> Created Date
+            </th>
+            <th class="text-center">
+              <i class="cil-check-circle me-2"></i> Status
+            </th>
+            <th class="text-center">
+              <i class="cil-settings me-2"></i> Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @if(getPagedResources().length > 0) {
+          @for(resource of getPagedResources(); track resource.resourceId) {
+          <tr [class.inactive-row]="!resource.isActive">
+            <td>
+              <div class="d-flex align-items-center">
+                <strong>{{ resource.resourceName }}</strong>
+              </div>
+            </td>
+            <td class="text-center">
+              {{ resource.initialAmount | number:'1.2-2' }}
+            </td>
+            <td class="text-center">
+              {{ resource.currentAmount | number:'1.2-2' }}
+            </td>
+            <td class="text-center">
+              {{ (resource.initialAmount - resource.currentAmount) | number:'1.2-2' }}
+            </td>
+            <td class="text-center">
+              @if(resource.createdDate) {
+              {{ resource.createdDate | date: 'MMM dd, yyyy' }}
+              } @else {
+              <span class="text-muted">-</span>
+              }
+            </td>
+            <td>
+              <div class="status-badge-wrapper">
+                @if(resource.isActive) {
+                <span class="badge bg-success">
+                  <i class="cil-check-circle me-1"></i> Active
+                </span>
+                } @else {
+                <span class="badge bg-secondary">
+                  <i class="cil-x-circle me-1"></i> Inactive
+                </span>
+                }
+              </div>
+            </td>
+            <td>
+              <div class="action-buttons">
+                 <button class="btn btn-sm btn-primary-outline" title="Edit Resource" (click)="viewTransactions(resource)">
+                  <i class="cil-list"></i> Manage
+                </button>
+                <!-- <button class="btn btn-sm btn-primary-outline" title="Edit Resource" (click)="editResource(resource)">
+                  <i class="cil-pencil"></i>
+                </button> -->
+                <!-- <button class="btn btn-sm btn-danger-outline" title="Delete Resource" (click)="openDeleteConfirm(resource)">
+                  <i class="cil-trash"></i>
+                </button> -->
+              </div>
+            </td>
+          </tr>
+          }
+          } @else {
+          <tr>
+            <td colspan="7" class="text-center text-muted py-4">
+              <i class="cil-search me-2" style="font-size: 2rem;"></i>
+              <div class="mt-2">No resources found</div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation" class="mt-4">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <button class="page-link" type="button" (click)="previousPage()" [disabled]="currentPage === 1">
+            <i class="cil-arrow-left me-1"></i> Previous
+          </button>
+        </li>
+        @for(page of getPageNumbers(); track page) {
+          <li class="page-item" [class.active]="page === currentPage">
+            <button class="page-link" type="button" (click)="currentPage = page">
+              {{ page }}
+            </button>
+          </li>
+        }
+        <li class="page-item" [class.disabled]="currentPage === getTotalPages()">
+          <button class="page-link" type="button" (click)="nextPage()" [disabled]="currentPage === getTotalPages()">
+            Next <i class="cil-arrow-right ms-1"></i>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<!-- Add/Edit Credit Modal -->
+@if (showResourceModal) {
+<div class="modal-backdrop" (click)="closeResourceModal()"></div>
+}
+<div class="modal custom-modal" [class.show]="showResourceModal" [class.d-block]="showResourceModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          @if(isEditMode) {
+            <i class="cil-pencil me-2"></i> Edit Resource
+          } @else {
+            <i class="cil-plus me-2"></i> Add New Resource
+          }
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeResourceModal()" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="resourceForm" class="form-professional">
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <label class="form-label">
+                <i class="cil-tag me-1"></i> Resource Name
+              </label>
+              <input type="text" class="form-control form-control-custom" formControlName="resourceName"
+                placeholder="e.g., Starter Pack, Premium Bundle" maxlength="100" />
+              @if (resourceForm.get('resourceName')?.invalid && resourceForm.get('resourceName')?.touched) {
+                <div class="text-danger small mt-1">Resource name is required (max 100 characters)</div>
+              }
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="cil-layers me-1"></i> Initial Amount
+              </label>
+              <input type="number" class="form-control form-control-custom" formControlName="initialAmount"
+                placeholder="e.g., 1000.00" min="0" step="0.01" [readonly]="isEditMode" />
+              @if (resourceForm.get('initialAmount')?.invalid && resourceForm.get('initialAmount')?.touched) {
+                <div class="text-danger small mt-1">Initial amount is required (0 - 9999999999999999.99)</div>
+              }
+              @if(isEditMode) {
+                <small class="text-muted d-block mt-1">
+                  <i class="cil-info me-1"></i>Initial amount cannot be changed
+                </small>
+              }
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="cil-chart-pie me-1"></i> Current Amount
+              </label>
+              <input type="number" class="form-control form-control-custom" formControlName="currentAmount"
+                placeholder="e.g., 750.00" min="0" step="0.01" />
+              @if (resourceForm.get('currentAmount')?.invalid && resourceForm.get('currentAmount')?.touched) {
+                <div class="text-danger small mt-1">Current amount is required (0 - 9999999999999999.99)</div>
+              }
+            </div>
+          </div>
+
+          @if(isEditMode) {
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <label class="form-label">
+                  <i class="cil-check-circle me-1"></i> Status
+                </label>
+                <div class="form-check mt-2">
+                  <input class="form-check-input" type="checkbox" formControlName="isActive" id="isActiveCheck">
+                  <label class="form-check-label" for="isActiveCheck">
+                    Active
+                  </label>
+                </div>
+              </div>
+            </div>
+          }
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeResourceModal()">
+          <i class="cil-x me-2"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="submitResourceForm()"
+          [disabled]="!resourceForm.valid || isSubmitting">
+          @if (!isSubmitting) {
+            <span>
+              <i class="cil-check me-2"></i> {{ isEditMode ? 'Update Resource' : 'Create Resource' }}
+            </span>
+          }
+          @if (isSubmitting) {
+            <span>
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Submitting...
+            </span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+@if (showDeleteConfirmModal) {
+<div class="modal-backdrop" (click)="closeDeleteConfirm()"></div>
+}
+<div class="modal custom-modal" [class.show]="showDeleteConfirmModal" [class.d-block]="showDeleteConfirmModal"
+  tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">
+          <i class="cil-warning me-2"></i> Delete Resource
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeDeleteConfirm()"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger" role="alert">
+          <i class="cil-warning me-2"></i>
+          This action cannot be undone!
+        </div>
+        <p class="mb-2">
+          Are you sure you want to delete the resource <strong>{{ selectedResource?.resourceName }}</strong>?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeDeleteConfirm()">
+          <i class="cil-x me-2"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="isSubmitting">
+          @if (!isSubmitting) {
+          <span>
+            <i class="cil-trash me-2"></i> Delete Resource
+          </span>
+          }
+          @if (isSubmitting) {
+          <span>
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Deleting...
+          </span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notifications -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+  <!-- Success Toast -->
+  <div class="toast align-items-center border-0" [class.show]="showSuccessToast" role="alert" aria-live="assertive"
+    aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body bg-success text-white rounded">
+        <div class="d-flex align-items-center">
+          <i class="cil-check-circle me-2" style="font-size: 1.5rem;"></i>
+          <div>
+            <strong class="d-block">Success!</strong>
+            <span>{{ successMessage }}</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showSuccessToast = false"
+        aria-label="Close"></button>
+    </div>
+  </div>
+
+  <!-- Error Toast -->
+  <div class="toast align-items-center border-0" [class.show]="showErrorToast" role="alert" aria-live="assertive"
+    aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body bg-danger text-white rounded">
+        <div class="d-flex align-items-center">
+          <i class="cil-x-circle me-2" style="font-size: 1.5rem;"></i>
+          <div>
+            <strong class="d-block">Error</strong>
+            <span>{{ errorMessage }}</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showErrorToast = false"
+        aria-label="Close"></button>
+    </div>
+  </div>
+</div>

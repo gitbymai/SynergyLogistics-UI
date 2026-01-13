@@ -152,19 +152,16 @@ export class ListsComponent implements OnInit {
       const valA = a[column];
       const valB = b[column];
 
-      // Handle null/undefined values (push to end)
       if (valA == null && valB == null) return 0;
       if (valA == null) return 1;
       if (valB == null) return -1;
 
-      // String comparison
       if (typeof valA === 'string' && typeof valB === 'string') {
         return this.sortDirection === 'asc'
           ? valA.localeCompare(valB)
           : valB.localeCompare(valA);
       }
 
-      // Number comparison
       if (typeof valA === 'number' && typeof valB === 'number') {
         return this.sortDirection === 'asc' ? valA - valB : valB - valA;
       }
@@ -194,14 +191,19 @@ export class ListsComponent implements OnInit {
   }
 
   getStatusBadgeClass(status: string): string {
-    switch (status.toUpperCase()) {
-      case 'FOR APPROVAL': return 'bg-warning text-dark';
-      case 'APPROVED': return 'bg-success';
-      case 'REJECTED': return 'bg-danger';
-      case 'COMPLETED': return 'bg-info';
-      default: return 'bg-secondary';
-    }
+  switch (status?.toUpperCase()) {
+    case 'FOR APPROVAL': return 'badge-for-approval';
+    case 'ONGOING': return 'badge-ongoing';
+    case 'REJECTED': return 'badge-rejected';
+    case 'COMPLETED': return 'badge-completed';
+    case 'PENDING': return 'badge-pending';
+    case 'ACTIVE': return 'badge-active';
+    case 'INACTIVE': return 'badge-inactive';
+    case 'APPROVED': return 'badge-approved';
+    case 'CANCELLED': return 'badge-cancelled';
+    default: return 'badge-default';
   }
+}
 
   toggleFilters(): void {
     this.showFilters = !this.showFilters;

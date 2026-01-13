@@ -84,12 +84,17 @@ export class ChargelistComponent {
     })
   }
   getStatusBadgeClass(status: string): string {
-    switch (status.toUpperCase()) {
-      case 'FOR APPROVAL': return 'bg-warning text-dark';
-      case 'APPROVED': return 'bg-success';
-      case 'REJECTED': return 'bg-danger';
-      case 'COMPLETED': return 'bg-info';
-      default: return 'bg-secondary';
-    }
+  switch (status?.toUpperCase()) {
+    case 'FOR APPROVAL': return 'badge-for-approval';
+    case 'ONGOING': return 'badge-ongoing';
+    case 'REJECTED': return 'badge-rejected';
+    case 'COMPLETED': return 'badge-completed';
+    case 'PENDING': return 'badge-pending';
+    case 'ACTIVE': return 'badge-active';
+    case 'INACTIVE': return 'badge-inactive';
+    case 'APPROVED': return 'badge-approved';
+    case 'CANCELLED': return 'badge-cancelled';
+    default: return 'badge-default';
   }
+}
 }

@@ -37,8 +37,14 @@ export const navItems = [
     roles: ['admin','finance','treasurer','cashier']
   },
   {
-    name: 'Billing',
-    url: '/billing',
+    name: 'Disbursement Requests',
+    url: '',
+    iconComponent: { name: 'cil-dollar' },
+    roles: ['admin','finance','treasurer','cashier']
+  },
+  {
+    name: 'Credit Management',
+    url: '/credit-management-list',
     iconComponent: { name: 'cil-description' },
     roles: ['admin','finance','treasurer']
   },

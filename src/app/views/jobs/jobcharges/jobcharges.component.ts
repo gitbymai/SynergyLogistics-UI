@@ -152,20 +152,22 @@ export class JobChargesComponent implements OnInit, OnChanges {
     return 'bg-primary';
   }
 
-  getStatusBadgeClass(status: string): string {
-    switch (status?.toUpperCase()) {
-      case 'FOR APPROVAL': return 'badge-for-approval';
-      case 'ONGOING': return 'badge-ongoing';
-      case 'REJECTED': return 'badge-rejected';
-      case 'COMPLETED': return 'badge-completed';
-      case 'PENDING': return 'badge-pending';
-      case 'ACTIVE': return 'badge-active';
-      case 'INACTIVE': return 'badge-inactive';
-      case 'APPROVED': return 'badge-approved';
-      case 'CANCELLED': return 'badge-cancelled';
-      default: return 'badge-default';
-    }
+ getStatusClass(status: string): string {
+  switch (status?.toUpperCase()) {
+    case 'FOR APPROVAL': return 'badge-for-approval';
+    case 'FOR CLEARING': return 'badge-released';
+    case 'CLEARED': return 'badge-cleared';
+    case 'REJECTED': return 'badge-rejected';
+    case 'COMPLETED': return 'badge-completed';
+    case 'FOR RELEASING': return 'badge-for-releasing';
+    case 'CASH RECEIVED - FOR LIQUIDATION': return 'badge-for-liquidation';
+    case 'CANCELLED': return 'badge-cancelled';
+    case 'APPROVED': return 'badge-approved';
+    case 'PENDING': return 'badge-pending';
+    case 'RELEASED': return 'badge-released';
+    default: return 'badge-default';
   }
+}
 
   canViewSellingAmount(): boolean {
     return ['SALES', 'FINANCE', 'TREASURER', 'ADMIN'].includes(this.userRole);
