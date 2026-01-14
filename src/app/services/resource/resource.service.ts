@@ -5,6 +5,7 @@ import { ApiService } from '../api.service';
 import { ApiResponse } from '../../models/api-response';
 import { map } from 'rxjs';
 import { Resource, NewResource, UpdateResource, ResourceTransaction, NewResourceTransaction, UpdateResourceTransaction } from '../../models/resource';
+import { Configuration } from '../../models/configuration'
 
 
 @Injectable({
@@ -19,39 +20,44 @@ export class ResourceService extends ApiService {
   }
 
   getAllResources(): Observable<ApiResponse<Resource[]>> {
-  return this.http.get<ApiResponse<Resource[]>>(`${this.apiUrl}/resource`);
-}
+    return this.http.get<ApiResponse<Resource[]>>(`${this.apiUrl}/resource`);
+  }
 
-getResourceByGuid(guid: string): Observable<ApiResponse<Resource>> {
-  return this.http.get<ApiResponse<Resource>>(`${this.apiUrl}/resource/${guid}`);
-}
+  getResourceByGuid(guid: string): Observable<ApiResponse<Resource>> {
+    return this.http.get<ApiResponse<Resource>>(`${this.apiUrl}/resource/${guid}`);
+  }
 
-createResource(newResourceDto: NewResource): Observable<ApiResponse<Resource>> {
-  return this.http.post<ApiResponse<Resource>>(`${this.apiUrl}/resource`, newResourceDto);
-}
+  createResource(newResourceDto: NewResource): Observable<ApiResponse<Resource>> {
+    return this.http.post<ApiResponse<Resource>>(`${this.apiUrl}/resource`, newResourceDto);
+  }
 
-updateResource(updateResourceDto: UpdateResource): Observable<ApiResponse<Resource>> {
-  return this.http.put<ApiResponse<Resource>>(`${this.apiUrl}/resource`, updateResourceDto);
-}
+  updateResource(updateResourceDto: UpdateResource): Observable<ApiResponse<Resource>> {
+    return this.http.put<ApiResponse<Resource>>(`${this.apiUrl}/resource`, updateResourceDto);
+  }
 
-deleteResource(guid: string): Observable<ApiResponse<void>> {
-  return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/resource/${guid}`);
-}
+  deleteResource(guid: string): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/resource/${guid}`);
+  }
 
-activateResource(guid: string): Observable<ApiResponse<void>> {
-  return this.http.put<ApiResponse<void>>(`${this.apiUrl}/resource/activate/${guid}`, {});
-}
+  activateResource(guid: string): Observable<ApiResponse<void>> {
+    return this.http.put<ApiResponse<void>>(`${this.apiUrl}/resource/activate/${guid}`, {});
+  }
 
-deactivateResource(guid: string): Observable<ApiResponse<void>> {
-  return this.http.put<ApiResponse<void>>(`${this.apiUrl}/resource/deactivate/${guid}`, {});
-}
+  deactivateResource(guid: string): Observable<ApiResponse<void>> {
+    return this.http.put<ApiResponse<void>>(`${this.apiUrl}/resource/deactivate/${guid}`, {});
+  }
 
-getResourceTransactionsByResourceId(id: number): Observable<ApiResponse<ResourceTransaction[]>> {
-  return this.http.get<ApiResponse<ResourceTransaction[]>>(`${this.apiUrl}/resource/transactions/${id}`);
-}
+  getResourceTransactionsByResourceId(id: number): Observable<ApiResponse<ResourceTransaction[]>> {
+    return this.http.get<ApiResponse<ResourceTransaction[]>>(`${this.apiUrl}/resource/transactions/${id}`);
+  }
 
-addResourceTransaction(newResourceTransactionDto: NewResourceTransaction): Observable<ApiResponse<ResourceTransaction>> {
-  return this.http.post<ApiResponse<ResourceTransaction>>(`${this.apiUrl}/resource/transactions`, newResourceTransactionDto);
-}
+  addResourceTransaction(newResourceTransactionDto: NewResourceTransaction): Observable<ApiResponse<ResourceTransaction>> {
+    return this.http.post<ApiResponse<ResourceTransaction>>(`${this.apiUrl}/resource/transactions`, newResourceTransactionDto);
+  }
+
+
+  getResourceTransactionTypes(): Observable<ApiResponse<Configuration[]>> {
+    return this.http.get<ApiResponse<Configuration[]>>(`${this.apiUrl}/configuration/resource-transaction-type`);
+  }
 
 }

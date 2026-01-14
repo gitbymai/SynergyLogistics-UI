@@ -10,6 +10,7 @@ import {
 } from '../../../models/resource';
 import { ResourceService } from '../../../services/resource/resource.service';
 import { finalize } from 'rxjs';
+import { Configuration } from '../../../models/configuration';
 
 @Component({
   selector: 'app-credit-transaction-lists',
@@ -37,12 +38,7 @@ export class CreditTransactionListsComponent implements OnInit {
   selectedTransaction: ResourceTransaction | null = null;
 
   // Transaction Types (You'll need to load these from your service/options)
-  transactionTypes: Array<{ id: number; name: string }> = [
-    { id: 1, name: 'Credit' },
-    { id: 2, name: 'Debit' },
-    { id: 3, name: 'Adjustment' },
-    { id: 4, name: 'Refund' }
-  ];
+  transactionTypes: Configuration[] = [];
 
   // Debit transaction type IDs (customize based on your actual IDs)
   debitTransactionTypeIds: number[] = [2]; // Adjust based on your actual debit type IDs
@@ -81,6 +77,7 @@ export class CreditTransactionListsComponent implements OnInit {
       if (this.resourceId) {
         this.loadTransactions();
         this.loadResourceDetails();
+        this.loadTransactionTypes();
       } else {
         this.showError('Invalid resource');
         this.goBack();
@@ -98,11 +95,41 @@ export class CreditTransactionListsComponent implements OnInit {
     });
   }
 
+  loadTransactionTypes(): void {
+    this.transactionService.getResourceTransactionTypes().subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.transactionTypes = response.data;
+        } else {
+          this.showError(response.message || 'Failed to load transaction types');
+        }
+      },
+      error: (error) => {
+        console.error('Error loading transaction types:', error);
+        this.showError('Failed to load transaction types. Please try again.');
+      }
+    });
+
+  }
+
   loadResourceDetails(): void {
-    // TODO: Load resource details to get resource name and current balance
-    // For now, using mock data
-    this.resourceName = 'Synergy Logistics Application';
-    this.currentBalance = 5000.00;
+
+    this.transactionService.getResourceByGuid(this.resourceGuid).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.resourceName = response.data.resourceName || 'N/A';
+          this.currentBalance = response.data.initialAmount || 0;
+
+        } else {
+          this.showError(response.message || 'Failed to load resource details');
+        }
+      },
+      error: (error) => {
+        console.error('Error loading resource details:', error);
+        this.showError('Failed to load resource details. Please try again.');
+      }
+    });
+
   }
 
   loadTransactions(): void {
@@ -114,11 +141,7 @@ export class CreditTransactionListsComponent implements OnInit {
           this.transactions = response.data;
           this.filteredTransactions = [...this.transactions];
           this.totalItems = this.transactions.length;
-          
-          if (this.transactions.length > 0) {
-            const latestTransaction = this.transactions[0];
-            this.currentBalance = latestTransaction.balanceAfter;
-          }
+
         } else {
           this.showError(response.message || 'Failed to load transactions');
         }
@@ -132,6 +155,10 @@ export class CreditTransactionListsComponent implements OnInit {
     });
   }
 
+getTransactionTypeById(id: number): Configuration | undefined {
+  return this.transactionTypes.find(type => type.optionId === id);
+}
+
   openNewTransactionModal(): void {
     this.selectedTransaction = null;
     this.transactionForm.reset({ isActive: true });
@@ -139,7 +166,6 @@ export class CreditTransactionListsComponent implements OnInit {
     this.transactionForm.get('amount')?.enable();
     this.showTransactionModal = true;
   }
-
 
   viewTransactionDetails(transaction: ResourceTransaction): void {
     this.selectedTransaction = transaction;
@@ -167,7 +193,7 @@ export class CreditTransactionListsComponent implements OnInit {
 
     this.isSubmitting = true;
 
-      this.createTransaction();
+    this.createTransaction();
   }
 
   createTransaction(): void {
@@ -187,9 +213,10 @@ export class CreditTransactionListsComponent implements OnInit {
             this.transactions.unshift(response.data); // Add to beginning
             this.showSuccess('Transaction created successfully');
             this.closeTransactionModal();
-            
-            // Update current balance
-            this.currentBalance = response.data.balanceAfter;
+
+                    this.loadTransactions();
+        this.loadResourceDetails();
+
           } else {
             this.showError(response.message || 'Failed to create transaction');
           }
@@ -205,10 +232,10 @@ export class CreditTransactionListsComponent implements OnInit {
     this.router.navigate(['/credit-management-list']);
   }
 
-  // Helper Methods
-  isDebitTransaction(transactionTypeId: number): boolean {
-    return this.debitTransactionTypeIds.includes(transactionTypeId);
-  }
+isDebitTransaction(transactionTypeId: number): boolean {
+  const transactionType = this.transactionTypes.find(type => type.optionId === transactionTypeId);
+  return transactionType ? transactionType.value === 'DEBIT' : false;
+}
 
   // Summary Calculations
   getTotalCredits(): number {

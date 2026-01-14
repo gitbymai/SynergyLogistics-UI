@@ -34,6 +34,8 @@ export interface ResourceTransaction {
   isActive: boolean;
   createdByName?: string;
   modifiedByName?: string;
+  resourceTransactionTypeName?: string;
+  resourceTypeName?: string;
 }
 
 export interface NewResource {
