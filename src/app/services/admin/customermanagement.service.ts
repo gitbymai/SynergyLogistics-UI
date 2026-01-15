@@ -25,12 +25,12 @@ export class CustomerManagementService extends ApiService {
         return this.http.get<ApiResponse<CustomerAccount>>(`${this.apiUrl}/get-by-guid/${customerGuid}`);
     }
 
-    createCustomer(dto: NewCustomerAccount): Observable<ApiResponse<CustomerAccount>> {
-        return this.http.post<ApiResponse<CustomerAccount>>(`${this.apiUrl}/create-customer`, dto);
+    createCustomer(newDto: NewCustomerAccount): Observable<ApiResponse<CustomerAccount>> {
+        return this.http.post<ApiResponse<CustomerAccount>>(`${this.apiUrl}/create-customer`, newDto);
     }
 
-    updateCustomer(dto: UpdateCustomerAccount): Observable<ApiResponse<CustomerAccount>> {
-        return this.http.put<ApiResponse<CustomerAccount>>(`${this.apiUrl}/update-customer`, dto);
+    updateCustomer(updateDto: UpdateCustomerAccount): Observable<ApiResponse<CustomerAccount>> {
+        return this.http.put<ApiResponse<CustomerAccount>>(`${this.apiUrl}/update-customer/${updateDto.customerGuid}`, updateDto);
     }
 
     deleteCustomer(customerGuid: string): Observable<ApiResponse<void>> {
@@ -40,10 +40,15 @@ export class CustomerManagementService extends ApiService {
     activateCustomer(customerGuid: string): Observable<ApiResponse<CustomerAccount>> {
         return this.http.put<ApiResponse<CustomerAccount>>(`${this.apiUrl}/activate-customer/${customerGuid}`, {});
     }
+
     toggleUserStatus(guid: string, isActive: boolean): Observable<ApiResponse<void>> {
         return this.http.patch<ApiResponse<void>>(
             `${this.apiUrl}/update-status/${guid}`,
             { isActive }
         );
+    }
+
+    getAllConfigurations(): Observable<ApiResponse<any[]>> {
+        return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/configuration`);
     }
 }

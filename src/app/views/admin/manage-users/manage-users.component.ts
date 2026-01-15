@@ -21,7 +21,6 @@ export class ManageUsersComponent implements OnInit {
 
   // Modal States
   showUserModal = false;
-  showDeleteConfirmModal = false;
   isEditMode = false;
   isSubmitting = false;
   isLoading = false;
@@ -289,46 +288,6 @@ export class ManageUsersComponent implements OnInit {
         error: (error) => {
           console.error('Error updating user:', error);
           this.showError(error?.error?.message || 'Failed to update user');
-        }
-      });
-  }
-
-  openDeleteConfirm(user: Account): void {
-    this.selectedUser = user;
-    this.showDeleteConfirmModal = true;
-  }
-
-  closeDeleteConfirm(): void {
-    this.showDeleteConfirmModal = false;
-    this.selectedUser = null;
-  }
-
-  confirmDelete(): void {
-    if (!this.selectedUser) return;
-
-    this.isSubmitting = true;
-
-    this.userManagementService.deleteUser(this.selectedUser.accountId)
-      .pipe(finalize(() => this.isSubmitting = false))
-      .subscribe({
-        next: (response) => {
-          if (response.success) {
-            const index = this.userList.findIndex(u => u.accountId === this.selectedUser!.accountId);
-            if (index !== -1) {
-              const userName = this.userList[index].accountName;
-              this.userList.splice(index, 1);
-              this.totalItems = this.userList.length;
-              this.applyFilters();
-              this.showSuccess(`User ${userName} deleted successfully`);
-            }
-            this.closeDeleteConfirm();
-          } else {
-            this.showError(response.message || 'Failed to delete user');
-          }
-        },
-        error: (error) => {
-          console.error('Error deleting user:', error);
-          this.showError(error?.error?.message || 'Failed to delete user');
         }
       });
   }

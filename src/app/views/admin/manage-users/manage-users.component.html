@@ -345,55 +345,6 @@
   </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-@if (showDeleteConfirmModal) {
-<div class="modal-backdrop" (click)="closeDeleteConfirm()"></div>
-}
-<div class="modal custom-modal" [class.show]="showDeleteConfirmModal" [class.d-block]="showDeleteConfirmModal"
-  tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
-    <div class="modal-content">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title">
-          <i class="cil-warning me-2"></i> Delete User
-        </h5>
-        <button type="button" class="btn-close btn-close-white" (click)="closeDeleteConfirm()"
-          aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="alert alert-danger" role="alert">
-          <i class="cil-warning me-2"></i>
-          This action cannot be undone!
-        </div>
-        <p class="mb-2">
-          Are you sure you want to delete the user <strong>{{ selectedUser?.accountName }}</strong>?
-        </p>
-        <p class="text-muted small mb-0">
-          Email: {{ selectedUser?.email }}
-        </p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeDeleteConfirm()">
-          <i class="cil-x me-2"></i> Cancel
-        </button>
-        <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="isSubmitting">
-          @if (!isSubmitting) {
-          <span>
-            <i class="cil-trash me-2"></i> Delete User
-          </span>
-          }
-          @if (isSubmitting) {
-          <span>
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            Deleting...
-          </span>
-          }
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- Toast Notifications -->
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
   <!-- Success Toast -->

@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { CustomerAccount, NewCustomerAccount, UpdateCustomerAccount } from '../../../models/customer';
 import { finalize } from 'rxjs/operators';
 import { CustomerManagementService } from '../../../services/admin/customermanagement.service';
+import { Configuration } from '../../../models/configuration';
 
 @Component({
   selector: 'app-manage-clients',
@@ -19,7 +20,6 @@ export class ManageClientsComponent implements OnInit {
 
   // Modals
   showModal = false;
-  showDeleteConfirmModal = false;
   isEditMode = false;
   isSubmitting = false;
   isLoading = false;
@@ -42,13 +42,18 @@ export class ManageClientsComponent implements OnInit {
   itemsPerPage = 10;
   totalItems = 0;
 
+  
+  clientType: Configuration[] = [];
+  clientIndustry: Configuration[] = [];
+
   constructor(private fb: FormBuilder, private customerService: CustomerManagementService) {
 
-    this.initializeForm();
   }
 
   ngOnInit(): void {
     this.loadCustomers();
+    this.loadConfigurations();
+    this.initializeForm();
   }
 
   initializeForm(): void {
@@ -62,10 +67,43 @@ export class ManageClientsComponent implements OnInit {
       contactNumber: ['', [Validators.maxLength(20)]],
       emailAddress: ['', [Validators.email, Validators.maxLength(50)]],
       taxIdentificationNumber: ['', [Validators.maxLength(90)]],
-      optionClientCategoryId: [null],
-      optionIndustryId: [null],
+      optionClientCategoryId: ['0'],
+      optionIndustryId: ['0'],
     });
   }
+
+  
+  loadConfigurations(): void {
+    this.customerService.getAllConfigurations().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.setClientType(response.data);
+          this.setClientIndustry(response.data);
+        } else {
+          console.error('API returned error:', response.message);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading configurations:', error);
+      }
+    });
+  }
+
+    setClientType(clientType: Configuration[]): void {
+      if (clientType?.length) {
+        this.clientType = clientType
+          .filter(term => term.category === 'CLIENTTYPE' && term.isActive)
+          .sort((a, b) => a.value.localeCompare(b.value));
+      }
+    }
+  
+    setClientIndustry(clientIndustry: Configuration[]): void {
+      if (clientIndustry?.length) {
+        this.clientIndustry = clientIndustry
+          .filter(term => term.category === 'INDUSTRY' && term.isActive)
+          .sort((a, b) => a.value.localeCompare(b.value));
+      }
+    }
 
   loadCustomers(): void {
     this.isLoading = true;
@@ -94,8 +132,7 @@ export class ManageClientsComponent implements OnInit {
     this.filterCustomers = this.customerList.filter(customer => {
 
       const matchSearch =
-        customer.customerName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        customer.emailAddress.toLowerCase().includes(this.searchTerm.toLowerCase());
+        customer.customerName.toLowerCase().includes(this.searchTerm.toLowerCase());
 
       const matchStatus = !this.selectedStatus ||
         (this.selectedStatus === 'active' && customer.isActive) ||
@@ -172,8 +209,8 @@ export class ManageClientsComponent implements OnInit {
       emailAddress: this.customerForm.value.email,
       contactNumber: this.customerForm.value.phone,
       taxIdentificationNumber: this.customerForm.value.taxIdentificationNumber,
-      optionClientCategoryId: this.customerForm.value.optionClientCategoryId,
-      optionIndustryId: this.customerForm.value.optionIndustryId
+      optionClientCategoryId: this.customerForm.value.optionClientCategoryId ?? 0,
+      optionIndustryId: this.customerForm.value.optionIndustryId ?? 0,
     };
 
     this.customerService.createCustomer(createRequest)
@@ -213,8 +250,8 @@ export class ManageClientsComponent implements OnInit {
       emailAddress: this.customerForm.value.email,
       contactNumber: this.customerForm.value.phone,
       taxIdentificationNumber: this.customerForm.value.taxIdentificationNumber,
-      optionClientCategoryId: this.customerForm.value.optionClientCategoryId,
-      optionIndustryId: this.customerForm.value.optionIndustryId,
+      optionClientCategoryId: this.customerForm.value.optionClientCategoryId ?? 0,
+      optionIndustryId: this.customerForm.value.optionIndustryId ?? 0,
       customerGuid: this.selectedCustomer.customerGuid,
     };
 
@@ -241,14 +278,15 @@ export class ManageClientsComponent implements OnInit {
       });
   }
 
-  toggleUserStatus(customer: CustomerAccount): void {
+  toggleClientStatus(customer: CustomerAccount): void {
     this.customerService.toggleUserStatus(customer.customerGuid, !customer.isActive)
       .subscribe({
         next: (response) => {
           if (response.success && response.data) {
+
             const index = this.customerList.findIndex(u => u.customerId === customer.customerId);
             if (index !== -1) {
-              this.customerList[index] = response.data;
+              this.customerList[index].isActive = !customer.isActive;
               this.applyFilters();
               this.showSuccess(response.message || 'Client status updated successfully');
             }
@@ -259,45 +297,6 @@ export class ManageClientsComponent implements OnInit {
         error: (error) => {
           console.error('Error toggling user status:', error);
           this.showError(error?.error?.message || 'Failed to update user status');
-        }
-      });
-  }
-
-  openDeleteConfirm(customer: CustomerAccount): void {
-    this.selectedCustomer = customer;
-    this.showDeleteConfirmModal = true;
-  }
-
-  closeDeleteConfirm(): void {
-    this.showDeleteConfirmModal = false;
-    this.selectedCustomer = null;
-  }
-
-  confirmDelete(): void {
-    if (!this.selectedCustomer) return;
-    this.isSubmitting = true;
-
-    this.customerService.deleteCustomer(this.selectedCustomer.customerGuid)
-      .pipe(finalize(() => this.isSubmitting = false))
-      .subscribe({
-        next: (response) => {
-          if (response.success) {
-            const index = this.customerList.findIndex(c => c.customerId === this.selectedCustomer!.customerId);
-            if (index !== -1) {
-              const userName = this.customerList[index].customerName;
-              this.customerList.splice(index, 1);
-              this.totalItems = this.customerList.length;
-              this.applyFilters();
-              this.showSuccess(`Customer ${userName} deleted successfully`);
-            }
-            this.closeDeleteConfirm();
-          } else {
-            this.showError(response.message || 'Failed to delete customer');
-          }
-        },
-        error: (error) => {
-          console.error('Error deleting customer:', error);
-          this.showError(error?.error?.message || 'Failed to delete customer');
         }
       });
   }
