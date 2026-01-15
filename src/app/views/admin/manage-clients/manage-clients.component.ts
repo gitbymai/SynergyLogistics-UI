@@ -4,13 +4,12 @@ import { CommonModule } from '@angular/common';
 import { CustomerAccount, NewCustomerAccount, UpdateCustomerAccount } from '../../../models/customer';
 import { finalize } from 'rxjs/operators';
 import { CustomerManagementService } from '../../../services/admin/customermanagement.service';
-import { initial } from 'lodash-es';
 
 @Component({
   selector: 'app-manage-clients',
-  imports: [],
   templateUrl: './manage-clients.component.html',
   styleUrl: './manage-clients.component.scss',
+  imports: [CommonModule, ReactiveFormsModule]
 })
 export class ManageClientsComponent implements OnInit {
 
