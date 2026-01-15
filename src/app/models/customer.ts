@@ -19,6 +19,23 @@ export interface CustomerAccount {
   modifiedDate: Date;
 }
 
+export interface NewCustomerAccount {
+  customerName: string;
+  mainAddress: string;
+  city: string;
+  state: string;
+  contactPerson: string;
+  contactNumber: string;
+  emailAddress: string;
+  taxIdentificationNumber: string;
+  optionClientCategoryId: number;
+  optionIndustryId: number;
+}
+
+export interface UpdateCustomerAccount extends NewCustomerAccount {
+  customerGuid: string;
+}
+
 // Helper function to convert API response to model
 export function toCustomerAccount(data: any): CustomerAccount {
   return {

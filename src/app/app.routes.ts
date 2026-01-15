@@ -58,35 +58,62 @@ export const routes: Routes = [
               roles: ['admin']
             },
             canActivate: [AuthGuard]
+          },
+          {
+            path: 'clients',
+            loadComponent: () =>
+              import('./views/admin/manage-clients/manage-clients.component').then(
+                m => m.ManageClientsComponent
+              ),
+            data: {
+              title: 'Manage Clients',
+              roles: ['admin']
+            },
+            canActivate: [AuthGuard]
           }
         ]
       },
       {
-        path: 'cash-advance-requests',
+        path: 'financial',
         canActivate: [AuthGuard],
-        loadComponent: () => import('./views/cashadvancerequest/lists/lists.component').then(m => m.ListsComponent),
         data: {
-          title: 'Cash Advance Requests',
-          roles: ['admin', 'cashier', 'finance', 'treasurer']
+          title: 'Financial',
+          roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales']
         },
-      },
-      {
-        path: 'credit-management-list',
-        canActivate: [AuthGuard],
-        loadComponent: () => import('./views/credit-management/credit-lists/credit-lists.component').then(m => m.CreditListsComponent),
-        data: {
-          title: 'Credit Management',
-          roles: ['admin', 'cashier', 'finance', 'treasurer']
-        },
-      },
-      {
-        path: 'credit-transaction-list',
-        canActivate: [AuthGuard],
-        loadComponent: () => import('./views/credit-management/credit-transaction-lists/credit-transaction-lists.component').then(m => m.CreditTransactionListsComponent),
-        data: {
-          title: 'Credit Transaction',
-          roles: ['admin', 'cashier', 'finance', 'treasurer']
-        },
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./views/financials/chargelist/chargelist.component').then(m => m.ChargelistComponent),
+          },
+          {
+            path: 'cash-advance-requests',
+            canActivate: [AuthGuard],
+            loadComponent: () => import('./views/cashadvancerequest/lists/lists.component').then(m => m.ListsComponent),
+            data: {
+              title: 'Cash Advance Requests',
+              roles: ['admin', 'cashier', 'finance', 'treasurer']
+            },
+          },
+          {
+            path: 'credit-management-list',
+            canActivate: [AuthGuard],
+            loadComponent: () => import('./views/credit-management/credit-lists/credit-lists.component').then(m => m.CreditListsComponent),
+            data: {
+              title: 'Credit Management',
+              roles: ['admin', 'cashier', 'finance', 'treasurer']
+            },
+          },
+          {
+            path: 'credit-management-list/credit-transaction-list',
+            canActivate: [AuthGuard],
+            loadComponent: () => import('./views/credit-management/credit-transaction-lists/credit-transaction-lists.component').then(m => m.CreditTransactionListsComponent),
+            data: {
+              title: 'Credit Transaction',
+              roles: ['admin', 'cashier', 'finance', 'treasurer']
+            },
+          },
+        ]
       },
       {
         path: 'jobs',
@@ -133,7 +160,7 @@ export const routes: Routes = [
               ),
             data: {
               title: 'Job Management',
-              roles: ['sales', 'admin','finance', 'treasurer']
+              roles: ['sales', 'admin', 'finance', 'treasurer']
             },
             canActivate: [AuthGuard]
           },

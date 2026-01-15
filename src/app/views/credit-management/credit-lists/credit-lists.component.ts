@@ -256,7 +256,7 @@ export class CreditListsComponent implements OnInit {
   }
 
   viewTransactions(resource: Resource): void {
-    this.router.navigate(['/credit-transaction-list'], {
+    this.router.navigate(['/financial/credit-management-list/credit-transaction-list'], {
       queryParams: { resourceId: resource.resourceId, guid: resource.resourceGuid }
     });
   }

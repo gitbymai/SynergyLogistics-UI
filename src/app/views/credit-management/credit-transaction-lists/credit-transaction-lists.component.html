@@ -30,7 +30,7 @@
                 </div>
             </div>
             <div class="col-md-3 mb-3">
-                <div class="credit-summary-card used">
+                <div class="credit-summary-card remaining">
                     <div class="card-icon">
                         <i class="cil-arrow-top"></i>
                     </div>
@@ -41,7 +41,7 @@
                 </div>
             </div>
             <div class="col-md-3 mb-3">
-                <div class="credit-summary-card remaining">
+                <div class="credit-summary-card used">
                     <div class="card-icon">
                         <i class="cil-arrow-bottom"></i>
                     </div>
@@ -104,7 +104,7 @@
                                     <i class="cil-arrow-top"></i>
                                 </span>
                                 }
-                                <span>{{ getTransactionTypeById(transaction.optionResourceTransactionTypeId)?.value
+                                <span>{{ transaction.resourceTransactionTypeName
                                     }}</span>
                             </div>
                         </td>

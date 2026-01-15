@@ -88,7 +88,7 @@ export class CreditTransactionListsComponent implements OnInit {
   initializeForm(): void {
     this.transactionForm = this.fb.group({
       optionResourceTransactionTypeId: ['', [Validators.required]],
-      amount: ['', [Validators.required, Validators.min(0.01), Validators.max(9999999999999999.99)]],
+      amount: ['', [Validators.required, Validators.min(-9999999999999999.99), Validators.max(9999999999999999.99)]],
       referenceNumber: ['', [Validators.maxLength(50)]],
       notes: ['', [Validators.maxLength(1000)]],
       isActive: [true]
@@ -99,7 +99,7 @@ export class CreditTransactionListsComponent implements OnInit {
     this.transactionService.getResourceTransactionTypes().subscribe({
       next: (response) => {
         if (response.success && response.data) {
-          this.transactionTypes = response.data;
+          this.transactionTypes = response.data.filter(x=> x.isActive === true)
         } else {
           this.showError(response.message || 'Failed to load transaction types');
         }
@@ -229,7 +229,7 @@ getTransactionTypeById(id: number): Configuration | undefined {
   }
 
   goBack(): void {
-    this.router.navigate(['/credit-management-list']);
+    this.router.navigate(['/financial/credit-management-list']);
   }
 
 isDebitTransaction(transactionTypeId: number): boolean {
