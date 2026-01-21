@@ -47,6 +47,12 @@ export const navItems = [
         iconComponent: { name: 'cil-description' },
         roles: ['admin', 'finance', 'treasurer']
       },
+      {
+        name: 'ICTSI Management',
+        url: '/financial/ictsi-management-list',
+        iconComponent: { name: 'cil-description' },
+        roles: ['admin', 'opsstaff', 'treasurer']
+      },
     ]
   },
 

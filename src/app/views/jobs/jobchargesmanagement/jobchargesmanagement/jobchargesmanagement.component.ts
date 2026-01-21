@@ -199,6 +199,8 @@ export class JobchargesmanagementComponent implements OnInit {
       amount: charge.amount,
       amountSelling: charge.amountSelling || 0,
       jobId: charge.jobId,
+      currency: charge.currencyCode,
+      conversionRate: charge.conversionRate,
       isForProcessing: charge.isForProcessing || false,
     });
 
@@ -309,7 +311,7 @@ export class JobchargesmanagementComponent implements OnInit {
       amountSelling: this.chargeFormGroup.value.amountSelling,
       isForProcessing: this.chargeFormGroup.value.isForProcessing,
       currencyCode: this.chargeFormGroup.value.currency,
-      currencyRate: this.chargeFormGroup.value.conversionRate,
+      conversionRate: this.chargeFormGroup.value.conversionRate,
       jobId: this.jobId,
     };
 
@@ -344,7 +346,7 @@ export class JobchargesmanagementComponent implements OnInit {
       isForProcessing: this.selectedCharge.isForProcessing || false,
       jobId: this.selectedCharge.jobId,
       currencyCode: this.chargeFormGroup.value.currency,
-      currencyRate: this.chargeFormGroup.value.conversionRate
+      conversionRate: this.chargeFormGroup.value.conversionRate
     };
 
     this.chargeService.updateCharge(this.selectedCharge.chargeGuid, updateRequest)

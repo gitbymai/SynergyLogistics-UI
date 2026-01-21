@@ -554,3 +554,26 @@
   scrollbar-width: thin;
   scrollbar-color: #90caf9 #f1f1f1;
 }
+
+.col-print-6 {
+  width: 50%;
+  display: inline-block;
+  vertical-align: top;
+  padding: 4px 8px;
+}
+
+.field-row {
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+
+.field-row label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 2px;
+  color: #666;
+}
+
+.field-row div {
+  color: #000;
+}

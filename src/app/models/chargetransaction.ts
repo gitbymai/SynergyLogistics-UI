@@ -7,7 +7,7 @@ export interface CreateChargeTransactionRequest {
   jobId: number;
   isForProcessing?: boolean | false;
   currencyCode: string;
-  currencyRate: number;
+  conversionRate: number;
 }
 
 export interface UpdateChargeTransactionRequest extends CreateChargeTransactionRequest {

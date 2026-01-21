@@ -248,6 +248,8 @@ export class JobChargesComponent implements OnInit, OnChanges {
       jobId: 0,
       optionChargeStatusId: 0,
       isForProcessing: false,
+      currency: 'PHP',
+      conversionRate: 1
     });
     this.showModal = true;
   }
@@ -279,7 +281,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
       isForProcessing: true,
       jobId: this.job!.jobId,
       currencyCode: this.chargeFormGroup.value.currency,
-      currencyRate: this.chargeFormGroup.value.conversionRate
+      conversionRate: this.chargeFormGroup.value.conversionRate
     };
 
     if (this.job?.jobId === undefined || this.job?.jobId === null) {

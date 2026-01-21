@@ -2,10 +2,10 @@
   <div class="card-header bg-primary text-white">
     <div class="d-flex justify-content-between align-items-center">
       <h4 class="mb-0">
-        <i class="cil-wallet me-2"></i> Credit Management
+        <i class="cil-wallet me-2"></i> ICTSI Budget Management
       </h4>
-      <button class="btn btn-light btn-sm" type="button" (click)="openNewResourceModal()">
-        <i class="cil-plus me-2"></i> Add Credits
+      <button class="btn btn-light btn-sm" type="button" (click)="openNewIctsiModal()">
+        <i class="cil-plus me-2"></i> Add Record
       </button>
     </div>
   </div>
@@ -19,7 +19,7 @@
             <i class="cil-layers"></i>
           </div>
           <div class="card-content">
-            <div class="card-label">Added Credits</div>
+            <div class="card-label">Added Budget</div>
             <div class="card-value">{{ getTotalCredits() | number:'1.0-0' }}</div>
           </div>
         </div>
@@ -30,7 +30,7 @@
             <i class="cil-battery-3"></i>
           </div>
           <div class="card-content">
-            <div class="card-label">Remaining Credits</div>
+            <div class="card-label">Remaining Budget</div>
             <div class="card-value">{{ getRemainingCredits() | number:'1.0-0' }}</div>
           </div>
         </div>
@@ -41,20 +41,19 @@
             <i class="cil-chart-line"></i>
           </div>
           <div class="card-content">
-            <div class="card-label">Used Credits</div>
+            <div class="card-label">Used Budget</div>
             <div class="card-value">{{ getUsedCredits() | number:'1.0-0' }}</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Resources Table -->
     <div class="table-responsive">
       <table class="table table-hover table-custom">
         <thead>
           <tr>
             <th>
-              <i class="cil-tag me-2"></i> Resource Name
+              <i class="cil-tag me-2"></i> Record Name
             </th>
             <th class="text-center">
               <i class="cil-layers me-2"></i> Total Added Amount
@@ -77,33 +76,33 @@
           </tr>
         </thead>
         <tbody>
-          @if(getPagedResources().length > 0) {
-          @for(resource of getPagedResources(); track resource.resourceId) {
-          <tr [class.inactive-row]="!resource.isActive">
+          @if(getPagedIctsi().length > 0) {
+          @for(ictsi of getPagedIctsi(); track ictsi.ictsiId) {
+          <tr [class.inactive-row]="!ictsi.isActive">
             <td>
               <div class="text-center">
-                <strong>{{ resource.resourceName }}</strong>
+                <strong>{{ ictsi.ictsiName }}</strong>
               </div>
             </td>
             <td class="text-center">
-              {{ resource.addedAmount | number:'1.2-2' }}
+              {{ ictsi.addedAmount | number:'1.2-2' }}
             </td>
             <td class="text-center">
-              {{ resource.currentAmount | number:'1.2-2' }}
+              {{ ictsi.currentAmount | number:'1.2-2' }}
             </td>
             <td class="text-center">
-              {{ (resource.addedAmount - resource.currentAmount) | number:'1.2-2' }}
+              {{ (ictsi.addedAmount - ictsi.currentAmount) | number:'1.2-2' }}
             </td>
             <td class="text-center">
-              @if(resource.createdDate) {
-              {{ resource.createdDate | date: 'MM/dd/yy h:mm a' }}
+              @if(ictsi.createdDate) {
+              {{ ictsi.createdDate | date: 'MM/dd/yy h:mm a' }}
               } @else {
               <span class="text-muted">-</span>
               }
             </td>
             <td>
               <div class="status-badge-wrapper text-center">
-                @if(resource.isActive) {
+                @if(ictsi.isActive) {
                 <span class="badge bg-success">
                   <i class="cil-check-circle me-1"></i> Active
                 </span>
@@ -116,15 +115,9 @@
             </td>
             <td>
               <div class="action-buttons status-badge-wrapper">
-                 <button class="btn btn-sm btn-primary-outline" title="Edit Resource" (click)="viewTransactions(resource)">
+                 <button class="btn btn-sm btn-primary-outline" title="Edit Record" (click)="viewTransactions(ictsi)">
                   <i class="cil-list"></i> Manage
                 </button>
-                <!-- <button class="btn btn-sm btn-primary-outline" title="Edit Resource" (click)="editResource(resource)">
-                  <i class="cil-pencil"></i>
-                </button> -->
-                <!-- <button class="btn btn-sm btn-danger-outline" title="Delete Resource" (click)="openDeleteConfirm(resource)">
-                  <i class="cil-trash"></i>
-                </button> -->
               </div>
             </td>
           </tr>
@@ -133,7 +126,7 @@
           <tr>
             <td colspan="7" class="text-center text-muted py-4">
               <i class="cil-search me-2" style="font-size: 2rem;"></i>
-              <div class="mt-2">No resources found</div>
+              <div class="mt-2">No records found</div>
             </td>
           </tr>
           }
@@ -166,34 +159,34 @@
   </div>
 </div>
 <!-- Add/Edit Credit Modal -->
-@if (showResourceModal) {
-<div class="modal-backdrop" (click)="closeResourceModal()"></div>
+@if (showIctsiModal) {
+<div class="modal-backdrop" (click)="closeIctsiModal()"></div>
 }
-<div class="modal custom-modal" [class.show]="showResourceModal" [class.d-block]="showResourceModal" tabindex="-1" role="dialog">
+<div class="modal custom-modal" [class.show]="showIctsiModal" [class.d-block]="showIctsiModal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
       <div class="modal-header bg-primary text-white">
         <h5 class="modal-title">
           @if(isEditMode) {
-            <i class="cil-pencil me-2"></i> Edit Resource
+            <i class="cil-pencil me-2"></i> Edit Record
           } @else {
-            <i class="cil-plus me-2"></i> Add New Resource
+            <i class="cil-plus me-2"></i> Add New Record
           }
         </h5>
-        <button type="button" class="btn-close btn-close-white" (click)="closeResourceModal()" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white" (click)="closeIctsiModal()" aria-label="Close"></button>
       </div>
 
       <div class="modal-body">
-        <form [formGroup]="resourceForm" class="form-professional">
+        <form [formGroup]="ictsiForm" class="form-professional">
           <div class="row mb-3">
             <div class="col-md-12">
               <label class="form-label">
-                <i class="cil-tag me-1"></i> Resource Name
+                <i class="cil-tag me-1"></i> Record Name
               </label>
-              <input type="text" class="form-control form-control-custom" formControlName="resourceName"
+              <input type="text" class="form-control form-control-custom" formControlName="ictsiName"
                 placeholder="e.g., Starter Pack, Premium Bundle" maxlength="100" />
-              @if (resourceForm.get('resourceName')?.invalid && resourceForm.get('resourceName')?.touched) {
-                <div class="text-danger small mt-1">Resource name is required (max 100 characters)</div>
+              @if (ictsiForm.get('ictsiName')?.invalid && ictsiForm.get('ictsiName')?.touched) {
+                <div class="text-danger small mt-1">Record name is required (max 100 characters)</div>
               }
             </div>
           </div>
@@ -204,7 +197,7 @@
               </label>
               <input type="number" class="form-control form-control-custom" formControlName="addedAmount"
                 placeholder="e.g., 1000.00" min="0" step="0.01" [readonly]="isEditMode" />
-              @if (resourceForm.get('addedAmount')?.invalid && resourceForm.get('addedAmount')?.touched) {
+              @if (ictsiForm.get('addedAmount')?.invalid && ictsiForm.get('addedAmount')?.touched) {
                 <div class="text-danger small mt-1">Initial amount is required (0 - 9999999999999999.99)</div>
               }
               @if(isEditMode) {
@@ -220,7 +213,7 @@
               </label>
               <input type="number" class="form-control form-control-custom" formControlName="currentAmount"
                 placeholder="e.g., 750.00" min="0" step="0.01" />
-              @if (resourceForm.get('currentAmount')?.invalid && resourceForm.get('currentAmount')?.touched) {
+              @if (ictsiForm.get('currentAmount')?.invalid && ictsiForm.get('currentAmount')?.touched) {
                 <div class="text-danger small mt-1">Current amount is required (0 - 9999999999999999.99)</div>
               }
             </div>
@@ -245,14 +238,14 @@
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeResourceModal()">
+        <button type="button" class="btn btn-secondary" (click)="closeIctsiModal()">
           <i class="cil-x me-2"></i> Cancel
         </button>
-        <button type="button" class="btn btn-primary" (click)="submitResourceForm()"
-          [disabled]="!resourceForm.valid || isSubmitting">
+        <button type="button" class="btn btn-primary" (click)="submitForm()"
+          [disabled]="!ictsiForm.valid || isSubmitting">
           @if (!isSubmitting) {
             <span>
-              <i class="cil-check me-2"></i> {{ isEditMode ? 'Update Resource' : 'Create Resource' }}
+              <i class="cil-check me-2"></i> {{ isEditMode ? 'Update Record' : 'Create Record' }}
             </span>
           }
           @if (isSubmitting) {
@@ -277,7 +270,7 @@
     <div class="modal-content">
       <div class="modal-header bg-danger text-white">
         <h5 class="modal-title">
-          <i class="cil-warning me-2"></i> Delete Resource
+          <i class="cil-warning me-2"></i> Delete Record
         </h5>
         <button type="button" class="btn-close btn-close-white" (click)="closeDeleteConfirm()"
           aria-label="Close"></button>
@@ -288,7 +281,7 @@
           This action cannot be undone!
         </div>
         <p class="mb-2">
-          Are you sure you want to delete the resource <strong>{{ selectedResource?.resourceName }}</strong>?
+          Are you sure you want to delete the record <strong>{{ selectedIctsi?.ictsiName }}</strong>?
         </p>
       </div>
       <div class="modal-footer">
@@ -298,7 +291,7 @@
         <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="isSubmitting">
           @if (!isSubmitting) {
           <span>
-            <i class="cil-trash me-2"></i> Delete Resource
+            <i class="cil-trash me-2"></i> Delete Record
           </span>
           }
           @if (isSubmitting) {

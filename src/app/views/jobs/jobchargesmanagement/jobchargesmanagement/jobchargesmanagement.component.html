@@ -77,7 +77,7 @@
             </td>
             <td>
               <span class="code-text">
-                {{ (charge.modifiedDate || charge.createdDate) | date:'MMM dd, yyyy h:mm:ss a' }}
+                {{ (charge.modifiedDate || charge.createdDate) | date:'MM/dd/yy h:mm a' }}
               </span>
             </td>
             <td>
@@ -712,20 +712,20 @@
                     <div class="mb-2">
                       <strong class="text-muted d-block">Created By:</strong>
                       {{ selectedCharge?.createdByName || 'N/A' }}<br>
-                      <small class="text-muted">{{ selectedCharge?.createdDate | date:'MMM dd, yyyy h:mm a' }}</small>
+                      <small class="text-muted">{{ selectedCharge?.createdDate | date:'MM/dd/yy h:mm a' }}</small>
                     </div>
                     @if (selectedCharge?.modifiedBy) {
                     <div class="mb-2">
                       <strong class="text-muted d-block">Modified By:</strong>
                       {{ selectedCharge?.modifiedByName || 'N/A' }}<br>
-                      <small class="text-muted">{{ selectedCharge?.modifiedDate | date:'MMM dd, yyyy h:mm a' }}</small>
+                      <small class="text-muted">{{ selectedCharge?.modifiedDate | date:'MM/dd/yy h:mm a' }}</small>
                     </div>
                     }
                     @if (selectedCharge?.completedBy) {
                     <div class="mb-2">
                       <strong class="text-muted d-block">Completed By:</strong>
                       {{ selectedCharge?.completedByName || 'N/A' }}<br>
-                      <small class="text-muted">{{ selectedCharge?.completedDate | date:'MMM dd, yyyy h:mm a'
+                      <small class="text-muted">{{ selectedCharge?.completedDate | date:'MM/dd/yy h:mm a'
                         }}</small>
                     </div>
                     }
@@ -733,14 +733,14 @@
                     <div class="mb-2">
                       <strong class="text-muted d-block">Closed By:</strong>
                       {{ selectedCharge?.closedByName || 'N/A' }}<br>
-                      <small class="text-muted">{{ selectedCharge?.closeDate | date:'MMM dd, yyyy h:mm a' }}</small>
+                      <small class="text-muted">{{ selectedCharge?.closeDate | date:'MM/dd/yy h:mm a' }}</small>
                     </div>
                     }
                     @if (selectedCharge?.cancelledBy) {
                     <div>
                       <strong class="text-muted d-block">Cancelled By:</strong>
                       {{ selectedCharge?.cancelledByName || 'N/A' }}<br>
-                      <small class="text-muted">{{ selectedCharge?.cancelledDate | date:'MMM dd, yyyy h:mm a'
+                      <small class="text-muted">{{ selectedCharge?.cancelledDate | date:'MM/dd/yy h:mm a'
                         }}</small>
                     </div>
                     }
@@ -765,7 +765,7 @@
                     <div class="col-md-3">
                       <div class="d-flex align-items-center mb-2">
                         <i class="bi bi-clock text-muted me-2"></i>
-                        <small class="text-muted">{{ log.createDate | date:'MMM dd, yyyy h:mm a' }}</small>
+                        <small class="text-muted">{{ log.createDate | date:'MM/dd/yy h:mm a' }}</small>
                       </div>
                       <span class="badge bg-secondary">{{ log.actionType }}</span>
                     </div>

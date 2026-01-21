@@ -79,7 +79,7 @@
             PHP {{ charge.calculatedSellingAmount | number:'1.2-2' }}
           </td>
           }
-          <td>{{ (charge.modifiedDate || charge.createdDate) | date:'MMM dd, yyyy h:mm:ss a' }}</td>
+          <td>{{ (charge.modifiedDate || charge.createdDate) | date:'MM/dd/yy h:mm a' }}</td>
           <td> {{ charge.modifiedByName || charge.createdByName }}</td>
           @if(!viewSummary){
 
@@ -738,7 +738,7 @@
                       </span>
                       <small class="text-muted d-block mt-1">
                         <i class="bi bi-clock me-1"></i>
-                        {{ log.createDate | date:'MMM dd, yyyy h:mm a' }}
+                        {{ log.createDate | date:'MM/dd/yy h:mm a' }}
                       </small>
                     </div>
                     <div class="text-end">

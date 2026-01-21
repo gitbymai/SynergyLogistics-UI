@@ -55,7 +55,6 @@ export class ResourceService extends ApiService {
     return this.http.post<ApiResponse<ResourceTransaction>>(`${this.apiUrl}/resource/transactions`, newResourceTransactionDto);
   }
 
-
   getResourceTransactionTypes(): Observable<ApiResponse<Configuration[]>> {
     return this.http.get<ApiResponse<Configuration[]>>(`${this.apiUrl}/configuration/resource-transaction-type`);
   }

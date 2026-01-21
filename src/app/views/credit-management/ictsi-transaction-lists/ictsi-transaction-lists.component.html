@@ -2,7 +2,7 @@
     <div class="card-header bg-primary text-white">
         <div class="d-flex justify-content-between align-items-center">
             <h4 class="mb-0">
-                <i class="cil-list me-2"></i> Credit Transactions - {{ resourceName }}
+                <i class="cil-list me-2"></i> Credit Transactions - {{ ictsiName }}
             </h4>
             <div class="d-flex gap-2">
                 <button class="btn btn-light btn-sm" type="button" (click)="goBack()">
@@ -91,11 +91,11 @@
                 </thead>
                 <tbody>
                     @if(getPagedTransactions().length > 0) {
-                    @for(transaction of getPagedTransactions(); track transaction.transactionId) {
+                    @for(transaction of getPagedTransactions(); track transaction.ictsiTransactionId) {
                     <tr [class.inactive-row]="!transaction.isActive">
                         <td>
                             <div class="d-flex align-items-center">
-                                @if(isDebitTransaction(transaction.optionResourceTransactionTypeId)) {
+                                @if(isDebitTransaction(transaction.optionIctsiTransactionTypeId)) {
                                 <span class="badge bg-danger me-2">
                                     <i class="cil-arrow-bottom"></i>
                                 </span>
@@ -104,12 +104,12 @@
                                     <i class="cil-arrow-top"></i>
                                 </span>
                                 }
-                                <span>{{ transaction.resourceTransactionTypeName
+                                <span>{{ transaction.ictsiTransactionTypeName
                                     }}</span>
                             </div>
                         </td>
                         <td class="text-center">
-                            @if(isDebitTransaction(transaction.optionResourceTransactionTypeId)) {
+                            @if(isDebitTransaction(transaction.optionIctsiTransactionTypeId)) {
                             <span class="text-danger fw-bold">-{{ transaction.amount | number:'1.2-2' }}</span>
                             } @else {
                             <span class="text-success fw-bold">+{{ transaction.amount | number:'1.2-2' }}</span>
@@ -208,14 +208,14 @@
                                 <i class="cil-layers me-1"></i> Transaction Type <span class="text-danger">*</span>
                             </label>
                             <select class="form-select form-control-custom"
-                                formControlName="optionResourceTransactionTypeId">
+                                formControlName="optionIctsiTransactionTypeId">
                                 <option value="">Select Transaction Type</option>
                                 @for(type of transactionTypes; track type.optionId) {
                                 <option [value]="type.optionId">{{ type.value }}</option>
                                 }
                             </select>
-                            @if (transactionForm.get('optionResourceTransactionTypeId')?.invalid &&
-                            transactionForm.get('optionResourceTransactionTypeId')?.touched) {
+                            @if (transactionForm.get('optionIctsiTransactionTypeId')?.invalid &&
+                            transactionForm.get('optionIctsiTransactionTypeId')?.touched) {
                             <div class="text-danger small mt-1">Transaction type is required</div>
                             }
                         </div>
@@ -306,7 +306,7 @@
                 @if(selectedTransaction) {
                 <!-- Amount -->
                 <div class="text-center mb-4">
-                    @if(isDebitTransaction(selectedTransaction.optionResourceTransactionTypeId)) {
+                    @if(isDebitTransaction(selectedTransaction.optionIctsiTransactionTypeId)) {
                     <div class="display-6 text-danger fw-bold">-{{ selectedTransaction.amount | number:'1.2-2' }}</div>
                     } @else {
                     <div class="display-6 text-success fw-bold">+{{ selectedTransaction.amount | number:'1.2-2' }}</div>

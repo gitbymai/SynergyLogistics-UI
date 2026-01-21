@@ -78,7 +78,7 @@ export const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
           title: 'Financial',
-          roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales']
+          roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales', 'opsstaff']
         },
         children: [
           {
@@ -111,6 +111,24 @@ export const routes: Routes = [
             data: {
               title: 'Credit Transaction',
               roles: ['admin', 'cashier', 'finance', 'treasurer']
+            },
+          },
+          {
+            path: 'ictsi-management-list',
+            canActivate: [AuthGuard],
+            loadComponent: () => import('./views/credit-management/ictsi-lists/ictsi-lists.component').then(m => m.IctsiListsComponent),
+            data: {
+              title: 'ICTSI Management',
+              roles: ['admin', 'opsstaff', 'treasurer']
+            },
+          },
+          {
+            path: 'ictsi-management-list/ictsi-transaction-list',
+            canActivate: [AuthGuard],
+            loadComponent: () => import('./views/credit-management/ictsi-transaction-lists/ictsi-transaction-lists.component').then(m=> m.IctsiTransactionListsComponent),
+            data: {
+              title: 'ICTSI Transaction',
+              roles: ['admin', 'opsstaff', 'treasurer']
             },
           },
         ]

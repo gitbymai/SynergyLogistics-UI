@@ -48,7 +48,7 @@ export class CreditListsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadResources();
+    this.loadRecords();
   }
 
   initializeForm(): void {
@@ -61,7 +61,7 @@ export class CreditListsComponent implements OnInit {
     });
   }
 
-  loadResources(): void {
+  loadRecords(): void {
     this.isLoading = true;
 
     this.resourceService.getAllResources().subscribe({
@@ -148,22 +148,21 @@ export class CreditListsComponent implements OnInit {
       .subscribe({
         next: (response) => {
           if (response.success && response.data) {
-            console.log('Created Resource:', response.data);
             this.resourcesList.push(response.data);
             this.totalItems = this.resourcesList.length;
           this.filteredResources = [...this.resourcesList];
           this.totalItems = this.resourcesList.length;
 
-            this.showSuccess(`Resource ${response.data.resourceName} created successfully`);
+            this.showSuccess(`Record ${response.data.resourceName} created successfully`);
 
             this.closeResourceModal();
           } else {
-            this.showError(response.message || 'Failed to create resource');
+            this.showError(response.message || 'Failed to create record');
           }
         },
         error: (error) => {
-          console.error('Error creating resource:', error);
-          this.showError(error?.error?.message || 'Failed to create resource');
+          console.error('Error creating record:', error);
+          this.showError(error?.error?.message || 'Failed to create record');
         }
       });
   }
@@ -199,7 +198,6 @@ export class CreditListsComponent implements OnInit {
           this.showError(error?.error?.message || 'Failed to update resource');
         }
       });
-
   }
 
   deleteResource(resource: Resource): void {
@@ -220,31 +218,6 @@ export class CreditListsComponent implements OnInit {
     if (!this.selectedResource) return;
 
     this.isSubmitting = true;
-
-    // TODO: Replace with actual API call
-    // this.resourceService.deleteResource(this.selectedResource.resourceId)
-    //   .pipe(finalize(() => this.isSubmitting = false))
-    //   .subscribe({
-    //     next: (response) => {
-    //       if (response.success) {
-    //         const index = this.resourcesList.findIndex(r => r.resourceId === this.selectedResource!.resourceId);
-    //         if (index !== -1) {
-    //           const resourceName = this.resourcesList[index].resourceName;
-    //           this.resourcesList.splice(index, 1);
-    //           this.totalItems = this.resourcesList.length;
-    //           this.applyFilters();
-    //           this.showSuccess(`Resource ${resourceName} deleted successfully`);
-    //         }
-    //         this.closeDeleteConfirm();
-    //       } else {
-    //         this.showError(response.message || 'Failed to delete resource');
-    //       }
-    //     },
-    //     error: (error) => {
-    //       console.error('Error deleting resource:', error);
-    //       this.showError(error?.error?.message || 'Failed to delete resource');
-    //     }
-    //   });
 
     // Mock implementation
     setTimeout(() => {

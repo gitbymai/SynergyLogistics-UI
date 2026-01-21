@@ -42,7 +42,7 @@ export class JobmanagementComponent implements OnInit {
   isSubmitting = false;
   selectedJob: Job | null = null;
   openSection: string = 'jobInfo';
-  
+
   showDisapproveConfirmModal = false;
 
   // Toast Notifications
@@ -88,8 +88,6 @@ export class JobmanagementComponent implements OnInit {
       next: (success) => {
         this.jobGuid = jobGuid;
         this.charges = success.data;
-
-        console.log('Loaded charges:', this.charges);
       },
       error: (error) => {
 
@@ -193,101 +191,469 @@ export class JobmanagementComponent implements OnInit {
       return;
     }
 
-    this.http.get('assets/print-templates/job-details.html', { responseType: 'text' })
-      .subscribe({
-        next: (template) => {
-          const job = this.job!;
+    const job = this.job!;
 
-          // Generate dynamic freight HTML based on transaction type
-          let freightHtml = '';
-          if (this.isSeaFreight()) {
-            freightHtml = `
-              <div class="col-print field-row"><label>MBL Reference</label><div>${job.mbl || '-'}</div></div>
-              <div class="col-print field-row"><label>HBL Reference</label><div>${job.hbl || '-'}</div></div>
-              <div class="col-print field-row"><label>Vessel</label><div>${job.vessel || '-'}</div></div>
-              <div class="col-print field-row"><label>Container Type</label><div>${job.containerType || '-'}</div></div>
-              <div class="col-print field-row"><label>Container Count</label><div>${job.containerCount || '-'}</div></div>
-              <div class="col-print field-row"><label>Gross Weight</label><div>${job.grossWeight ? job.grossWeight + ' kg' : '-'}</div></div>
-              <div class="col-print field-row"><label>Volume (CBM)</label><div>${job.volume ? job.volume + ' m³' : '-'}</div></div>
-              <div class="col-print field-row"><label>Shipper</label><div>${job.shipper || '-'}</div></div>
-              <div class="col-print field-row"><label>Consignee</label><div>${job.consignee || '-'}</div></div>
-            `;
-          } else if (this.isAirFreight()) {
-            freightHtml = `
-              <div class="col-print field-row"><label>MAWB Reference</label><div>${job.mawb || '-'}</div></div>
-              <div class="col-print field-row"><label>HAWB Reference</label><div>${job.hawb || '-'}</div></div>
-              <div class="col-print field-row"><label>Flight No.</label><div>${job.flightNo || '-'}</div></div>
-              <div class="col-print field-row"><label>Chargeable Weight</label><div>${job.chargeableWeight ? job.chargeableWeight + ' kg' : '-'}</div></div>
-              <div class="col-print field-row"><label>Shipper</label><div>${job.shipper || '-'}</div></div>
-              <div class="col-print field-row"><label>Consignee</label><div>${job.consignee || '-'}</div></div>
-            `;
-          }
+    // Generate dynamic freight HTML based on transaction type
+    let freightHtml = '';
+    let freightClass = '';
 
-          // Format dates
-          const formatDate = (dateString: string | null | undefined): string => {
-            if (!dateString) return '-';
-            return new Date(dateString).toLocaleDateString('en-PH', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric'
-            });
-          };
+    if (this.isSeaFreight()) {
+      freightClass = 'sea';
+      freightHtml = `
+      <div class="col-4">
+        <div class="field-row"><label>MBL Reference</label><div class="value">${job.mbl || '-'}</div></div>
+      </div>
+      <div class="col-4">
+        <div class="field-row"><label>HBL Reference</label><div class="value">${job.hbl || '-'}</div></div>
+      </div>
+      <div class="col-4">
+        <div class="field-row"><label>Vessel</label><div class="value">${job.vessel || '-'}</div></div>
+      </div>
+      <div class="col-4">
+        <div class="field-row"><label>Container Type</label><div class="value">${job.containerType || '-'}</div></div>
+      </div>
+      <div class="col-4">
+        <div class="field-row"><label>Container Count</label><div class="value">${job.containerCount || '-'}</div></div>
+      </div>
+      <div class="col-4">
+        <div class="field-row"><label>Shipper</label><div class="value">${job.shipper || '-'}</div></div>
+      </div>
+      <div class="col-4">
+        <div class="field-row"><label>Consignee</label><div class="value">${job.consignee || '-'}</div></div>
+      </div>
+    `;
+    } else if (this.isAirFreight()) {
+      freightClass = 'air';
+      freightHtml = `
+      <div class="col-4">
+        <div class="field-row"><label>MAWB Reference</label><div class="value">${job.mawb || '-'}</div></div>
+      </div>
+      <div class="col-4">
+        <div class="field-row"><label>HAWB Reference</label><div class="value">${job.hawb || '-'}</div></div>
+      </div>
+      <div class="col-4">
+        <div class="field-row"><label>Flight No.</label><div class="value">${job.flightNo || '-'}</div></div>
+      </div>
+      <div class="col-4">
+        <div class="field-row"><label>Chargeable Weight</label><div class="value">${job.chargeableWeight ? job.chargeableWeight + ' kg' : '-'}</div></div>
+      </div>
+      <div class="col-4">
+        <div class="field-row"><label>Shipper</label><div class="value">${job.shipper || '-'}</div></div>
+      </div>
+      <div class="col-4">
+        <div class="field-row"><label>Consignee</label><div class="value">${job.consignee || '-'}</div></div>
+      </div>
+    `;
+    }
 
-          // Format currency
-          const formatCurrency = (amount: number | null | undefined): string => {
-            if (!amount) return '₱0.00';
-            return `₱${amount.toLocaleString('en-PH', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            })}`;
-          };
-
-          // Replace placeholders in template with actual job data
-          let filledTemplate = template
-            .replace('{{jobCode}}', job.jobCode || '-')
-            .replace('{{client}}', job.customerName || '-')
-            .replace('{{transactionType}}', job.transactionTypeName || '-')
-            .replace('{{incoterms}}', job.incotermsName || '-')
-            .replace('{{paymentType}}', job.paymentTypeName || '-')
-            .replace('{{amount}}', formatCurrency(job.amount))
-            .replace('{{createdDate}}', formatDate(job.createdDate))
-            .replace('{{status}}', job.jobStatusName || 'Pending')
-            .replace('{{commodity}}', job.commodity || '-')
-            .replace('{{cutoff}}', formatDate(job.cutoff))
-            .replace('{{etd}}', formatDate(job.etd))
-            .replace('{{eta}}', formatDate(job.eta))
-            .replace('{{carrier}}', job.carrier || '-')
-            .replace('{{origin}}', job.origin || '-')
-            .replace('{{destination}}', job.destination || '-')
-            .replace('{{portCfs}}', job.portCfs || '-')
-            .replace('{{agent}}', job.agent || '-')
-            .replace('{{bookingNo}}', job.bookingNo || '-')
-            .replace('{{remarks}}', job.remarks || 'No remarks')
-            .replace('{{freightTypeLabel}}', this.isSeaFreight() ? 'Sea Freight' : this.isAirFreight() ? 'Air Freight' : 'N/A')
-            .replace('{{freightDetails}}', freightHtml)
-            .replace('{{printFooter}}', `Printed on ${new Date().toLocaleString('en-PH')}`);
-
-          // Open print window
-          const popupWin = window.open('', '_blank', 'width=900,height=600');
-          if (!popupWin) {
-            console.error('Could not open print window');
-            return;
-          }
-
-          popupWin.document.open();
-          popupWin.document.write(filledTemplate);
-          popupWin.document.close();
-
-          // Trigger print after content loads
-          popupWin.onload = () => {
-            popupWin.print();
-          };
-        },
-        error: (error) => {
-          console.error('Error loading print template:', error);
-          alert('Failed to load print template. Please try again.');
-        }
+    // Format dates
+    const formatDate = (dateString: string | null | undefined): string => {
+      if (!dateString) return '-';
+      return new Date(dateString).toLocaleDateString('en-PH', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
       });
+    };
+
+    // Format currency
+    const formatCurrency = (amount: number | null | undefined): string => {
+      if (!amount) return '₱0.00';
+      return `₱${amount.toLocaleString('en-PH', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })}`;
+    };
+
+    // Build the complete HTML template with data
+    const htmlTemplate = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Job Details - ${job.jobCode || '-'}</title>
+      <style>
+        @page {
+          size: A4;
+          margin: 10mm;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: Arial, sans-serif;
+          font-size: 9px;
+          line-height: 1.3;
+          color: #000;
+        }
+
+        .print-container {
+          width: 100%;
+          max-width: 190mm;
+          margin: 0 auto;
+        }
+
+        /* Header */
+        .print-header {
+          text-align: center;
+          margin-bottom: 8px;
+          padding-bottom: 6px;
+          border-bottom: 2px solid #333;
+        }
+
+        .print-header h1 {
+          font-size: 16px;
+          margin-bottom: 3px;
+          color: #2c3e50;
+        }
+
+        .print-header .job-code {
+          font-size: 11px;
+          color: #666;
+          font-weight: bold;
+        }
+
+        /* Section Headers */
+        .section-header {
+          background: #34495e;
+          color: white;
+          padding: 3px 6px;
+          font-size: 10px;
+          font-weight: bold;
+          margin-top: 6px;
+          margin-bottom: 4px;
+        }
+
+        /* Grid Layout */
+        .print-row {
+          display: flex;
+          flex-wrap: wrap;
+          margin-bottom: 2px;
+        }
+
+        .col-3 {
+          width: 25%;
+          padding: 2px 4px;
+        }
+
+        .col-4 {
+          width: 33.33%;
+          padding: 2px 4px;
+        }
+
+        .col-6 {
+          width: 50%;
+          padding: 2px 4px;
+        }
+
+        .col-12 {
+          width: 100%;
+          padding: 2px 4px;
+        }
+
+        /* Field Styling */
+        .field-row {
+          margin-bottom: 3px;
+        }
+
+        .field-row label {
+          font-weight: 600;
+          display: block;
+          margin-bottom: 1px;
+          color: #555;
+          font-size: 8px;
+        }
+
+        .field-row .value {
+          color: #000;
+          font-size: 9px;
+          padding: 2px;
+          background: #f8f9fa;
+          border-left: 2px solid #3498db;
+          padding-left: 4px;
+        }
+
+        /* Status Badge */
+        .status-badge {
+          display: inline-block;
+          padding: 2px 6px;
+          border-radius: 3px;
+          font-size: 8px;
+          font-weight: bold;
+          background: #ffc107;
+          color: #000;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+          background: #e8f4f8;
+          border: 1px solid #3498db;
+          padding: 4px;
+          text-align: center;
+        }
+
+        .highlight-box .value {
+          font-size: 12px;
+          font-weight: bold;
+          color: #2c3e50;
+          background: transparent;
+          border: none;
+        }
+
+        /* Freight Badge */
+        .freight-badge {
+          display: inline-block;
+          padding: 2px 8px;
+          border-radius: 3px;
+          font-size: 9px;
+          font-weight: bold;
+          margin-bottom: 4px;
+        }
+
+        .freight-sea {
+          background: #3498db;
+          color: white;
+        }
+
+        .freight-air {
+          background: #e74c3c;
+          color: white;
+        }
+
+        /* Remarks */
+        .remarks-box {
+          background: #fff9e6;
+          border: 1px solid #ffc107;
+          padding: 4px;
+          font-size: 8px;
+          min-height: 30px;
+          max-height: 40px;
+          overflow: hidden;
+        }
+
+        /* Footer */
+        .print-footer {
+          text-align: center;
+          margin-top: 8px;
+          padding-top: 4px;
+          border-top: 1px solid #ddd;
+          font-size: 7px;
+          color: #999;
+        }
+
+        @media print {
+          body {
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+          }
+
+          .print-container {
+            page-break-inside: avoid;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="print-container">
+        
+        <!-- HEADER -->
+        <div class="print-header">
+          <h1>JOB DETAILS</h1>
+          <div class="job-code">Job Code: ${job.jobCode || '-'}</div>
+        </div>
+
+        <!-- JOB INFORMATION -->
+        <div class="section-header">📋 JOB INFORMATION</div>
+        <div class="print-row">
+          <div class="col-6">
+            <div class="field-row">
+              <label>Client</label>
+              <div class="value">${job.customerName || '-'}</div>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="field-row">
+              <label>Status</label>
+              <div class="value"><span class="status-badge">${job.jobStatusName || 'Pending'}</span></div>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="field-row">
+              <label>Created Date</label>
+              <div class="value">${formatDate(job.createdDate)}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="print-row">
+          <div class="col-4">
+            <div class="field-row">
+              <label>Transaction Type</label>
+              <div class="value">${job.transactionTypeName || '-'}</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="field-row">
+              <label>Incoterms</label>
+              <div class="value">${job.incotermsName || '-'}</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="field-row">
+              <label>Payment Type</label>
+              <div class="value">${job.paymentTypeName || '-'}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="print-row">
+          <div class="col-12">
+            <div class="field-row highlight-box">
+              <label>Amount</label>
+              <div class="value">${formatCurrency(job.amount)}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARGO & ROUTING -->
+        <div class="section-header">📦 CARGO & ROUTING DETAILS</div>
+        <div class="print-row">
+          <div class="col-4">
+            <div class="field-row">
+              <label>Commodity</label>
+              <div class="value">${job.commodity || '-'}</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="field-row">
+              <label>Cut-off / LCT</label>
+              <div class="value">${formatDate(job.cutoff)}</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="field-row">
+              <label>Carrier</label>
+              <div class="value">${job.carrier || '-'}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="print-row">
+          <div class="col-3">
+            <div class="field-row">
+              <label>Origin</label>
+              <div class="value">${job.origin || '-'}</div>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="field-row">
+              <label>Destination</label>
+              <div class="value">${job.destination || '-'}</div>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="field-row">
+              <label>Port / CFS</label>
+              <div class="value">${job.portCfs || '-'}</div>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="field-row">
+              <label>ETD → ETA</label>
+              <div class="value">${formatDate(job.etd)} → ${formatDate(job.eta)}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="print-row">
+          <div class="col-4">
+            <div class="field-row">
+              <label>Gross Weight</label>
+              <div class="value">${job.grossWeight ? job.grossWeight + ' kg' : '-'}</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="field-row">
+              <label>Volume (CBM)</label>
+              <div class="value">${job.volume ? job.volume + ' m³' : '-'}</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="field-row">
+              <label>Number of Packages</label>
+              <div class="value">${job.numberOfPackages || '-'}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FREIGHT DETAILS -->
+        <div class="section-header">🚢 FREIGHT DETAILS</div>
+        <div class="print-row">
+          <div class="col-12">
+            <span class="freight-badge freight-${freightClass}">${this.isSeaFreight() ? 'Sea Freight' : this.isAirFreight() ? 'Air Freight' : 'N/A'}</span>
+          </div>
+        </div>
+        <div class="print-row">
+          ${freightHtml}
+        </div>
+
+        <!-- ADDITIONAL DETAILS -->
+        <div class="section-header">📝 ADDITIONAL DETAILS</div>
+        <div class="print-row">
+          <div class="col-6">
+            <div class="field-row">
+              <label>Agent</label>
+              <div class="value">${job.agent || '-'}</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="field-row">
+              <label>Booking No.</label>
+              <div class="value">${job.bookingNo || '-'}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="print-row">
+          <div class="col-12">
+            <div class="field-row">
+              <label>Remarks</label>
+              <div class="remarks-box">${job.remarks || 'No remarks'}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="print-footer">
+          Printed on ${new Date().toLocaleString('en-PH')}
+        </div>
+
+      </div>
+    </body>
+    </html>
+  `;
+
+    // Open print window with proper dimensions
+    const popupWin = window.open('', '_blank', 'width=1024,height=768,scrollbars=yes,resizable=yes');
+    if (!popupWin) {
+      console.error('Could not open print window');
+      return;
+    }
+
+    popupWin.document.open();
+    popupWin.document.write(htmlTemplate);
+    popupWin.document.close();
+
+    // Trigger print after content loads
+    popupWin.onload = () => {
+      setTimeout(() => {
+        popupWin.print();
+      }, 250);
+    };
   }
 
   openApproveConfirm(job: any) {
