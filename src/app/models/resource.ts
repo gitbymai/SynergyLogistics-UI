@@ -41,7 +41,7 @@ export interface ResourceTransaction {
 export interface NewResource {
   resourceName: string;
   optionResourceTypeId: number;
-  initialAmount: number;
+  addedAmount: number;
   currentAmount: number;
 }
 
@@ -59,7 +59,7 @@ export interface Resource {
   resourceName: string;
   optionResourceTypeId: string;
   resourceTypeName?: string;
-  initialAmount: number;
+  addedAmount: number;
   currentAmount: number;
   isActive: boolean;
   createdBy: number;

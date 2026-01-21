@@ -55,7 +55,7 @@ export class CreditListsComponent implements OnInit {
     this.resourceForm = this.fb.group({
       resourceName: ['', [Validators.required, Validators.maxLength(100)]],
       optionResourceTypeId: [0],
-      initialAmount: ['', [Validators.required, Validators.min(0), Validators.max(9999999999999999.99)]],
+      addedAmount: ['', [Validators.required, Validators.min(0), Validators.max(9999999999999999.99)]],
       currentAmount: ['', [Validators.required, Validators.min(0), Validators.max(9999999999999999.99)]],
       isActive: [true]
     });
@@ -91,7 +91,7 @@ export class CreditListsComponent implements OnInit {
     this.isEditMode = false;
     this.selectedResource = null;
     this.resourceForm.reset({ isActive: true });
-    this.resourceForm.get('initialAmount')?.enable();
+    this.resourceForm.get('addedAmount')?.enable();
     this.showResourceModal = true;
   }
 
@@ -102,13 +102,13 @@ export class CreditListsComponent implements OnInit {
     this.resourceForm.patchValue({
       resourceName: resource.resourceName,
       optionResourceTypeId: resource.optionResourceTypeId,
-      initialAmount: resource.initialAmount,
+      addedAmount: resource.addedAmount,
       currentAmount: resource.currentAmount,
       isActive: resource.isActive
     });
 
-    // Disable initialAmount in edit mode
-    this.resourceForm.get('initialAmount')?.disable();
+    // Disable addedAmount in edit mode
+    this.resourceForm.get('addedAmount')?.disable();
     this.showResourceModal = true;
   }
 
@@ -117,7 +117,7 @@ export class CreditListsComponent implements OnInit {
     this.resourceForm.reset();
     this.selectedResource = null;
     this.isEditMode = false;
-    this.resourceForm.get('initialAmount')?.enable();
+    this.resourceForm.get('addedAmount')?.enable();
   }
 
   submitResourceForm(): void {
@@ -139,7 +139,7 @@ export class CreditListsComponent implements OnInit {
     const createRequest: NewResource = {
       resourceName: this.resourceForm.value.resourceName,
       optionResourceTypeId: 1,
-      initialAmount: this.resourceForm.value.initialAmount,
+      addedAmount: this.resourceForm.value.addedAmount,
       currentAmount: this.resourceForm.value.currentAmount
     };
 
@@ -148,9 +148,14 @@ export class CreditListsComponent implements OnInit {
       .subscribe({
         next: (response) => {
           if (response.success && response.data) {
+            console.log('Created Resource:', response.data);
             this.resourcesList.push(response.data);
             this.totalItems = this.resourcesList.length;
+          this.filteredResources = [...this.resourcesList];
+          this.totalItems = this.resourcesList.length;
+
             this.showSuccess(`Resource ${response.data.resourceName} created successfully`);
+
             this.closeResourceModal();
           } else {
             this.showError(response.message || 'Failed to create resource');
@@ -265,13 +270,13 @@ export class CreditListsComponent implements OnInit {
   getTotalCredits(): number {
     return this.resourcesList
       .filter(r => r.isActive)
-      .reduce((sum, resource) => sum + resource.initialAmount, 0);
+      .reduce((sum, resource) => sum + resource.addedAmount, 0);
   }
 
   getUsedCredits(): number {
     return this.resourcesList
       .filter(r => r.isActive)
-      .reduce((sum, resource) => sum + (resource.initialAmount - resource.currentAmount), 0);
+      .reduce((sum, resource) => sum + (resource.addedAmount - resource.currentAmount), 0);
   }
 
   getRemainingCredits(): number {

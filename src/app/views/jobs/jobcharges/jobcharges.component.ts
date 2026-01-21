@@ -78,6 +78,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
       }
       else {
         if (changes['charges'] && changes['charges'].currentValue) {
+          
           this.filteredCharges = this.charges.filter(charge => {
             return charge.isForProcessing === true
               && charge.isActive === true
@@ -206,7 +207,9 @@ export class JobChargesComponent implements OnInit, OnChanges {
       amount: [0, [Validators.required, Validators.min(0)]],
       amountSelling: [0, [Validators.required, Validators.min(0)]],
       isForProcessing: [false],
-      jobId: [0]
+      jobId: [0],
+      currency: ['PHP', Validators.required],
+      conversionRate: [{ value: 1, disabled: false }, [Validators.required, Validators.min(0.0001)]],
     });
   }
 
@@ -275,6 +278,8 @@ export class JobChargesComponent implements OnInit, OnChanges {
       amountSelling: 0,
       isForProcessing: true,
       jobId: this.job!.jobId,
+      currencyCode: this.chargeFormGroup.value.currency,
+      currencyRate: this.chargeFormGroup.value.conversionRate
     };
 
     if (this.job?.jobId === undefined || this.job?.jobId === null) {

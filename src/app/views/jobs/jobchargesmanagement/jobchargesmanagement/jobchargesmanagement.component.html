@@ -32,7 +32,9 @@
             <th>Item</th>
             <th>Status</th>
             <th class="text-end">Charge Amount</th>
+            <th class="text-end">Calculated Charge Amount</th>
             <th class="text-end">Selling Amount</th>
+            <th class="text-end">Calculated Selling Amount</th>
             <th>Created By</th>
             <th>Last Update</th>
             <th class="text-center">Actions</th>
@@ -54,28 +56,33 @@
             <td>
               <div class="status-badge-wrapper">
                 <span class="badge" [ngClass]="getStatusClass(charge.chargeTransactionStatus || '')">
-  {{ charge.chargeTransactionStatus }}
-</span>
+                  {{ charge.chargeTransactionStatus }}
+                </span>
               </div>
             </td>
             <td class="text-end">
               <span class="code-text">{{ charge.currencyCode }} {{ charge.amount | number:'1.2-2' }}</span>
             </td>
             <td class="text-end">
+              <span class="code-text">PHP {{ charge.calculatedAmount | number:'1.2-2' }}</span>
+            </td>
+            <td class="text-end">
               <span class="code-text">{{ charge.currencyCode }} {{ charge.amountSelling | number:'1.2-2' }}</span>
+            </td>
+            <td class="text-end">
+              <span class="code-text">PHP {{ charge.calculatedSellingAmount | number:'1.2-2' }}</span>
             </td>
             <td>
               <span class="code-text">{{ charge.createdByName }}</span>
             </td>
-          <td>
-            <span class="code-text">
-            {{ (charge.modifiedDate || charge.createdDate) |  date:'MMM dd, yyyy' }}
-            </span>
-          </td>
             <td>
-              <div class="action-buttons">
+              <span class="code-text">
+                {{ (charge.modifiedDate || charge.createdDate) | date:'MMM dd, yyyy h:mm:ss a' }}
+              </span>
+            </td>
+            <td>
+              <div class="btn-group" role="group" aria-label="Action buttons">
                 @if(charge.chargeTransactionStatus === 'FOR APPROVAL'){
-
                 <button class="btn btn-sm btn-success-outline" (click)="openReviewModal(charge)" title="Review Request">
                   <i class="cil-list"></i>
                 </button>
@@ -91,6 +98,10 @@
                   [style.opacity]="charge.chargeTransactionStatus !== 'APPROVED' ? '0.5' : '1'"
                   [style.pointer-events]="charge.chargeTransactionStatus !== 'APPROVED' ? 'none' : 'auto'">
                   <i class="cil-trash"></i>
+                </button>
+                <button class="btn btn-sm btn-primary-outline" (click)="openViewModal(charge)"
+                  title="Open Charge Details">
+                  <i class="cil-spreadsheet"></i>
                 </button>
               </div>
             </td>
@@ -108,17 +119,17 @@
         @if (filteredCharges.length > 0) {
         <tfoot>
           <tr class="table-light">
-            <td colspan="4" class="text-end fw-bold total-label">Total Charge Amount:</td>
+            <td colspan="6" class="text-end fw-bold total-label">Total Charge Amount:</td>
             <td class="text-end fw-bold total-amount">PHP {{ totalChargeAmount | number:'1.2-2' }}</td>
             <td colspan="3"></td>
           </tr>
           <tr class="table-light">
-            <td colspan="4" class="text-end fw-bold total-label">Total Selling Amount:</td>
+            <td colspan="6" class="text-end fw-bold total-label">Total Selling Amount:</td>
             <td class="text-end fw-bold total-amount text-primary">PHP {{ totalSellingAmount | number:'1.2-2' }}</td>
             <td colspan="3"></td>
           </tr>
           <tr class="table-secondary">
-            <td colspan="4" class="text-end fw-bold total-label">Total Profit:</td>
+            <td colspan="6" class="text-end fw-bold total-label">Total Profit:</td>
             <td class="text-end fw-bold total-amount"
               [style.color]="(totalSellingAmount - totalChargeAmount) >= 0 ? '#198754' : '#dc3545'">
               PHP {{ (totalSellingAmount - totalChargeAmount) | number:'1.2-2' }}
@@ -187,6 +198,55 @@
             </div>
           </div>
 
+          <div class="row mb-3">
+            <!-- Currency -->
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="bi bi-currency-exchange me-1"></i> Currency <span class="text-danger">*</span>
+              </label>
+              <select class="form-select form-control-custom" formControlName="currency"
+                [class.disabled-select]="isEditMode" [style.pointer-events]="isEditMode ? 'none' : 'auto'"
+                [style.background-color]="isEditMode ? '#e9ecef' : null" [style.opacity]="isEditMode ? '0.6' : '1'">
+                <option value="">Select currency...</option>
+                <option value="PHP">PHP - Philippine Peso</option>
+                <option value="USD">USD - US Dollar</option>
+                <option value="SGD">SGD - Singapore Dollar</option>
+                <option value="GBP">GBP - British Pound</option>
+                <option value="EUR">EUR - Euro</option>
+              </select>
+              @if (chargeFormGroup.get('currency')?.invalid &&
+              chargeFormGroup.get('currency')?.touched) {
+              <div class="text-danger small mt-1">
+                Currency is required
+              </div>
+              }
+            </div>
+            <!-- Conversion Rate -->
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="bi bi-calculator me-1"></i> Conversion Rate to PHP
+                @if (chargeFormGroup.get('currency')?.value !== 'PHP') {
+                <span class="text-danger">*</span>
+                }
+              </label>
+              <input type="number" class="form-control form-control-custom" formControlName="conversionRate"
+                step="0.0001" placeholder="e.g., 56.50" [class.disabled-select]="isEditMode"
+                [style.pointer-events]="isEditMode ? 'none' : 'auto'"
+                [style.background-color]="isEditMode ? '#e9ecef' : null" [style.opacity]="isEditMode ? '0.6' : '1'">
+              @if (chargeFormGroup.get('currency')?.value === 'PHP') {
+              <div class="text-muted small mt-1">
+                <i class="bi bi-info-circle me-1"></i> Default rate (1.0) for PHP
+              </div>
+              }
+              @if (chargeFormGroup.get('conversionRate')?.invalid &&
+              chargeFormGroup.get('conversionRate')?.touched &&
+              chargeFormGroup.get('currency')?.value !== 'PHP') {
+              <div class="text-danger small mt-1">
+                Valid conversion rate is required
+              </div>
+              }
+            </div>
+          </div>
           <div class="row mb-3">
             <!-- Amount -->
             <div class="col-md-6">
@@ -285,41 +345,88 @@
 }
 <div class="modal custom-modal" [class.show]="showDeleteConfirmModal" [class.d-block]="showDeleteConfirmModal"
   tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
+  <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
       <div class="modal-header bg-danger text-white">
         <h5 class="modal-title">
-          <i class="bi bi-exclamation-triangle me-2"></i> Cancel Charge
+          <i class="bi bi-exclamation-triangle-fill me-2"></i> Cancel Charge
         </h5>
         <button type="button" class="btn-close btn-close-white" (click)="closeDeleteConfirm()"
           aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <div class="alert alert-danger" role="alert">
-          <i class="bi bi-exclamation-triangle me-2"></i>
-          This action cannot be undone!
+      <div class="modal-body p-4">
+        <!-- Warning Icon -->
+        <div class="text-center mb-4">
+          <i class="bi bi-exclamation-circle text-danger" style="font-size: 4rem;"></i>
         </div>
-        <p class="mb-2">
-          Are you sure you want to cancel the charge <strong>{{ selectedCharge?.chargeCode }}</strong>?
+        
+        <!-- Warning Message -->
+        <div class="alert alert-danger d-flex align-items-center mb-3" role="alert">
+          <i class="bi bi-shield-exclamation me-2 fs-5"></i>
+          <strong>This action cannot be undone!</strong>
+        </div>
+        
+        <!-- Confirmation Text -->
+        <p class="text-center mb-4">
+          Are you sure you want to cancel this charge?
         </p>
-        <p class="text-muted small mb-0">
-          Amount: {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
-        </p>
+        
+        <!-- Charge Details Card -->
+        <div class="card border-danger">
+          <div class="card-body p-3">
+            <div class="row g-2 small">
+              <div class="col-5 text-muted">
+                <strong>Charge Code:</strong>
+              </div>
+              <div class="col-7">
+                <span class="badge bg-secondary">{{ selectedCharge?.chargeCode }}</span>
+              </div>
+              
+              <div class="col-5 text-muted">
+                <strong>Category:</strong>
+              </div>
+              <div class="col-7">
+                {{ selectedCharge?.chargeSubCategoryName }}
+              </div>
+              
+              <div class="col-5 text-muted">
+                <strong>Amount:</strong>
+              </div>
+              <div class="col-7">
+                <strong class="text-danger">
+                  {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
+                </strong>
+              </div>
+              
+              @if (selectedCharge?.description) {
+              <div class="col-5 text-muted">
+                <strong>Description:</strong>
+              </div>
+              <div class="col-7">
+                <small class="text-truncate d-block" [title]="selectedCharge?.description">
+                  {{ selectedCharge?.description }}
+                </small>
+              </div>
+              }
+            </div>
+          </div>
+        </div>
       </div>
+      
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closeDeleteConfirm()">
-          <i class="bi bi-x me-2"></i> Cancel
+          <i class="bi bi-x-circle me-2"></i> No, Keep It
         </button>
         <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="isSubmitting">
           @if (!isSubmitting) {
           <span>
-            <i class="bi bi-trash me-2"></i> Cancel Charge
+            <i class="bi bi-trash-fill me-2"></i> Yes, Cancel Charge
           </span>
           }
           @if (isSubmitting) {
           <span>
             <span class="spinner-border spinner-border-sm me-2"></span>
-            Deleting...
+            Cancelling...
           </span>
           }
         </button>
@@ -332,8 +439,8 @@
 @if (showReviewModal) {
 <div class="modal-backdrop" (click)="closeReviewModal()"></div>
 }
-<div class="modal custom-modal" [class.show]="showReviewModal" [class.d-block]="showReviewModal"
-  tabindex="-1" role="dialog">
+<div class="modal custom-modal" [class.show]="showReviewModal" [class.d-block]="showReviewModal" tabindex="-1"
+  role="dialog">
   <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
       <div class="modal-header bg-primary text-white">
@@ -401,6 +508,18 @@
           </div>
         </div>
 
+        <form [formGroup]="reviewFormGroup" class="form-professional">
+          <div class="row mb-3">
+            <div class="col-12">
+              <label class="form-label">
+                <i class="bi bi-card-text me-1"></i> Approval / Rejection comment(s):
+              </label>
+              <textarea class="form-control form-control-custom" rows="3" formControlName="reviewRemarks"
+                placeholder="Enter comment(s)..."></textarea>
+            </div>
+          </div>
+        </form>
+
         <!-- Warning Alert -->
         <div class="alert alert-warning" role="alert">
           <i class="bi bi-info-circle me-2"></i>
@@ -437,6 +556,281 @@
             Approving...
           </span>
           }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Charge Transaction Modal -->
+@if (showViewModal) {
+<div class="modal-backdrop" (click)="closeViewModal()"></div>
+}
+<div class="modal custom-modal" [class.show]="showViewModal" [class.d-block]="showViewModal" tabindex="-1"
+  role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-eye me-2"></i> Charge Transaction Details
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeViewModal()" aria-label="Close"></button>
+      </div>
+
+      <!-- Scrollable Modal Body -->
+      <div class="modal-body p-3">
+        <!-- Nav Tabs -->
+        <ul class="nav nav-tabs mb-3 sticky-top bg-white" style="top: 0; z-index: 10;" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" (click)="activeTab = 'details'" [class.active]="activeTab === 'details'"
+              type="button">
+              <i class="bi bi-info-circle me-1"></i> Details
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" (click)="activeTab = 'audit'" [class.active]="activeTab === 'audit'" type="button">
+              <i class="bi bi-clock-history me-1"></i> Audit Log
+            </button>
+          </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" style="max-height: 50vh; overflow: hidden auto;">
+          <!-- Details Tab -->
+          @if (activeTab === 'details') {
+          <div class="tab-pane fade show active">
+            <!-- Basic Information -->
+            <div class="card mb-3 border">
+              <div class="card-header bg-light py-2">
+                <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Basic Information</h6>
+              </div>
+              <div class="card-body p-3">
+                <div class="row g-3 small">
+                  <div class="col-6">
+                    <strong class="text-muted d-block mb-1">Charge Code:</strong>
+                    <span class="badge bg-secondary">{{ selectedCharge?.chargeCode }}</span>
+                  </div>
+                  <div class="col-6">
+                    <strong class="text-muted d-block mb-1">Status:</strong>
+                    <span class="badge" [ngClass]="getStatusClass(selectedCharge?.chargeTransactionStatus ?? '')">
+                      {{ selectedCharge?.chargeTransactionStatus }}
+                    </span>
+                  </div>
+                  <div class="col-6">
+                    <strong class="text-muted d-block mb-1">Category:</strong>
+                    <span>{{ selectedCharge?.chargeCategoryName }}</span>
+                  </div>
+                  <div class="col-6">
+                    <strong class="text-muted d-block mb-1">Sub-Category:</strong>
+                    <span>{{ selectedCharge?.chargeSubCategoryName }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Financial Information -->
+            <div class="card mb-3 border">
+              <div class="card-header bg-light py-2">
+                <h6 class="mb-0"><i class="bi bi-currency-exchange me-2"></i>Financial Information</h6>
+              </div>
+              <div class="card-body p-3">
+                <div class="row g-3 small">
+                  <div class="col-6">
+                    <strong class="text-muted d-block mb-1">Currency:</strong>
+                    <span class="badge bg-info">{{ selectedCharge?.currencyCode }}</span>
+                  </div>
+                  <div class="col-6">
+                    <strong class="text-muted d-block mb-1">Conversion Rate:</strong>
+                    <span>{{ selectedCharge?.conversionRate | number:'1.4-4' }}</span>
+                  </div>
+                  <div class="col-6">
+                    <strong class="text-muted d-block mb-1">Amount:</strong>
+                    <strong class="text-primary">{{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount |
+                      number:'1.2-2' }}</strong>
+                  </div>
+                  <div class="col-6">
+                    <strong class="text-muted d-block mb-1">Calculated (PHP):</strong>
+                    <strong class="text-primary">PHP {{ selectedCharge?.calculatedAmount | number:'1.2-2' }}</strong>
+                  </div>
+                  <div class="col-6">
+                    <strong class="text-muted d-block mb-1">Amount Selling:</strong>
+                    <strong class="text-success">{{ selectedCharge?.currencyCode }} {{ selectedCharge?.amountSelling |
+                      number:'1.2-2' }}</strong>
+                  </div>
+                  <div class="col-6">
+                    <strong class="text-muted d-block mb-1">Calculated Selling (PHP):</strong>
+                    <strong class="text-success">PHP {{ selectedCharge?.calculatedSellingAmount | number:'1.2-2'
+                      }}</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Description -->
+            @if (selectedCharge?.description) {
+            <div class="card mb-3 border">
+              <div class="card-header bg-light py-2">
+                <h6 class="mb-0"><i class="bi bi-card-text me-2"></i>Description</h6>
+              </div>
+              <div class="card-body p-3">
+                <small>{{ selectedCharge?.description }}</small>
+              </div>
+            </div>
+            }
+
+            <!-- Flags & Audit -->
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="card border">
+                  <div class="card-header bg-light py-2">
+                    <h6 class="mb-0"><i class="bi bi-toggles me-2"></i>Status Flags</h6>
+                  </div>
+                  <div class="card-body p-3">
+                    <div class="form-check mb-2">
+                      <input class="form-check-input" type="checkbox" [checked]="selectedCharge?.isActive" disabled>
+                      <label class="form-check-label small">Is Active</label>
+                    </div>
+                    <div class="form-check mb-2">
+                      <input class="form-check-input" type="checkbox" [checked]="selectedCharge?.isForProcessing"
+                        disabled>
+                      <label class="form-check-label small">Is For Processing</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" [checked]="selectedCharge?.isForDisbursement"
+                        disabled>
+                      <label class="form-check-label small">Is For Disbursement</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card border">
+                  <div class="card-header bg-light py-2">
+                    <h6 class="mb-0"><i class="bi bi-person-circle me-2"></i>Audit Trail</h6>
+                  </div>
+                  <div class="card-body p-3 small">
+                    <div class="mb-2">
+                      <strong class="text-muted d-block">Created By:</strong>
+                      {{ selectedCharge?.createdByName || 'N/A' }}<br>
+                      <small class="text-muted">{{ selectedCharge?.createdDate | date:'MMM dd, yyyy h:mm a' }}</small>
+                    </div>
+                    @if (selectedCharge?.modifiedBy) {
+                    <div class="mb-2">
+                      <strong class="text-muted d-block">Modified By:</strong>
+                      {{ selectedCharge?.modifiedByName || 'N/A' }}<br>
+                      <small class="text-muted">{{ selectedCharge?.modifiedDate | date:'MMM dd, yyyy h:mm a' }}</small>
+                    </div>
+                    }
+                    @if (selectedCharge?.completedBy) {
+                    <div class="mb-2">
+                      <strong class="text-muted d-block">Completed By:</strong>
+                      {{ selectedCharge?.completedByName || 'N/A' }}<br>
+                      <small class="text-muted">{{ selectedCharge?.completedDate | date:'MMM dd, yyyy h:mm a'
+                        }}</small>
+                    </div>
+                    }
+                    @if (selectedCharge?.closedBy) {
+                    <div class="mb-2">
+                      <strong class="text-muted d-block">Closed By:</strong>
+                      {{ selectedCharge?.closedByName || 'N/A' }}<br>
+                      <small class="text-muted">{{ selectedCharge?.closeDate | date:'MMM dd, yyyy h:mm a' }}</small>
+                    </div>
+                    }
+                    @if (selectedCharge?.cancelledBy) {
+                    <div>
+                      <strong class="text-muted d-block">Cancelled By:</strong>
+                      {{ selectedCharge?.cancelledByName || 'N/A' }}<br>
+                      <small class="text-muted">{{ selectedCharge?.cancelledDate | date:'MMM dd, yyyy h:mm a'
+                        }}</small>
+                    </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          }
+
+          <!-- Audit Log Tab -->
+          @if (activeTab === 'audit') {
+
+          <div class="tab-pane fade show active">
+            @if (chargeAuditLogs && chargeAuditLogs.length > 0) {
+            <div class="audit-log-container">
+              @for (log of chargeAuditLogs; track log.id) {
+              <div class="card mb-2 border">
+                <div class="card-body p-3">
+                  <div class="row g-2 align-items-center">
+                    <!-- Date & Action -->
+                    <div class="col-md-3">
+                      <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-clock text-muted me-2"></i>
+                        <small class="text-muted">{{ log.createDate | date:'MMM dd, yyyy h:mm a' }}</small>
+                      </div>
+                      <span class="badge bg-secondary">{{ log.actionType }}</span>
+                    </div>
+
+                    <!-- Status Change -->
+                    <div class="col-md-4">
+                      <small class="text-muted d-block mb-1">Status Change:</small>
+                      <div class="d-flex align-items-center gap-2">
+                        @if (log.previousStatus) {
+                        <span class="badge bg-light text-dark">{{ log.previousStatus }}</span>
+                        <i class="bi bi-arrow-right text-muted"></i>
+                        }
+                        <span class="badge" [ngClass]="getStatusClass(log.newStatus)">
+                          {{ log.newStatus }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Amount & User -->
+                    <div class="col-md-5">
+                      <div class="row g-2">
+                        <div class="col-6">
+                          <small class="text-muted d-block">Amount:</small>
+                          <strong>{{ log.amount | number:'1.2-2' }}</strong>
+                        </div>
+                        <div class="col-6">
+                          <small class="text-muted d-block">Modified By:</small>
+                          <small>{{ log.modifiedBy }}</small>
+                        </div>
+                      </div>
+                      @if (log.requestedBy) {
+                      <div class="mt-1">
+                        <small class="text-muted">Requested By: </small>
+                        <small>{{ log.requestedBy }}</small>
+                      </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Remarks -->
+                  @if (log.remarks) {
+                  <div class="mt-2 pt-2 border-top">
+                    <small class="text-muted"><i class="bi bi-chat-left-text me-1"></i>Remarks:</small>
+                    <small class="d-block mt-1">{{ log.remarks }}</small>
+                  </div>
+                  }
+                </div>
+              </div>
+              }
+            </div>
+            } @else {
+            <div class="text-center text-muted py-5">
+              <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+              <p class="mb-0">No audit logs available</p>
+            </div>
+            }
+          </div>
+
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer py-2">
+        <button type="button" class="btn btn-sm btn-secondary" (click)="closeViewModal()">
+          <i class="bi bi-x me-2"></i> Close
         </button>
       </div>
     </div>

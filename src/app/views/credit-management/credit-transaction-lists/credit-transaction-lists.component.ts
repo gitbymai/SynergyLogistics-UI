@@ -118,7 +118,7 @@ export class CreditTransactionListsComponent implements OnInit {
       next: (response) => {
         if (response.success && response.data) {
           this.resourceName = response.data.resourceName || 'N/A';
-          this.currentBalance = response.data.initialAmount || 0;
+          this.currentBalance = response.data.currentAmount || 0;
 
         } else {
           this.showError(response.message || 'Failed to load resource details');

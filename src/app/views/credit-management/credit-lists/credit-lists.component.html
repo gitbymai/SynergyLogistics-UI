@@ -25,17 +25,6 @@
         </div>
       </div>
       <div class="col-md-4 mb-3">
-        <div class="credit-summary-card used">
-          <div class="card-icon">
-            <i class="cil-chart-line"></i>
-          </div>
-          <div class="card-content">
-            <div class="card-label">Used Credits</div>
-            <div class="card-value">{{ getUsedCredits() | number:'1.0-0' }}</div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4 mb-3">
         <div class="credit-summary-card remaining">
           <div class="card-icon">
             <i class="cil-battery-3"></i>
@@ -43,6 +32,17 @@
           <div class="card-content">
             <div class="card-label">Remaining Credits</div>
             <div class="card-value">{{ getRemainingCredits() | number:'1.0-0' }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="credit-summary-card used">
+          <div class="card-icon">
+            <i class="cil-chart-line"></i>
+          </div>
+          <div class="card-content">
+            <div class="card-label">Used Credits</div>
+            <div class="card-value">{{ getUsedCredits() | number:'1.0-0' }}</div>
           </div>
         </div>
       </div>
@@ -57,7 +57,7 @@
               <i class="cil-tag me-2"></i> Resource Name
             </th>
             <th class="text-center">
-              <i class="cil-layers me-2"></i> Initial Amount
+              <i class="cil-layers me-2"></i> Total Added Amount
             </th>
             <th class="text-center">
               <i class="cil-chart-pie me-2"></i> Current Amount
@@ -81,18 +81,18 @@
           @for(resource of getPagedResources(); track resource.resourceId) {
           <tr [class.inactive-row]="!resource.isActive">
             <td>
-              <div class="d-flex align-items-center">
+              <div class="text-center">
                 <strong>{{ resource.resourceName }}</strong>
               </div>
             </td>
             <td class="text-center">
-              {{ resource.initialAmount | number:'1.2-2' }}
+              {{ resource.addedAmount | number:'1.2-2' }}
             </td>
             <td class="text-center">
               {{ resource.currentAmount | number:'1.2-2' }}
             </td>
             <td class="text-center">
-              {{ (resource.initialAmount - resource.currentAmount) | number:'1.2-2' }}
+              {{ (resource.addedAmount - resource.currentAmount) | number:'1.2-2' }}
             </td>
             <td class="text-center">
               @if(resource.createdDate) {
@@ -102,7 +102,7 @@
               }
             </td>
             <td>
-              <div class="status-badge-wrapper">
+              <div class="status-badge-wrapper text-center">
                 @if(resource.isActive) {
                 <span class="badge bg-success">
                   <i class="cil-check-circle me-1"></i> Active
@@ -115,7 +115,7 @@
               </div>
             </td>
             <td>
-              <div class="action-buttons">
+              <div class="action-buttons status-badge-wrapper">
                  <button class="btn btn-sm btn-primary-outline" title="Edit Resource" (click)="viewTransactions(resource)">
                   <i class="cil-list"></i> Manage
                 </button>
@@ -202,9 +202,9 @@
               <label class="form-label">
                 <i class="cil-layers me-1"></i> Initial Amount
               </label>
-              <input type="number" class="form-control form-control-custom" formControlName="initialAmount"
+              <input type="number" class="form-control form-control-custom" formControlName="addedAmount"
                 placeholder="e.g., 1000.00" min="0" step="0.01" [readonly]="isEditMode" />
-              @if (resourceForm.get('initialAmount')?.invalid && resourceForm.get('initialAmount')?.touched) {
+              @if (resourceForm.get('addedAmount')?.invalid && resourceForm.get('addedAmount')?.touched) {
                 <div class="text-danger small mt-1">Initial amount is required (0 - 9999999999999999.99)</div>
               }
               @if(isEditMode) {

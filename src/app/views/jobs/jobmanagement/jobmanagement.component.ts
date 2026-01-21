@@ -88,6 +88,8 @@ export class JobmanagementComponent implements OnInit {
       next: (success) => {
         this.jobGuid = jobGuid;
         this.charges = success.data;
+
+        console.log('Loaded charges:', this.charges);
       },
       error: (error) => {
 

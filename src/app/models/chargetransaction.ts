@@ -6,6 +6,8 @@ export interface CreateChargeTransactionRequest {
   amountSelling: number;
   jobId: number;
   isForProcessing?: boolean | false;
+  currencyCode: string;
+  currencyRate: number;
 }
 
 export interface UpdateChargeTransactionRequest extends CreateChargeTransactionRequest {
@@ -75,6 +77,10 @@ export interface ChargeTransaction {
   createdByName?: string | null;
   modifiedByName?: string | null;
   
+  conversionRate: number;
+  calculatedAmount: number;
+  calculatedSellingAmount: number;
+
 }
 
 export interface ChargeTransactionAuditLog {
@@ -88,5 +94,5 @@ export interface ChargeTransactionAuditLog {
   remarks?: string | null;
   requestedBy?: string | null;
   modifiedBy: string;
-  createdDate: Date;
+  createDate: Date;
 }

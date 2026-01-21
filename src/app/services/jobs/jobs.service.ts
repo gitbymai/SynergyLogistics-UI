@@ -22,7 +22,7 @@ export class JobsService extends ApiService {
   }
 
   getAllCustomers(): Observable<ApiResponse<CustomerAccount[]>> {
-    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/customer`).pipe(
+    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/customer/get-all`).pipe(
       map(response => {
         const customers = response.data.map(item => toCustomerAccount(item));
         return { ...response, data: customers };

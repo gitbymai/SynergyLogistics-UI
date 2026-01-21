@@ -72,14 +72,14 @@
 
           </td>
           <td class="text-end amount-cell">
-            {{ charge.currencyCode }} {{ charge.amount | number:'1.2-2' }}
+            PHP {{ charge.calculatedAmount | number:'1.2-2' }}
           </td>
           @if (canViewSellingAmount()) {
           <td class="text-end amount-cell">
-            {{ charge.currencyCode }} {{ charge.amountSelling | number:'1.2-2' }}
+            PHP {{ charge.calculatedSellingAmount | number:'1.2-2' }}
           </td>
           }
-          <td>{{ (charge.modifiedDate || charge.createdDate) | date:'MMM dd, yyyy' }}</td>
+          <td>{{ (charge.modifiedDate || charge.createdDate) | date:'MMM dd, yyyy h:mm:ss a' }}</td>
           <td> {{ charge.modifiedByName || charge.createdByName }}</td>
           @if(!viewSummary){
 
@@ -107,8 +107,7 @@
             </button>
             }
 
-            @if(charge.chargeTransactionStatus === 'FOR RELEASING' && (userRole === 'ADMIN' || userRole === 'CASHIER' ||
-            userRole === 'TREASURER')) {
+            @if(charge.chargeTransactionStatus === 'FOR RELEASING' && (userRole === 'ADMIN' || userRole === 'CASHIER')) {
 
             <button class="btn btn-primary btn-sm btn-badge-style" tooltip="Set Cash Release"
               (click)="openCashReleaseConfirmation(charge)">
@@ -739,7 +738,7 @@
                       </span>
                       <small class="text-muted d-block mt-1">
                         <i class="bi bi-clock me-1"></i>
-                        {{ log.createdDate | date:'short' }}
+                        {{ log.createDate | date:'MMM dd, yyyy h:mm a' }}
                       </small>
                     </div>
                     <div class="text-end">

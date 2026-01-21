@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
-import { ChargeTransaction, CreateChargeTransactionRequest, UpdateChargeTransactionRequest } from '../../../../models/chargetransaction';
+import { ChargeTransaction, ChargeTransactionAuditLog, CreateChargeTransactionRequest, UpdateChargeTransactionRequest } from '../../../../models/chargetransaction';
 import { ChargeTransactionService } from '../../../../services/chargetransaction/chargetransaction.service';
 import { JobsService } from '../../../../services/jobs/jobs.service';
 import { Job } from '../../../../models/job';
@@ -33,6 +33,10 @@ export class JobchargesmanagementComponent implements OnInit {
   showModal: boolean = false;
   showDeleteConfirmModal: boolean = false;
   isEditMode: boolean = false;
+  activeTab: 'details' | 'audit' = 'details'
+
+  showViewModal = false;
+  chargeAuditLogs: ChargeTransactionAuditLog[] = [];
 
   // Search & Filter
   searchTerm: string = '';
@@ -44,9 +48,9 @@ export class JobchargesmanagementComponent implements OnInit {
 
   // Reactive Form
   chargeFormGroup!: FormGroup;
+  reviewFormGroup!: FormGroup;
 
   showReviewModal = false;
-  reviewRemarks = '';
   reviewAction: 'approve' | 'reject' | null = null;
 
   // Toast Notifications
@@ -77,13 +81,39 @@ export class JobchargesmanagementComponent implements OnInit {
     this.chargeFormGroup = this.fb.group({
       chargeSubCategoryId: [0, [Validators.required, Validators.min(1)]],
       description: ['', Validators.maxLength(500)],
+      currency: ['', Validators.required],
+      conversionRate: [{ value: 1, disabled: false }, [Validators.required, Validators.min(0.0001)]],
       amount: [0, [Validators.required, Validators.min(0)]],
       amountSelling: [0, [Validators.required, Validators.min(0)]],
       isForProcessing: [false],
       jobId: [0]
     });
+
+    this.reviewFormGroup = this.fb.group({
+      reviewRemarks: ['']
+    });
+
+    // Listen to currency changes
+    this.chargeFormGroup.get('currency')?.valueChanges.subscribe(currency => {
+      this.onCurrencyChange(currency);
+    });
   }
 
+  onCurrencyChange(currency: string): void {
+    const conversionRateControl = this.chargeFormGroup.get('conversionRate');
+
+    if (currency === 'PHP') {
+      conversionRateControl?.setValue(1);
+      conversionRateControl?.disable();
+      conversionRateControl?.clearValidators();
+    } else {
+      conversionRateControl?.enable();
+      conversionRateControl?.setValidators([Validators.required, Validators.min(0.0001)]);
+    }
+
+    conversionRateControl?.updateValueAndValidity();
+  }
+  
   loadJobDetails(): void {
     this.jobService.getByGuid(this.jobGuid).subscribe({
       next: (response) => {
@@ -171,7 +201,7 @@ export class JobchargesmanagementComponent implements OnInit {
       jobId: charge.jobId,
       isForProcessing: charge.isForProcessing || false,
     });
-    
+
     // Disable charge code in edit mode
     this.chargeFormGroup.get('chargeCode')?.disable();
     this.chargeFormGroup.get('isForProcessing')?.disable();
@@ -184,17 +214,18 @@ export class JobchargesmanagementComponent implements OnInit {
     this.chargeFormGroup.reset();
     this.chargeFormGroup.get('chargeCode')?.enable();
   }
+
   openReviewModal(charge: any) {
+
     this.selectedCharge = charge;
-    this.reviewRemarks = '';
     this.reviewAction = null;
     this.showReviewModal = true;
   }
 
   closeReviewModal() {
+    this.reviewFormGroup.reset();
     this.showReviewModal = false;
     this.selectedCharge = null;
-    this.reviewRemarks = '';
     this.reviewAction = null;
   }
 
@@ -204,11 +235,11 @@ export class JobchargesmanagementComponent implements OnInit {
     this.isSubmitting = true;
     this.reviewAction = 'approve';
 
-    this.chargeService.approveCharge(this.selectedCharge.chargeGuid).subscribe({
+    this.chargeService.approveCharge(this.selectedCharge.chargeGuid, this.reviewFormGroup.get('reviewRemarks')?.value).subscribe({
       next: (response) => {
         this.isSubmitting = false;
 
-         if (response.data) {
+        if (response.data) {
           this.loadCharges();
           this.showSuccess(`Charge has been approved successfully`);
           this.closeReviewModal();
@@ -229,11 +260,11 @@ export class JobchargesmanagementComponent implements OnInit {
     this.isSubmitting = true;
     this.reviewAction = 'reject';
 
-   this.chargeService.rejectCharge(this.selectedCharge.chargeGuid).subscribe({
+    this.chargeService.rejectCharge(this.selectedCharge.chargeGuid, this.reviewFormGroup.get('reviewRemarks')?.value).subscribe({
       next: (response) => {
         this.isSubmitting = false;
 
-         if (response.data) {
+        if (response.data) {
           this.loadCharges();
           this.showSuccess(`Charge has been rejected`);
           this.closeReviewModal();
@@ -247,7 +278,7 @@ export class JobchargesmanagementComponent implements OnInit {
       }
     });
   }
-  
+
   onSubmit(): void {
     if (!this.chargeFormGroup.valid) {
       this.showError('Please fill in all required fields correctly');
@@ -264,19 +295,21 @@ export class JobchargesmanagementComponent implements OnInit {
     }
   }
 
-  private markFormGroupTouched(): void {
+  markFormGroupTouched(): void {
     Object.keys(this.chargeFormGroup.controls).forEach(key => {
       this.chargeFormGroup.get(key)?.markAsTouched();
     });
   }
 
-  private createCharge(): void {
+  createCharge(): void {
     const createRequest: CreateChargeTransactionRequest = {
       chargeSubCategoryId: this.chargeFormGroup.value.chargeSubCategoryId,
       description: this.chargeFormGroup.value.description,
       amount: this.chargeFormGroup.value.amount,
       amountSelling: this.chargeFormGroup.value.amountSelling,
       isForProcessing: this.chargeFormGroup.value.isForProcessing,
+      currencyCode: this.chargeFormGroup.value.currency,
+      currencyRate: this.chargeFormGroup.value.conversionRate,
       jobId: this.jobId,
     };
 
@@ -298,7 +331,7 @@ export class JobchargesmanagementComponent implements OnInit {
       });
   }
 
-  private updateCharge(): void {
+  updateCharge(): void {
     if (!this.selectedCharge) return;
 
     const updateRequest: UpdateChargeTransactionRequest = {
@@ -309,7 +342,9 @@ export class JobchargesmanagementComponent implements OnInit {
       amount: this.chargeFormGroup.value.amount,
       amountSelling: this.chargeFormGroup.value.amountSelling,
       isForProcessing: this.selectedCharge.isForProcessing || false,
-      jobId: this.selectedCharge.jobId
+      jobId: this.selectedCharge.jobId,
+      currencyCode: this.chargeFormGroup.value.currency,
+      currencyRate: this.chargeFormGroup.value.conversionRate
     };
 
     this.chargeService.updateCharge(this.selectedCharge.chargeGuid, updateRequest)
@@ -362,53 +397,82 @@ export class JobchargesmanagementComponent implements OnInit {
       });
   }
 
+   openViewModal(charge: ChargeTransaction): void {
+ this.selectedCharge = charge;
+    this.activeTab = 'details'; // Reset to details tab
+    this.loadAuditLogs(charge.chargeId);
+    this.showViewModal = true;
+  }
+
+  closeViewModal(): void {
+   this.showViewModal = false;
+    this.selectedCharge = null;
+    this.chargeAuditLogs = [];
+    this.activeTab = 'details';
+  }
+
+
+  loadAuditLogs(chargeId: number): void {
+    // Call your service to load audit logs
+    this.chargeService.getChargeAuditLog(chargeId).subscribe({
+      next: (response) => {
+        this.chargeAuditLogs = response.data;
+      },
+      error: (error) => {
+        console.error('Error loading audit logs:', error);
+      }
+    });
+  }
+
   get totalChargeAmount(): number {
     const excludedStatuses = ['CANCELLED', 'REJECTED'];
     return this.filteredCharges
       .filter(charge => !excludedStatuses.includes(charge.chargeTransactionStatus!))
-      .reduce((sum, charge) => sum + (charge.amount || 0), 0);
+      .reduce((sum, charge) => sum + (charge.calculatedAmount || 0), 0);
   }
 
   get totalSellingAmount(): number {
     const excludedStatuses = ['CANCELLED', 'REJECTED'];
     return this.filteredCharges
       .filter(charge => !excludedStatuses.includes(charge.chargeTransactionStatus!))
-      .reduce((sum, charge) => sum + (charge.amountSelling || 0), 0);
+      .reduce((sum, charge) => sum + (charge.calculatedSellingAmount || 0), 0);
   }
 
- getStatusClass(status: string): string {
-  switch (status?.toUpperCase()) {
-    case 'FOR APPROVAL': return 'badge-for-approval';
-    case 'FOR CLEARING': return 'badge-released';
-    case 'CLEARED': return 'badge-cleared';
-    case 'REJECTED': return 'badge-rejected';
-    case 'COMPLETED': return 'badge-completed';
-    case 'FOR RELEASING': return 'badge-for-releasing';
-    case 'CASH RECEIVED - FOR LIQUIDATION': return 'badge-for-liquidation';
-    case 'CANCELLED': return 'badge-cancelled';
-    case 'APPROVED': return 'badge-approved';
-    case 'PENDING': return 'badge-pending';
-    case 'RELEASED': return 'badge-released';
-    default: return 'badge-default';
-  }
-}
+  getStatusClass(status: string | null | undefined): string {
+     if (!status) return 'bg-secondary';
 
-getStatusIcon(status: string): string {
-  switch (status?.toUpperCase()) {
-    case 'FOR APPROVAL': return 'bi-clock-history';
-    case 'FOR CLEARING': return 'bi-send-check';
-    case 'CLEARED': return 'bi-check2-circle';
-    case 'REJECTED': return 'bi-x-circle';
-    case 'COMPLETED': return 'bi-check-circle-fill';
-    case 'FOR RELEASING': return 'bi-box-arrow-right';
-    case 'CASH RECEIVED - FOR LIQUIDATION': return 'bi-currency-dollar';
-    case 'CANCELLED': return 'bi-dash-circle';
-    case 'APPROVED': return 'bi-check-circle';
-    default: return 'bi-question-circle';
+    switch (status?.toUpperCase()) {
+      case 'FOR APPROVAL': return 'badge-for-approval';
+      case 'FOR CLEARING': return 'badge-released';
+      case 'CLEARED': return 'badge-cleared';
+      case 'REJECTED': return 'badge-rejected';
+      case 'COMPLETED': return 'badge-completed';
+      case 'FOR RELEASING': return 'badge-for-releasing';
+      case 'CASH RECEIVED - FOR LIQUIDATION': return 'badge-for-liquidation';
+      case 'CANCELLED': return 'badge-cancelled';
+      case 'APPROVED': return 'badge-approved';
+      case 'PENDING': return 'badge-pending';
+      case 'RELEASED': return 'badge-released';
+      default: return 'badge-default';
+    }
   }
-}
 
-  private showSuccess(message: string): void {
+  getStatusIcon(status: string): string {
+    switch (status?.toUpperCase()) {
+      case 'FOR APPROVAL': return 'bi-clock-history';
+      case 'FOR CLEARING': return 'bi-send-check';
+      case 'CLEARED': return 'bi-check2-circle';
+      case 'REJECTED': return 'bi-x-circle';
+      case 'COMPLETED': return 'bi-check-circle-fill';
+      case 'FOR RELEASING': return 'bi-box-arrow-right';
+      case 'CASH RECEIVED - FOR LIQUIDATION': return 'bi-currency-dollar';
+      case 'CANCELLED': return 'bi-dash-circle';
+      case 'APPROVED': return 'bi-check-circle';
+      default: return 'bi-question-circle';
+    }
+  }
+
+  showSuccess(message: string): void {
     this.successMessage = message;
     this.showSuccessToast = true;
     setTimeout(() => {
@@ -416,7 +480,7 @@ getStatusIcon(status: string): string {
     }, 4000);
   }
 
-  private showError(message: string): void {
+  showError(message: string): void {
     this.errorMessage = message;
     this.showErrorToast = true;
     setTimeout(() => {

@@ -74,12 +74,12 @@ export class ChargeTransactionService extends ApiService {
   getChargeAuditLog(chargeId: number): Observable<ApiResponse<ChargeTransactionAuditLog[]>> {
     return this.http.get<ApiResponse<ChargeTransactionAuditLog[]>>(`${this.apiUrl}/job/charges-audit/${chargeId}`);
   }
-  approveCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
-    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/approvecharge/${tranGuid}`, {});
+  approveCharge(tranGuid: string, comments: string): Observable<ApiResponse<ChargeTransaction>> {
+    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/approvecharge/${tranGuid}`, {comments});
   }
 
-  rejectCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
-    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/rejectcharge/${tranGuid}`, {});
+  rejectCharge(tranGuid: string, comments: string): Observable<ApiResponse<ChargeTransaction>> {
+    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/rejectcharge/${tranGuid}`, {comments});
   }
 
   cancelCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
