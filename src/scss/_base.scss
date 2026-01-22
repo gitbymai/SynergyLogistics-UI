@@ -1,0 +1,17 @@
+
+
+/* Core System (Always needed) */
+@import 'variables';          // ~0.5 KB - Design tokens & base styles
+
+/* Layout Components */
+@import 'cards';               // ~2.0 KB - Card headers, footers, summary cards
+@import 'forms';               // ~3.5 KB - Form controls, filters, search
+@import 'tables';              // ~3.0 KB - Tables and cell styles
+
+/* UI Elements */
+@import 'badges';              // ~3.0 KB - All badge variants and status indicators
+@import 'buttons';             // ~2.0 KB - Buttons and pagination
+
+/* Overlays */
+@import 'modals';              // ~2.5 KB - Modals, alerts, toasts
+

@@ -30,7 +30,7 @@ export class TransactionlistComponent implements OnInit {
   sortColumn = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
-  showFilters = false;
+  showFilters = true;
   filters = {
     status: '',
     transactionType: '',
@@ -58,10 +58,13 @@ export class TransactionlistComponent implements OnInit {
       next: (response) => {
 
         if (response.success && response.data?.length) {
-
           this.jobs = response.data
-            .filter(c => c.isActive && c.jobStatusName !== 'FOR APPROVAL' && c.jobStatusName !== 'CANCELLED')
-            .sort((a, b) => b.jobId = a.jobId)
+            .filter(c => c.isActive)
+            .map(job => ({
+              ...job,
+              agingDays: this.calculateAgingDays(job.createdDate)
+            }))
+            .sort((a, b) => b.jobId - a.jobId);
 
           this.filteredJobs = [...this.jobs];
         }
@@ -73,7 +76,28 @@ export class TransactionlistComponent implements OnInit {
 
     });
   }
-  
+
+  calculateAgingDays(createdDate: string | Date | null | undefined): number {
+    if (!createdDate) {
+      return 0;
+    }
+
+    const created = new Date(createdDate);
+    const today = new Date();
+
+    // Reset time to midnight for accurate day calculation
+    created.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    // Calculate difference in milliseconds
+    const diffTime = today.getTime() - created.getTime();
+
+    // Convert to days
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays >= 0 ? diffDays : 0; // Return 0 if future date
+  }
+
   loadFilterOptionFields() {
 
     this.jobService.getAllConfigurations().subscribe({
@@ -90,6 +114,7 @@ export class TransactionlistComponent implements OnInit {
     });
 
   }
+  
   loadJobTransactionTypes(): void {
     this.jobService.getJobTransactionTypes().subscribe({
       next: (response) => {
@@ -190,20 +215,20 @@ export class TransactionlistComponent implements OnInit {
     this.router.navigate(['/jobs/financials/chargelists/', job.jobGuid]);
   }
 
-getStatusBadgeClass(status: string): string {
-  switch (status?.toUpperCase()) {
-    case 'FOR APPROVAL': return 'badge-for-approval';
-    case 'ONGOING': return 'badge-ongoing';
-    case 'REJECTED': return 'badge-rejected';
-    case 'COMPLETED': return 'badge-completed';
-    case 'PENDING': return 'badge-pending';
-    case 'ACTIVE': return 'badge-active';
-    case 'INACTIVE': return 'badge-inactive';
-    case 'APPROVED': return 'badge-approved';
-    case 'CANCELLED': return 'badge-cancelled';
-    default: return 'badge-default';
+  getStatusBadgeClass(status: string): string {
+    switch (status?.toUpperCase()) {
+      case 'FOR APPROVAL': return 'badge-for-approval';
+      case 'ONGOING': return 'badge-ongoing';
+      case 'REJECTED': return 'badge-rejected';
+      case 'COMPLETED': return 'badge-completed';
+      case 'PENDING': return 'badge-pending';
+      case 'ACTIVE': return 'badge-active';
+      case 'INACTIVE': return 'badge-inactive';
+      case 'APPROVED': return 'badge-approved';
+      case 'CANCELLED': return 'badge-cancelled';
+      default: return 'badge-default';
+    }
   }
-}
 
   toggleFilters(): void {
     this.showFilters = !this.showFilters;

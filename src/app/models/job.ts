@@ -52,6 +52,8 @@ export interface Job extends CreateJobRequest {
   transactionTypeName: string;
   incotermsName: string;
   paymentTypeName: string;
+
+  agingDays?: number; // optional property
 }
 
 

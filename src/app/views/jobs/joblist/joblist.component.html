@@ -7,234 +7,219 @@
       <div class="d-flex gap-2 align-items-center">
         <div class="search-wrapper" style="width: 250px;">
           <i class="cil-search search-icon"></i>
-          <input type="text" class="form-control form-control-custom search-input"
-            placeholder="Search jobs..." [(ngModel)]="searchTerm" (input)="onSearchChange()" />
-          </div>
-          <button class="btn btn-light btn-sm filter-btn-compact" (click)="toggleFilters()">
-            <i class="cil-filter" style="font-size: 11px;"></i>
-            <span class="d-none d-md-inline filter-text">{{ showFilters ? 'Hide' : 'Show' }}</span>
-            @if (hasActiveFilters()) {
-              <span class="badge bg-danger ms-1 badge-xs">{{ activeFilterCount() }}</span>
+          <input type="text" class="form-control form-control-custom search-input" placeholder="Search jobs..."
+            [(ngModel)]="searchTerm" (input)="onSearchChange()" />
+        </div>
+        <button class="btn btn-light btn-sm filter-btn-compact" (click)="toggleFilters()">
+          <i class="cil-filter" style="font-size: 11px;"></i>
+          <span class="d-none d-md-inline filter-text">{{ showFilters ? 'Hide' : 'Show' }}</span>
+          @if (hasActiveFilters()) {
+          <span class="badge bg-danger ms-1 badge-xs">{{ activeFilterCount() }}</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Panel -->
+  @if (showFilters) {
+  <div class="filter-panel">
+    <div class="filter-header">
+      <h6 class="mb-0">
+        <i class="cil-filter me-2"></i> Filter Options
+      </h6>
+      <button class="btn btn-sm btn-primary" (click)="clearFilters()">
+        <i class="cil-x me-1"></i> Clear All
+      </button>
+    </div>
+    <div class="filter-body">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-info me-1"></i> Status
+          </label>
+          <select class="form-select form-control-custom" [(ngModel)]="filters.status" (change)="applyFilters()">
+            <option value="">All Statuses</option>
+            @for(status of filterJobStatus; track status.optionId){
+            <option [value]="status.value"> {{ status.value }}</option>
             }
-          </button>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-airplane-mode me-1"></i> Transaction Type
+          </label>
+          <select class="form-select form-control-custom" [(ngModel)]="filters.transactionType"
+            (change)="applyFilters()">
+            <option value="">All Types</option>
+            @for(type of filterJobTransactionTypeList; track type.jobTransactionTypeId){
+            <option [value]="type.jobTransactionType" [attr.data-freight-type]="type.jobTransactionTypePrefix">
+              {{ type.jobTransactionType }}
+            </option>
+            }
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-credit-card me-1"></i> Payment Type
+          </label>
+          <select class="form-select form-control-custom" [(ngModel)]="filters.paymentType" (change)="applyFilters()">
+            <option value="">All Payment Types</option>
+            @for (payment of filterPaymenTypeList; track payment.optionId){
+            <option [value]="payment.value">
+              {{ payment.value }}
+            </option>
+            }
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-tags me-1"></i> Incoterms
+          </label>
+          <select class="form-select form-control-custom" [(ngModel)]="filters.incoterms" (change)="applyFilters()">
+            <option value="">All Incoterms</option>
+            @for(term of filterIncotermsList; track term.optionId){
+            <option [value]="term.value">
+              {{ term.value }}
+            </option>
+            }
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-user me-1"></i> Customer
+          </label>
+          <input type="text" class="form-control form-control-custom" placeholder="Enter customer name"
+            [(ngModel)]="filters.customer" (input)="applyFilters()" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-calendar me-1"></i> Date From
+          </label>
+          <input type="date" class="form-control form-control-custom" [(ngModel)]="filters.dateFrom"
+            (change)="applyFilters()" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-calendar me-1"></i> Date To
+          </label>
+          <input type="date" class="form-control form-control-custom" [(ngModel)]="filters.dateTo"
+            (change)="applyFilters()" />
         </div>
       </div>
     </div>
+  </div>
+  }
 
-    <!-- Filter Panel -->
-    @if (showFilters) {
-      <div class="filter-panel">
-        <div class="filter-header">
-          <h6 class="mb-0">
-            <i class="cil-filter me-2"></i> Filter Options
-          </h6>
-          <button class="btn btn-sm btn-primary" (click)="clearFilters()">
-            <i class="cil-x me-1"></i> Clear All
-          </button>
-        </div>
-        <div class="filter-body">
-          <div class="row g-3">
-            <div class="col-md-3">
-              <label class="form-label">
-                <i class="cil-info me-1"></i> Status
-              </label>
-              <select class="form-select form-control-custom" [(ngModel)]="filters.status" (change)="applyFilters()">
-                <option value="">All Statuses</option>
-                @for(status of filterJobStatus; track status.optionId){
-                  <option [value]="status.value"> {{ status.value }}</option>
-                }
-              </select>
+  <!-- Jobs Table -->
+  <div class="table-responsive">
+    <table class="table table-hover table-custom">
+      <thead>
+        <tr>
+          <th class="text-center">
+            <i class="cil-code me-2"></i> Job Code
+          </th>
+          <th class="text-center">
+            <i class="cil-people me-2"></i> Customer
+          </th>
+          <th class="text-center">
+            <i class="cil-layers me-2"></i> Transaction
+          </th>
+          <th class="text-center">
+            <i class="cil-task me-2"></i> Status
+          </th>
+          <th class="text-center">
+            <i class="cil-calendar me-2"></i> Created Date
+          </th>
+          <th class="text-center">
+            <i class="cil-settings me-2"></i> Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @if(paginatedJobs.length > 0) {
+        @for (job of paginatedJobs; track job) {
+        <tr>
+          <td class="text-center">
+            <div class="d-flex align-items-center justify-content-center gap-2">
+              <strong>{{ job.jobCode }}</strong>
+              <span class="badge badge-xs" [ngClass]="{
+            'bg-success': (job.agingDays ?? 0) < 7,
+            'bg-warning': (job.agingDays ?? 0) >= 7 && (job.agingDays ?? 0) < 30,
+            'bg-danger': (job.agingDays ?? 0) >= 30
+          }">
+                {{ job.agingDays }} d
+              </span>
             </div>
-            <div class="col-md-3">
-              <label class="form-label">
-                <i class="cil-airplane-mode me-1"></i> Transaction Type
-              </label>
-              <select class="form-select form-control-custom" [(ngModel)]="filters.transactionType" (change)="applyFilters()">
-                <option value="">All Types</option>
-                @for(type of filterJobTransactionTypeList; track type.jobTransactionTypeId){
-                  <option [value]="type.jobTransactionType"
-                    [attr.data-freight-type]="type.jobTransactionTypePrefix">
-                    {{ type.jobTransactionType }}
-                  </option>
-                }
-              </select>
+          </td>
+          <td class="text-center">
+            <span class="code-text">{{ job.customerName }}</span>
+          </td>
+          <td class="text-center">
+            {{ job.transactionTypeName }}
+          </td>
+          <td>
+            <div class="status-badge-wrapper text-center">
+              <span class="badge" [ngClass]="getStatusBadgeClass(job.jobStatusName)">
+                {{ job.jobStatusName }}
+              </span>
             </div>
-            <div class="col-md-3">
-              <label class="form-label">
-                <i class="cil-credit-card me-1"></i> Payment Type
-              </label>
-              <select class="form-select form-control-custom" [(ngModel)]="filters.paymentType" (change)="applyFilters()">
-                <option value="">All Payment Types</option>
-                @for (payment of filterPaymenTypeList; track payment.optionId){
-                  <option [value]="payment.value">
-                    {{ payment.value }}
-                  </option>
-                }
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">
-                <i class="cil-tags me-1"></i> Incoterms
-              </label>
-              <select class="form-select form-control-custom" [(ngModel)]="filters.incoterms" (change)="applyFilters()">
-                <option value="">All Incoterms</option>
-                @for(term of filterIncotermsList; track term.optionId){
-                  <option [value]="term.value">
-                    {{ term.value }}
-                  </option>
-                }
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">
-                <i class="cil-user me-1"></i> Customer
-              </label>
-              <input type="text" class="form-control form-control-custom"
-                placeholder="Enter customer name"
-                [(ngModel)]="filters.customer"
-                (input)="applyFilters()" />
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">
-                  <i class="cil-calendar me-1"></i> Date From
-                </label>
-                <input type="date" class="form-control form-control-custom"
-                  [(ngModel)]="filters.dateFrom"
-                  (change)="applyFilters()" />
-                </div>
-                <div class="col-md-3">
-                  <label class="form-label">
-                    <i class="cil-calendar me-1"></i> Date To
-                  </label>
-                  <input type="date" class="form-control form-control-custom"
-                    [(ngModel)]="filters.dateTo"
-                    (change)="applyFilters()" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          }
+          </td>
+          <td class="text-center">
+            @if(job.createdDate) {
+            {{ job.createdDate | date:'MM/dd/yy h:mm a' }}
+            } @else {
+            <span class="text-muted">-</span>
+            }
+          </td>
+          <td>
+            <button class="btn btn-sm btn-primary-outline btn-badge-style" (click)="viewJob(job)"
+              title="View Job Details">
+              <i class="cil-magnifying-glass me-1"></i>
+            </button>
+          </td>
+        </tr>
+        }
+        } @else {
+        <tr>
+          <td colspan="7" class="text-center text-muted py-4">
+            <i class="cilInbox me-2" style="font-size: 2rem;"></i>
+            <div class="mt-2">No jobs found</div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
 
-          <!-- Jobs Table -->
-          <div class="table-responsive">
-            <table class="table table-custom">
-              <thead>
-                <tr class="text-center">
-                  <th (click)="sortBy('jobCode')" class="sortable">
-                    <i class="me-2"></i> Job Code
-                  </th>
-                  <th (click)="sortBy('customerName')" class="sortable">
-                    <i class="me-2"></i> Customer
-                  </th>
-                  <th (click)="sortBy('transactionTypeName')" class="sortable">
-                    <i class="me-2"></i> Transaction
-                  </th>
-                  <th (click)="sortBy('jobStatusName')" class="sortable">
-                    <i class="me-2"></i> Status
-                  </th>
-                  <th (click)="sortBy('origin')" class="sortable">
-                    <i class="me-2"></i> Origin
-                  </th>
-                  <th (click)="sortBy('destination')" class="sortable">
-                    <i class="me-2"></i> Destination
-                  </th>
-                  <th (click)="sortBy('amount')" class="sortable text-end">
-                    <i class="me-2"></i> Amount
-                  </th>
-                  <th (click)="sortBy('createdDate')" class="sortable">
-                    <i class="me-2"></i>Created Date
-                  </th>
-                  <th class="text-center">
-                    <i class="me-2"></i> Actions
-                  </th>
-                </tr>
-              </thead>
+  <!-- Pagination -->
+  <nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" type="button" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+          <i class="cil-arrow-left me-1"></i> Previous
+        </button>
+      </li>
+      @for (page of [].constructor(totalPages()); track page; let i = $index) {
+      <li class="page-item" [class.active]="i + 1 === currentPage">
+        <button class="page-link" type="button" (click)="goToPage(i + 1)">
+          {{ i + 1 }}
+        </button>
+      </li>
+      }
+      <li class="page-item" [class.disabled]="currentPage === totalPages()">
+        <button class="page-link" type="button" (click)="goToPage(currentPage + 1)"
+          [disabled]="currentPage === totalPages()">
+          Next <i class="cil-arrow-right ms-1"></i>
+        </button>
+      </li>
+    </ul>
+  </nav>
 
-              <tbody>
-                @for (job of paginatedJobs; track job) {
-                  <tr class="text-center">
-                    <td>
-                      <div class="job-code-cell">
-                        <strong class="job-code-badge">{{ job.jobCode }}</strong>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="customer-cell">
-                        <strong class="customer-name">{{ job.customerName }}</strong>
-                      </div>
-                    </td>
-                    <td>
-                      <span>
-                        {{ job.transactionTypeName }}
-                      </span>
-                    </td>
-                    <td>
-                      <span [class]="'badge status-badge ' + getStatusBadgeClass(job.jobStatusName)">
-                        {{ job.jobStatusName }}
-                      </span>
-                    </td>
-                    <td class="location-cell">
-                      <span class="location-text">{{ job.origin || '-' }}</span>
-                    </td>
-                    <td class="location-cell">
-                      <span class="location-text">{{ job.destination || '-' }}</span>
-                    </td>
-                    <td class="text-end">
-                      <span class="amount-value">{{ job.amount | currency:'PHP':'symbol':'1.2-2' }}</span>
-                    </td>
-                    <td>
-                      <span class="date-text">{{ job.createdDate | date:'MM/dd/yy h:mm a' }}</span>
-                    </td>
-                    <td class="text-center">
-                      <div class="action-buttons">
-                        <button class="btn btn-sm btn-info-outline" (click)="viewJob(job)" title="View Job Details">
-                          <i class="cil-magnifying-glass"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                }
-
-                @if (paginatedJobs.length === 0) {
-                  <tr>
-                    <td colspan="9" class="text-center py-4 text-muted">
-                      <i class="cil-search" style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>
-                      <div>No jobs found</div>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Pagination -->
-          <nav aria-label="Page navigation" class="mt-4">
-            <ul class="pagination justify-content-center">
-              <li class="page-item" [class.disabled]="currentPage === 1">
-                <button class="page-link" type="button" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
-                  <i class="cil-arrow-left me-1"></i> Previous
-                </button>
-              </li>
-              @for (page of [].constructor(totalPages()); track page; let i = $index) {
-                <li class="page-item"
-                  [class.active]="i + 1 === currentPage">
-                  <button class="page-link" type="button" (click)="goToPage(i + 1)">
-                    {{ i + 1 }}
-                  </button>
-                </li>
-              }
-              <li class="page-item" [class.disabled]="currentPage === totalPages()">
-                <button class="page-link" type="button" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages()">
-                  Next <i class="cil-arrow-right ms-1"></i>
-                </button>
-              </li>
-            </ul>
-          </nav>
-
-          <!-- Card Footer -->
-          <div class="card-footer d-flex justify-content-between align-items-center">
-            <div class="footer-info small">
-              Showing <strong>{{ paginatedJobs.length }}</strong> of <strong>{{ filteredJobs.length }}</strong> jobs
-            </div>
-          </div>
-        </div>
+  <!-- Card Footer -->
+  <div class="card-footer d-flex justify-content-between align-items-center">
+    <div class="footer-info small">
+      Showing <strong>{{ paginatedJobs.length }}</strong> of <strong>{{ filteredJobs.length }}</strong> jobs
+    </div>
+  </div>
+</div>

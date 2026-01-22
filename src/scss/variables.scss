@@ -1,0 +1,42 @@
+/* ============================================
+   DESIGN TOKENS & VARIABLES
+   ============================================ */
+
+/* 
+Primary Colors:
+  - Primary Blue: #1e88e5
+  - Primary Dark: #1565c0
+  - Primary Light: #42a5f5
+  - Primary Bg: #e3f2fd
+  - Primary Border: #90caf9
+
+Status Colors:
+  - Success: #28a745 / #4caf50
+  - Warning: #ffc107
+  - Danger: #dc3545
+  - Info: #17a2b8
+  - Gray: #6c757d
+
+Text Colors:
+  - Dark: #212529
+  - Medium: #495057
+  - Light: #6c757d
+*/
+
+/* Global Font Settings */
+* {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Base body text color and size */
+body {
+  color: #212529;
+  font-size: 16px;
+}
+
+/* Default text color for common elements */
+p, div, span, td, li, label, input, select, textarea {
+  color: #212529;
+}

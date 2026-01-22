@@ -1,0 +1,38 @@
+
+/* Card Header */
+.card-header.bg-primary {
+  background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%) !important;
+  border-bottom: 3px solid #1565c0;
+  padding: 1.25rem 1.5rem;
+}
+
+.card-header h4 {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-size: 1.25rem;
+  color: #ffffff;
+}
+
+.card-header h4 i {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Card Footer */
+.card-footer {
+  padding: 1rem 1.5rem;
+  background: #e3f2fd;
+  border-top: 2px solid #bbdefb;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: #1565c0;
+}
+
+.footer-info {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.footer-info strong {
+  color: #1565c0;
+  font-weight: 700;
+}

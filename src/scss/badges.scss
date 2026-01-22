@@ -1,0 +1,239 @@
+/* ============================================
+   BADGE SYSTEM - UNIFIED
+   ============================================ */
+
+/* Base Badge Styles */
+.badge {
+  padding: 0.4em 0.8em;
+  font-size: 0.85em;
+  font-weight: 600;
+  border-radius: 4px;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  letter-spacing: 0.2px;
+}
+
+.badge i {
+  font-size: 0.8rem;
+}
+
+.badge-xs {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.35rem;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.badge.bg-danger {
+  animation: pulse 2s infinite;
+}
+
+/* Category Badge */
+.badge-category {
+  background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+  color: white;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.3px;
+}
+
+/* Item Badge */
+.badge-item {
+  background: #e3f2fd;
+  color: #1565c0;
+  font-weight: 500;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.4rem;
+}
+
+/* Code Badge */
+.badge-code {
+  background-color: #2196f3;
+  color: white;
+  padding: 0.4em 0.8em;
+  font-size: 0.95em;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* Bootstrap Badge Variants */
+.badge.bg-success {
+  background: linear-gradient(135deg, #28a745 0%, #218838 100%) !important;
+}
+
+.badge.bg-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+}
+
+.badge.bg-warning {
+  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%) !important;
+  color: #333;
+}
+
+/* ============================================
+   TRANSACTION TYPE BADGES
+   ============================================ */
+
+.transaction-badge {
+  display: inline-block;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.2px;
+  text-align: center;
+}
+
+.transaction-air-import {
+  background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+  color: white;
+}
+
+.transaction-air-export {
+  background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+  color: white;
+}
+
+.transaction-sea-import {
+  background: linear-gradient(135deg, #ffa726 0%, #ff8c00 100%);
+  color: white;
+}
+
+.transaction-sea-export {
+  background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+  color: white;
+}
+
+/* ============================================
+   STATUS BADGES - UNIFIED SYSTEM
+   ============================================ */
+
+/* Status Badge Base */
+.status-badge {
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.2px;
+  display: inline-block;
+}
+
+.status-badge-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.status-badge-wrapper .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Status Colors - Simplified Flat Design */
+.status-approved {
+  background-color: #d4edda !important;
+  color: #155724;
+  border: 1px solid #28a745;
+}
+
+.status-pending {
+  background-color: #fff3cd !important;
+  color: #856404;
+  border: 1px solid #ffc107;
+}
+
+.status-cancelled {
+  background-color: #e9ecef !important;
+  color: #495057;
+  border: 1px solid #6c757d;
+}
+
+.status-completed {
+  background-color: #d1f2eb !important;
+  color: #0f5132;
+  border: 1px solid #20c997;
+}
+
+.status-default {
+  background-color: #f8f9fa !important;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
+/* FOR APPROVAL - Yellow/Warning */
+.badge-for-approval,
+.status-for-approval {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+}
+
+/* RELEASED - Blue */
+.badge-released,
+.status-released {
+  background-color: #cfe2ff;
+  color: #084298;
+  border: 1px solid #0d6efd;
+}
+
+/* CLEARED - Teal/Cyan */
+.badge-cleared,
+.status-cleared {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #17a2b8;
+}
+
+/* REJECTED - Red */
+.badge-rejected,
+.status-rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #dc3545;
+}
+
+/* FOR RELEASING - Orange */
+.status-for-releasing {
+  background-color: #ffe5d0;
+  color: #cc5200;
+  border: 1px solid #fd7e14;
+}
+
+/* FOR LIQUIDATION - Purple */
+.status-for-liquidation {
+  background-color: #e0cffc;
+  color: #59359a;
+  border: 1px solid #6f42c1;
+}
+
+/* Additional Status Badges */
+.badge-ongoing {
+  background-color: #cfe2ff;
+  color: #084298;
+  border: 1px solid #0d6efd;
+}
+
+.badge-active {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #28a745;
+}
+
+.badge-inactive {
+  background-color: #e9ecef;
+  color: #495057;
+  border: 1px solid #6c757d;
+}
+
+/* Badge with icon support */
+.badge-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.badge-role i {
+  font-size: 0.8rem;
+}
