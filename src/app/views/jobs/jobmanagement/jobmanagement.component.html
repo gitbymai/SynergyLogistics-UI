@@ -133,6 +133,28 @@
             </div>
             }
 
+            @if((userRole === 'SALES' || userRole === 'ADMIN') && job?.jobStatusName !== 'FOR APPROVAL') {
+            <div class="detail-section">
+              <div class="row g-4">
+                <div class="col-md-8">
+
+                </div>
+                <div class="col-md-4">
+                  <div class="text-end">
+                    @if(job?.jobStatusName !== 'CLOSED' && job?.jobStatusName !== 'CANCELLED' ){
+                    <button class="btn btn-approve me-2" (click)="openCloseConfirm(job)">
+                      <span>Close Job</span>
+                    </button>
+                    }
+                    <button class="btn btn-replicate" (click)="openReplicateConfirm(job)">
+                      <span>Replicate Job</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            }
+
           </div>
         </div>
       </div>
@@ -389,9 +411,9 @@
                   <i class="bi bi-chat-left-text"></i> Remarks
                 </label>
                 <div class="detail-value remarks-box">
-                       <div class="remarks-content">
-                            {{ job?.remarks || 'No remarks' }}
-                        </div>
+                  <div class="remarks-content">
+                    {{ job?.remarks || 'No remarks' }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -411,7 +433,8 @@
         <div id="collapseCharges" class="accordion-collapse" [class.collapse]="!isSectionOpen('charges')"
           [class.show]="isSectionOpen('charges')">
           <div class="accordion-body p-0">
-            <app-job-charges [charges]="charges" [jobGuid]="jobGuid" [userRole]="userRole" [jobStatus]="job?.jobStatusName || ''" [viewSummary]="true"></app-job-charges>
+            <app-job-charges [charges]="charges" [jobGuid]="jobGuid" [userRole]="userRole"
+              [jobStatus]="job?.jobStatusName || ''" [viewSummary]="true"></app-job-charges>
           </div>
         </div>
       </div>
@@ -420,6 +443,139 @@
   </div>
 </div>
 
+<!-- Active Transactions Warning Modal -->
+@if (showActiveTransactionsModal) {
+<div class="modal-backdrop" (click)="closeActiveTransactionsModal()"></div>
+}
+<div class="modal custom-modal" [class.show]="showActiveTransactionsModal" [class.d-block]="showActiveTransactionsModal"
+  tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title">
+          <i class="cil-warning me-2"></i> Cannot Close Job
+        </h5>
+        <button type="button" class="btn-close" (click)="closeActiveTransactionsModal()"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning" role="alert">
+          <i class="cil-ban me-2"></i>
+          This job has active transactions and cannot be closed
+        </div>
+        <p class="mb-2">
+          The job <strong>{{ selectedJob?.jobCode }}</strong> cannot be closed at this time.
+        </p>
+        <p class="text-muted small mb-0">
+          <i class="cil-info me-1"></i> Please complete or cancel all ongoing charge transactions before closing this job.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="closeActiveTransactionsModal()">
+          <i class="cil-check me-2"></i> Understood
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Close Job Confirmation Modal -->
+@if (showCloseConfirmModal) {
+<div class="modal-backdrop" (click)="closeClosingConfirmation()"></div>
+}
+<div class="modal custom-modal" [class.show]="showCloseConfirmModal" [class.d-block]="showCloseConfirmModal"
+  tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">
+          <i class="cil-lock-locked me-2"></i> Close Job
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeClosingConfirmation()"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger" role="alert">
+          <i class="cil-warning me-2"></i>
+          Please confirm you want to close this job
+        </div>
+        <p class="mb-2">
+          Are you sure you want to close the job <strong>{{ selectedJob?.jobCode }}</strong>?
+        </p>
+        <p class="text-muted small mb-0">
+          <i class="cil-info me-1"></i> This action will mark the job as closed.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeClosingConfirmation()">
+          <i class="cil-x me-2"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="confirmCloseJob()" [disabled]="isSubmitting">
+          @if (!isSubmitting) {
+          <span>
+            <i class="cil-lock-locked me-2"></i> Close Job
+          </span>
+          }
+          @if (isSubmitting) {
+          <span>
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Closing...
+          </span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Replicate Job Confirmation Modal -->
+@if (showReplicateConfirmModal) {
+<div class="modal-backdrop" (click)="closeReplicateConfirm()"></div>
+}
+<div class="modal custom-modal" [class.show]="showReplicateConfirmModal" [class.d-block]="showReplicateConfirmModal"
+  tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="cil-copy me-2"></i> Replicate Job
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeReplicateConfirm()"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-primary" role="alert">
+          <i class="cil-info me-2"></i>
+          Please confirm you want to replicate this job
+        </div>
+        <p class="mb-2">
+          Are you sure you want to replicate the job <strong>{{ selectedJob?.jobCode }}</strong>?
+        </p>
+        <p class="text-muted small mb-0">
+          <i class="cil-info me-1"></i> This will create a new job with the same details.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeReplicateConfirm()">
+          <i class="cil-x me-2"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="confirmReplicateJob()" [disabled]="isSubmitting">
+          @if (!isSubmitting) {
+          <span>
+            <i class="cil-copy me-2"></i> Replicate Job
+          </span>
+          }
+          @if (isSubmitting) {
+          <span>
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Replicating...
+          </span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Approve Confirmation Modal -->
 @if (showApproveConfirmModal) {

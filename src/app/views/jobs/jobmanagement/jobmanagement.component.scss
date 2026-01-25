@@ -508,6 +508,17 @@
   }
 }
 
+.btn-replicate {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+  border: none;
+  color: white;
+  
+  &:hover {
+    background: linear-gradient(135deg, #0069d9 0%, #004085 100%) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
 .custom-modal + .modal-backdrop,
 .modal-backdrop {
   background-color: rgba(0, 0, 0, 0.5);

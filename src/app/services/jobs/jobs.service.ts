@@ -65,6 +65,14 @@ export class JobsService extends ApiService {
     return this.http.put<ApiResponse<any>>(`${this.apiUrl}/job/disapprove/${jobGuid}`, {});
   }
 
+  closeJob(jobGuid: string): Observable<ApiResponse<Job>> {
+    return this.http.put<ApiResponse<any>>(`${this.apiUrl}/job/close/${jobGuid}`, {});
+  }
+
+  replicateJob(jobGuid: string): Observable<ApiResponse<Job>> {
+    return this.http.put<ApiResponse<any>>(`${this.apiUrl}/job/replicate/${jobGuid}`, {});
+  }
+
   getAllChargeTransactionByGuid(jobGuid: string): Observable<ApiResponse<ChargeTransaction[]>> {
 
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/${jobGuid}/charges`);

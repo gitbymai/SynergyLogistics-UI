@@ -39,6 +39,9 @@ export class JobmanagementComponent implements OnInit {
   errorMessage = '';
   userRole: string = "";
   showApproveConfirmModal = false;
+  showCloseConfirmModal = false;
+  showReplicateConfirmModal = false;
+  showActiveTransactionsModal = false;
   isSubmitting = false;
   selectedJob: Job | null = null;
   openSection: string = 'jobInfo';
@@ -656,6 +659,81 @@ export class JobmanagementComponent implements OnInit {
     };
   }
 
+  openCloseConfirm(job: any) {
+
+    this.selectedJob = job;
+
+    if (this.hasOngoingChargeTransaction()) {
+      this.showActiveTransactionsModal = true;
+    } else {
+
+      this.showCloseConfirmModal = true;
+    }
+
+  }
+
+  closeClosingConfirmation() {
+    this.showCloseConfirmModal = false;
+  }
+  closeActiveTransactionsModal() {
+
+    this.showActiveTransactionsModal = false;
+  }
+  confirmCloseJob() {
+
+    this.isSubmitting = true;
+
+    this.jobService.closeJob(this.selectedJob!.jobGuid).subscribe({
+      next: (response) => {
+        this.loadJobDetails(this.selectedJob!.jobGuid);
+
+        this.showSuccess(`Job ${this.job!.jobCode} closed successfully`);
+        this.isSubmitting = false;
+        this.closeClosingConfirmation();
+      },
+      error: (error) => {
+        console.error('Error closing job:', error);
+        this.showError(error.message || 'Failed to close job. Please try again.');
+        this.isSubmitting = false;
+      }
+    });
+
+    this.closeApproveConfirm();
+
+  }
+
+  openReplicateConfirm(job: any) {
+
+    this.selectedJob = job;
+    this.showReplicateConfirmModal = true;
+  }
+
+  closeReplicateConfirm() {
+    this.showReplicateConfirmModal = false;
+  }
+
+  confirmReplicateJob() {
+    this.isSubmitting = true;
+
+    this.jobService.replicateJob(this.selectedJob!.jobGuid).subscribe({
+      next: (response) => {
+        this.loadJobDetails(this.selectedJob!.jobGuid);
+
+        this.showSuccess(`Job ${this.job!.jobCode} replicated successfully`);
+        this.isSubmitting = false;
+        this.closeReplicateConfirm();
+      },
+      error: (error) => {
+        console.error('Error replicating job:', error);
+        this.showError(error.message || 'Failed to replicate job. Please try again.');
+        this.isSubmitting = false;
+      }
+    });
+
+    this.closeReplicateConfirm();
+
+  }
+
   openApproveConfirm(job: any) {
     this.selectedJob = job;
     this.showApproveConfirmModal = true;
@@ -714,6 +792,22 @@ export class JobmanagementComponent implements OnInit {
     });
 
     this.closeDisapproveConfirm();
+  }
+
+  hasOngoingChargeTransaction(): boolean {
+    const activeStatuses = [
+      "FOR APPROVAL",
+      "APPROVED",
+      "FOR RELEASING",
+      "CASH RECEIVED - FOR LIQUIDATION",
+      "FOR CLEARING",
+      "CLEARED"
+    ];
+
+    return this.charges.some(charge =>
+      charge.chargeTransactionStatus != null &&
+      activeStatuses.includes(charge.chargeTransactionStatus)
+    );
   }
 
   showSuccess(message: string): void {

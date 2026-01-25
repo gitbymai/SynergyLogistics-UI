@@ -20,11 +20,13 @@ import { Configuration } from '../../../models/configuration';
 })
 export class CreditTransactionListsComponent implements OnInit {
   transactionForm!: FormGroup;
+  editTransactionForm!: FormGroup;
   transactions: ResourceTransaction[] = [];
   filteredTransactions: ResourceTransaction[] = [];
 
   showTransactionModal = false;
   showDetailsModal = false;
+  showEditTransactionModal = false;
   isSubmitting = false;
   isLoading = false;
 
@@ -93,13 +95,22 @@ export class CreditTransactionListsComponent implements OnInit {
       notes: ['', [Validators.maxLength(1000)]],
       isActive: [true]
     });
+
+    this.editTransactionForm = this.fb.group({
+      optionResourceTransactionTypeId: ['', [Validators.required]],
+      amount: ['', [Validators.required, Validators.min(-9999999999999999.99), Validators.max(9999999999999999.99)]],
+      referenceNumber: ['', [Validators.maxLength(50)]],
+      notes: ['', [Validators.maxLength(1000)]],
+      isActive: [true]
+    });
+
   }
 
   loadTransactionTypes(): void {
     this.transactionService.getResourceTransactionTypes().subscribe({
       next: (response) => {
         if (response.success && response.data) {
-          this.transactionTypes = response.data.filter(x=> x.isActive === true)
+          this.transactionTypes = response.data.filter(x => x.isActive === true)
         } else {
           this.showError(response.message || 'Failed to load transaction types');
         }
@@ -155,9 +166,9 @@ export class CreditTransactionListsComponent implements OnInit {
     });
   }
 
-getTransactionTypeById(id: number): Configuration | undefined {
-  return this.transactionTypes.find(type => type.optionId === id);
-}
+  getTransactionTypeById(id: number): Configuration | undefined {
+    return this.transactionTypes.find(type => type.optionId === id);
+  }
 
   openNewTransactionModal(): void {
     this.selectedTransaction = null;
@@ -170,6 +181,38 @@ getTransactionTypeById(id: number): Configuration | undefined {
   viewTransactionDetails(transaction: ResourceTransaction): void {
     this.selectedTransaction = transaction;
     this.showDetailsModal = true;
+  }
+
+  editTransaction(transaction: ResourceTransaction): void {
+
+    this.selectedTransaction = transaction;
+    this.editTransactionForm.patchValue({
+      optionResourceTransactionTypeId: transaction.optionResourceTransactionTypeId,
+      amount: transaction.amount,
+      referenceNumber: transaction.referenceNumber,
+      notes: transaction.notes,
+      isActive: transaction.isActive
+    });
+    this.showEditTransactionModal = true;
+
+  }
+
+  closeEditTransactionModal(): void {
+
+    this.showEditTransactionModal = false;
+    this.editTransactionForm.reset();
+    this.selectedTransaction = null;
+  }
+
+  submitEditTransactionForm(): void {
+    if (this.editTransactionForm.valid) {
+      this.isSubmitting = true;
+      // Your update logic here
+      // After successful update:
+      
+      this.closeEditTransactionModal();
+      this.isSubmitting = false;
+    }
   }
 
   closeTransactionModal(): void {
@@ -214,8 +257,8 @@ getTransactionTypeById(id: number): Configuration | undefined {
             this.showSuccess('Transaction created successfully');
             this.closeTransactionModal();
 
-                    this.loadTransactions();
-        this.loadResourceDetails();
+            this.loadTransactions();
+            this.loadResourceDetails();
 
           } else {
             this.showError(response.message || 'Failed to create transaction');
@@ -232,10 +275,10 @@ getTransactionTypeById(id: number): Configuration | undefined {
     this.router.navigate(['/financial/credit-management-list']);
   }
 
-isDebitTransaction(transactionTypeId: number): boolean {
-  const transactionType = this.transactionTypes.find(type => type.optionId === transactionTypeId);
-  return transactionType ? transactionType.value === 'DEBIT' : false;
-}
+  isDebitTransaction(transactionTypeId: number): boolean {
+    const transactionType = this.transactionTypes.find(type => type.optionId === transactionTypeId);
+    return transactionType ? transactionType.value === 'DEBIT' : false;
+  }
 
   // Summary Calculations
   getTotalCredits(): number {
