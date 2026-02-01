@@ -7,437 +7,401 @@
     <!-- Step Navigation -->
     <ul class="nav nav-pills nav-pills-custom mb-4">
       @for (s of [1, 2, 3]; track s) {
-        <li class="nav-item">
-          <button class="nav-link" type="button" [class.active]="currentStep === s"
-            [disabled]="s > currentStep + 1" (click)="goToStep(s)">
-            <span class="step-number">{{ s }}</span>
-            <span class="step-label">{{
-              s === 1
-              ? 'Job Details'
-              : s === 2
-              ? 'Cargo & Routing'
-              : 'Freight Details'
+      <li class="nav-item">
+        <button class="nav-link" type="button" [class.active]="currentStep === s" [disabled]="s > currentStep + 1"
+          (click)="goToStep(s)">
+          <span class="step-number">{{ s }}</span>
+          <span class="step-label">{{
+            s === 1
+            ? 'Job Details'
+            : s === 2
+            ? 'Cargo & Routing'
+            : 'Freight Details'
             }}</span>
-          </button>
-        </li>
+        </button>
+      </li>
       }
     </ul>
 
     <!-- STEP 1: Job Details -->
     @if (currentStep === 1) {
-      <div class="step-content">
-        <form [formGroup]="jobDetailsForm" class="form-professional">
-          <h5 class="section-title">
-            <i class="cil-briefcase"></i> Basic Job Information
-          </h5>
-          <!-- Client -->
-          <div class="row mb-3">
-            <div class="col-md-8 col-lg-6">
-              <div class="position-relative client-dropdown">
-                <label class="form-label">
-                  <i class="cil-user"></i> Client
-                </label>
-                <input type="text" class="form-control form-control-custom"
-                  placeholder="Search or select client"
-                  [value]="clientSearch"
-                  (input)="onClientSearchChange($event.target.value)"
-                  (focus)="clientDropdownOpen = true" />
-                  @if (clientDropdownOpen && filteredClients.length > 0) {
-                    <ul
-                      class="dropdown-list">
-                      @for(client of filteredClients; track client.customerId){
-                        <li class="dropdown-item-custom" (click)="selectClient(client)">
-                          {{ client.customerName }}
-                        </li>
-                      }
-                    </ul>
-                  }
-                  <input type="hidden" formControlName="clientInformation" />
-                </div>
-              </div>
-            </div>
-            <!-- Transaction + Incoterms -->
-            <div class="row mb-3">
-              <div class="col-md-8 col-lg-6 mb-3">
-                <label class="form-label">
-                  <i class="cil-swap-horizontal"></i> Transaction Type
-                </label>
-                <select formControlName="transactionType" class="form-select form-control-custom"
-                  (change)="onTransactionTypeChange($event)">
-                  <option value="">Select Transaction</option>
-                  @for(type of jobTransactionTypeList; track type.jobTransactionTypeId){
-                    <option [value]="type.jobTransactionTypeId"
-                      [attr.data-freight-type]="type.jobTransactionTypePrefix">
-                      {{ type.jobTransactionType }}
-                    </option>
-                  }
-                </select>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">
-                  <i class="cil-tags"></i> Incoterms
-                </label>
-                <select formControlName="incoterms" class="form-select form-control-custom">
-                  <option value="">Select Incoterms</option>
-                  @for(term of incotermsList; track term.optionId){
-                    <option [value]="term.optionId">
-                      {{ term.value }}
-                    </option>
-                  }
-                </select>
-              </div>
-            </div>
-            <!-- Payment + Amount -->
-            <div class="row mb-3">
-              <div class="col-md-6 mb-3">
-                <label class="form-label">
-                  <i class="cil-credit-card"></i> Payment Type
-                </label>
-                <select formControlName="paymentType" class="form-select form-control-custom">
-                  <option value="">Select Payment</option>
-                  @for (payment of paymenTypeList; track payment.optionId){
-                    <option [value]="payment.optionId">
-                      {{ payment.value }}
-                    </option>
-                  }
-                </select>
-              </div>
-              <div class="col-md-4 mb-3">
-                <label class="form-label">
-                  <i class="cil-dollar"></i> Amount
-                </label>
-                <input type="text" class="form-control form-control-custom"
-                  formControlName="amount" appNumberFormat placeholder="0.00" />
-                  @if (jobDetailsForm.get('amount')?.invalid && jobDetailsForm.get('amount')?.touched) {
-                    <div
-                      class="text-danger small mt-1">
-                      Please enter a valid amount.
-                    </div>
-                  }
-                </div>
-              </div>
-              <div class="step-actions">
-                <button class="btn btn-primary btn-custom" type="button"
-                  (click)="nextStep()" [disabled]="!jobDetailsForm.valid">
-                  Next <i class="cil-arrow-right ms-2"></i>
-                </button>
-              </div>
-            </form>
-          </div>
-        }
-
-        <!-- STEP 2: Common Freight Details -->
-        @if (currentStep === 2) {
-          <div class="step-content">
-            <form [formGroup]="shipmentFreightForm" class="form-professional">
-              <h5 class="section-title">
-                <i class="cil-calendar"></i> Shipment Schedule
-              </h5>
-              <div class="row mb-4">
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">Cut-off / LCT Date</label>
-                  <input type="date" class="form-control form-control-custom" formControlName="cutoff" />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">ETD (Estimated Departure)</label>
-                  <input type="date" class="form-control form-control-custom" formControlName="etd" />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">ETA (Estimated Arrival)</label>
-                  <input type="date" class="form-control form-control-custom" formControlName="eta" />
-                </div>
-              </div>
-              <h5 class="section-title">
-                <i class="cil-location-pin"></i> Routing & Location
-              </h5>
-              <div class="row mb-4">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Origin / Port of Loading</label>
-                  <input type="text" class="form-control form-control-custom" formControlName="origin" />
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Destination / Port of Discharge</label>
-                  <input type="text" class="form-control form-control-custom" formControlName="destination" />
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Port / CFS</label>
-                  <input type="text" class="form-control form-control-custom" formControlName="portCfs" />
-                </div>
-              </div>
-              <h5 class="section-title">
-                <i class="cil-layers"></i> Shipment Details
-              </h5>
-              <div class="row">
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">Commodity</label>
-                  <input type="text" class="form-control form-control-custom" formControlName="commodity" />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">Volume (m³)</label>
-                  <input type="number" step="0.001" class="form-control form-control-custom"
-                    formControlName="volume" />
-                  </div>
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label">Gross Weight (kg)</label>
-                    <input type="number" step="0.01" class="form-control form-control-custom"
-                      formControlName="grossWeight" />
-                    </div>
-                    <div class="col-md-4 mb-3">
-                      <label class="form-label">Number of Packages</label>
-                      <input type="number" class="form-control form-control-custom"
-                        formControlName="numberOfPackages" />
-                      </div>
-                    </div>
-                    <div class="step-actions">
-                      <button class="btn btn-secondary btn-custom-secondary" type="button"
-                        (click)="previousStep()">
-                        <i class="cil-arrow-left me-2"></i> Previous
-                      </button>
-                      <button class="btn btn-primary btn-custom" type="button"
-                        (click)="nextStep()" [disabled]="!shipmentFreightForm.valid">
-                        Next <i class="cil-arrow-right ms-2"></i>
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              }
-
-              <!-- STEP 3: Freight Mode Details -->
-              @if (currentStep === 3) {
-                <div class="step-content">
-                  <form [formGroup]="freightForm" class="form-professional">
-                    <h5 class="section-title">
-                      <i class="cil-airplane-mode"></i> Freight Mode Details ({{ freightTypeLabel }})
-                    </h5>
-                    <!-- SEA FIELDS -->
-                    @if (isSeaFreight) {
-                      <div>
-                        <div class="row mb-4">
-                          <div class="col-md-6 mb-3">
-                            <label class="form-label">MBL Reference</label>
-                            <input type="text" class="form-control form-control-custom" formControlName="mbl" />
-                          </div>
-                          <div class="col-md-6 mb-3">
-                            <label class="form-label">HBL Reference</label>
-                            <input type="text" class="form-control form-control-custom" formControlName="hbl" />
-                          </div>
-                          <div class="col-md-6 mb-3">
-                            <label class="form-label">Vessel</label>
-                            <input type="text" class="form-control form-control-custom" formControlName="vessel" />
-                          </div>
-                          <div class="col-md-6 mb-3">
-                            <label class="form-label">Container Type</label>
-                            <select class="form-select form-control-custom" formControlName="containerType">
-                              <option value="">Select Size</option>
-                              <option value="20GP">20GP</option>
-                              <option value="40GP">40GP</option>
-                              <option value="40HQ">40HQ</option>
-                            </select>
-                          </div>
-                          <div class="col-md-3 mb-3">
-                            <label class="form-label">Container Count</label>
-                            <input type="number" class="form-control form-control-custom"
-                              formControlName="containerCount" />
-                            </div>
-                          </div>
-                        </div>
-                      }
-                      <!-- AIR FIELDS -->
-                      @if (isAirFreight) {
-                        <div>
-                          <div class="row mb-4">
-                            <div class="col-md-6 mb-3">
-                              <label class="form-label">MAWB Reference</label>
-                              <input type="text" class="form-control form-control-custom" formControlName="mawb" />
-                            </div>
-                            <div class="col-md-6 mb-3">
-                              <label class="form-label">HAWB Reference</label>
-                              <input type="text" class="form-control form-control-custom" formControlName="hawb" />
-                            </div>
-                            <div class="col-md-6 mb-3">
-                              <label class="form-label">Flight No.</label>
-                              <input type="text" class="form-control form-control-custom" formControlName="flightNo" />
-                            </div>
-                            <div class="col-md-6 mb-3">
-                              <label class="form-label">Chargeable Weight (kg)</label>
-                              <input type="number" step="0.01" class="form-control form-control-custom"
-                                formControlName="chargeableWeight" />
-                              </div>
-                            </div>
-                          </div>
-                        }
-                        <h5 class="section-title">
-                          <i class="cil-people"></i> References & Parties
-                        </h5>
-                        <div class="row">
-                          <div class="col-md-6 mb-3">
-                            <label class="form-label">BL / AWB / Booking No.</label>
-                            <input type="text" class="form-control form-control-custom" formControlName="bookingNo" />
-                          </div>
-                          <div class="col-md-6 mb-3">
-                            <label class="form-label">Carrier / Airline</label>
-                            <input type="text" class="form-control form-control-custom" formControlName="carrier" />
-                          </div>
-                          <div class="col-md-6 mb-3">
-                            <label class="form-label">Shipper</label>
-                            <input type="text" class="form-control form-control-custom" formControlName="shipper" />
-                          </div>
-                          <div class="col-md-6 mb-3">
-                            <label class="form-label">Consignee</label>
-                            <input type="text" class="form-control form-control-custom" formControlName="consignee" />
-                          </div>
-                          <div class="col-md-6 mb-3">
-                            <div class="position-relative agency-dropdown">
-                              <label class="form-label">Agent</label>
-                              <input type="text" class="form-control form-control-custom"
-                                placeholder="Search or select agent"
-                                [value]="agencySearch"
-                                (input)="onAgencySearchChange($any($event.target).value)"
-                                (focus)="agencyDropdownOpen = true" />
-                                @if (agencyDropdownOpen && filteredAgencies.length > 0) {
-                                  <ul
-                                    class="dropdown-list">
-                                    @for(agency of filteredAgencies; track agency.agencyGuid){
-                                      <li class="dropdown-item-custom" (click)="selectAgency(agency)">
-                                        {{ agency.agentName }}
-                                      </li>
-                                    }
-                                  </ul>
-                                }
-                                <input type="hidden" formControlName="agent" />
-                              </div>
-                            </div>
-                            <div class="col-md-12 mb-3">
-                              <label class="form-label">Remarks</label>
-                              <textarea rows="3" class="form-control form-control-custom"
-                              formControlName="remarks"></textarea>
-                            </div>
-                          </div>
-                          <div class="step-actions">
-                            <button class="btn btn-secondary btn-custom-secondary" type="button"
-                              (click)="previousStep()">
-                              <i class="cil-arrow-left me-2"></i> Previous
-                            </button>
-                            <button class="btn btn-success btn-custom-success" type="button"
-                              (click)="showConfirmationModal()">
-                              <i class="cil-check me-2"></i> Finish
-                            </button>
-                          </div>
-                        </form>
-                      </div>
-                    }
-                  </div>
-                </div>
-
-                <!-- Confirmation Modal - Angular Based -->
-                @if (showConfirmModal) {
-                  <div class="modal-backdrop" (click)="closeConfirmModal()"></div>
+    <div class="step-content">
+      <form [formGroup]="jobDetailsForm" class="form-professional">
+        <h5 class="section-title">
+          <i class="cil-briefcase"></i> Basic Job Information
+        </h5>
+        <!-- Client -->
+        <div class="row mb-3">
+          <div class="col-md-8 col-lg-6">
+            <div class="position-relative client-dropdown">
+              <label class="form-label">
+                <i class="cil-user"></i> Client
+              </label>
+              <input type="text" class="form-control form-control-custom" placeholder="Search or select client"
+                [value]="clientSearch" (input)="onClientSearchChange($event.target.value)"
+                (focus)="clientDropdownOpen = true" />
+              @if (clientDropdownOpen && filteredClients.length > 0) {
+              <ul class="dropdown-list">
+                @for(client of filteredClients; track client.customerId){
+                <li class="dropdown-item-custom" (click)="selectClient(client)">
+                  {{ client.customerName }}
+                </li>
                 }
-                <div class="modal custom-modal" [class.show]="showConfirmModal" [class.d-block]="showConfirmModal"
-                  tabindex="-1" role="dialog">
-                  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">
-                          <i class="cil-check-circle me-2"></i>
-                          Confirm Job Submission
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" (click)="closeConfirmModal()"
-                        aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        <div class="confirmation-content">
-                          <div class="alert alert-info" role="alert">
-                            <i class="cil-info me-2"></i>
-                            Please review the following information before submitting:
-                          </div>
+              </ul>
+              }
+              <input type="hidden" formControlName="clientInformation" />
+            </div>
+          </div>
+        </div>
+        <!-- Transaction + Incoterms -->
+        <div class="row mb-3">
+          <div class="col-md-8 col-lg-6 mb-3">
+            <label class="form-label">
+              <i class="cil-swap-horizontal"></i> Transaction Type
+            </label>
+            <select formControlName="transactionType" class="form-select form-control-custom"
+              (change)="onTransactionTypeChange($event)">
+              <option value="">Select Transaction</option>
+              @for(type of jobTransactionTypeList; track type.jobTransactionTypeId){
+              <option [value]="type.jobTransactionTypeId" [attr.data-freight-type]="type.jobTransactionTypePrefix">
+                {{ type.jobTransactionType }}
+              </option>
+              }
+            </select>
+          </div>
+        </div>
+        <!-- Payment + Amount -->
+        <div class="row mb-3">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">
+              <i class="cil-credit-card"></i> Payment Type
+            </label>
+            <select formControlName="paymentType" class="form-select form-control-custom">
+              <option value="">Select Payment</option>
+              @for (payment of paymenTypeList; track payment.optionId){
+              <option [value]="payment.optionId">
+                {{ payment.value }}
+              </option>
+              }
+            </select>
+          </div>
 
-                          <div class="summary-section">
-                            <h6 class="fw-bold mb-3">Job Summary</h6>
-                            <div class="row mb-2">
-                              <div class="col-5 text-muted">Client:</div>
-                              <div class="col-7 fw-semibold">{{ selectedClientName || '-' }}</div>
-                            </div>
-                            <div class="row mb-2">
-                              <div class="col-5 text-muted">Transaction Type:</div>
-                              <div class="col-7 fw-semibold">{{ selectedTransactionType || '-' }}</div>
-                            </div>
-                            <div class="row mb-2">
-                              <div class="col-5 text-muted">Amount:</div>
-                              <div class="col-7 fw-semibold">₱{{ jobDetailsForm.get('amount')?.value | number:'1.2-2' }}</div>
-                            </div>
-                            <div class="row mb-2">
-                              <div class="col-5 text-muted">Origin:</div>
-                              <div class="col-7 fw-semibold">{{ shipmentFreightForm.get('origin')?.value || '-' }}</div>
-                            </div>
-                            <div class="row mb-2">
-                              <div class="col-5 text-muted">Destination:</div>
-                              <div class="col-7 fw-semibold">{{ shipmentFreightForm.get('destination')?.value || '-' }}</div>
-                            </div>
-                          </div>
+          <div class="col-md-4">
+            <label class="form-label">
+              <i class="cil-tags"></i> Incoterms
+            </label>
+            <select formControlName="incoterms" class="form-select form-control-custom">
+              <option value="">Select Incoterms</option>
+              @for(term of incotermsList; track term.optionId){
+              <option [value]="term.optionId">
+                {{ term.value }}
+              </option>
+              }
+            </select>
+          </div>
+          <div class="col-md-2 mb-3" hidden="hidden">
+            <label class="form-label">
+              <i class="cil-dollar"></i> Amount
+            </label>
+            <input type="text" class="form-control form-control-custom" formControlName="amount" appNumberFormat
+              placeholder="0.00" />
+            @if (jobDetailsForm.get('amount')?.invalid && jobDetailsForm.get('amount')?.touched) {
+            <div class="text-danger small mt-1">
+              Please enter a valid amount.
+            </div>
+            }
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="btn btn-primary btn-custom" type="button" (click)="nextStep()"
+            [disabled]="!jobDetailsForm.valid">
+            Next <i class="cil-arrow-right ms-2"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    }
 
-                          <p class="mb-0 mt-3">
-                            <i class="cil-warning text-warning me-2"></i>
-                            Are you sure you want to submit this job?
-                          </p>
-                        </div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" (click)="closeConfirmModal()">
-                          <i class="cil-x me-2"></i>Cancel
-                        </button>
-                        <button type="button" class="btn btn-success" (click)="confirmSubmit()" [disabled]="isSubmitting">
-                          @if (!isSubmitting) {
-                            <span>
-                              <i class="cil-check me-2"></i>Yes, Submit Job
-                            </span>
-                          }
-                          @if (isSubmitting) {
-                            <span>
-                              <span class="spinner-border spinner-border-sm me-2"></span>
-                              Submitting...
-                            </span>
-                          }
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <!-- Toast Notifications - Angular Based -->
-                <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
-                  <!-- Success Toast -->
-                  <div class="toast align-items-center border-0" [class.show]="showSuccessToast"
-                    role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="d-flex">
-                      <div class="toast-body bg-success text-white rounded">
-                        <div class="d-flex align-items-center">
-                          <i class="cil-check-circle me-2" style="font-size: 1.5rem;"></i>
-                          <div>
-                            <strong class="d-block">Success!</strong>
-                            <span>{{ successMessage }}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <button type="button" class="btn-close btn-close-white me-2 m-auto"
-                      (click)="showSuccessToast = false" aria-label="Close"></button>
-                    </div>
-                  </div>
+    <!-- STEP 2: Common Freight Details -->
+    @if (currentStep === 2) {
+    <div class="step-content">
+      <form [formGroup]="shipmentFreightForm" class="form-professional">
+        <h5 class="section-title">
+          <i class="cil-location-pin"></i> Routing & Location
+        </h5>
+        <div class="row mb-4">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Origin / Port of Loading</label>
+            <input type="text" class="form-control form-control-custom" formControlName="origin" />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Destination / Port of Discharge</label>
+            <input type="text" class="form-control form-control-custom" formControlName="destination" />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Port / CFS</label>
+            <input type="text" class="form-control form-control-custom" formControlName="portCfs" />
+          </div>
+        </div>
+        <h5 class="section-title">
+          <i class="cil-layers"></i> Shipment Details
+        </h5>
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Commodity</label>
+            <input type="text" class="form-control form-control-custom" formControlName="commodity" />
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Volume (m³)</label>
+            <input type="number" step="0.001" class="form-control form-control-custom" formControlName="volume" />
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Gross Weight (kg)</label>
+            <input type="number" step="0.01" class="form-control form-control-custom" formControlName="grossWeight" />
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Number of Packages</label>
+            <input type="number" class="form-control form-control-custom" formControlName="numberOfPackages" />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="btn btn-secondary btn-custom-secondary" type="button" (click)="previousStep()">
+            <i class="cil-arrow-left me-2"></i> Previous
+          </button>
+          <button class="btn btn-primary btn-custom" type="button" (click)="nextStep()"
+            [disabled]="!shipmentFreightForm.valid">
+            Next <i class="cil-arrow-right ms-2"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    }
 
-                  <!-- Error Toast -->
-                  <div class="toast align-items-center border-0" [class.show]="showErrorToast"
-                    role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="d-flex">
-                      <div class="toast-body bg-danger text-white rounded">
-                        <div class="d-flex align-items-center">
-                          <i class="cil-x-circle me-2" style="font-size: 1.5rem;"></i>
-                          <div>
-                            <strong class="d-block">Error</strong>
-                            <span>{{ errorMessage }}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <button type="button" class="btn-close btn-close-white me-2 m-auto"
-                      (click)="showErrorToast = false" aria-label="Close"></button>
-                    </div>
-                  </div>
-                </div>
+    <!-- STEP 3: Freight Mode Details -->
+    @if (currentStep === 3) {
+    <div class="step-content">
+      <form [formGroup]="freightForm" class="form-professional">
+        <h5 class="section-title">
+          <i class="cil-airplane-mode"></i> Freight Mode Details ({{ freightTypeLabel }})
+        </h5>
+        <!-- SEA FIELDS -->
+        @if (isSeaFreight) {
+        <div>
+          <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">MBL Reference</label>
+              <input type="text" class="form-control form-control-custom" formControlName="mbl" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">HBL Reference</label>
+              <input type="text" class="form-control form-control-custom" formControlName="hbl" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Vessel</label>
+              <input type="text" class="form-control form-control-custom" formControlName="vessel" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Container Type</label>
+              <select class="form-select form-control-custom" formControlName="containerType">
+                <option value="">Select Size</option>
+                <option value="20GP">20GP</option>
+                <option value="40GP">40GP</option>
+                <option value="40HQ">40HQ</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        }
+        <!-- AIR FIELDS -->
+        @if (isAirFreight) {
+        <div>
+          <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">MAWB Reference</label>
+              <input type="text" class="form-control form-control-custom" formControlName="mawb" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">HAWB Reference</label>
+              <input type="text" class="form-control form-control-custom" formControlName="hawb" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Flight No.</label>
+              <input type="text" class="form-control form-control-custom" formControlName="flightNo" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Chargeable Weight (kg)</label>
+              <input type="number" step="0.01" class="form-control form-control-custom"
+                formControlName="chargeableWeight" />
+            </div>
+          </div>
+        </div>
+        }
+        <h5 class="section-title">
+          <i class="cil-people"></i> References & Parties
+        </h5>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">BL / AWB / Booking No.</label>
+            <input type="text" class="form-control form-control-custom" formControlName="bookingNo" />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Carrier / Airline</label>
+            <input type="text" class="form-control form-control-custom" formControlName="carrier" />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Shipper</label>
+            <input type="text" class="form-control form-control-custom" formControlName="shipper" />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Consignee</label>
+            <input type="text" class="form-control form-control-custom" formControlName="consignee" />
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="position-relative agency-dropdown">
+              <label class="form-label">Agent</label>
+              <input type="text" class="form-control form-control-custom" placeholder="Search or select agent"
+                [value]="agencySearch" (input)="onAgencySearchChange($any($event.target).value)"
+                (focus)="agencyDropdownOpen = true" />
+              @if (agencyDropdownOpen && filteredAgencies.length > 0) {
+              <ul class="dropdown-list">
+                @for(agency of filteredAgencies; track agency.agencyGuid){
+                <li class="dropdown-item-custom" (click)="selectAgency(agency)">
+                  {{ agency.agentName }}
+                </li>
+                }
+              </ul>
+              }
+              <input type="hidden" formControlName="agent" />
+            </div>
+          </div>
+          <div class="col-md-12 mb-3">
+            <label class="form-label">Remarks</label>
+            <textarea rows="3" class="form-control form-control-custom" formControlName="remarks"></textarea>
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="btn btn-secondary btn-custom-secondary" type="button" (click)="previousStep()">
+            <i class="cil-arrow-left me-2"></i> Previous
+          </button>
+          <button class="btn btn-success btn-custom-success" type="button" (click)="showConfirmationModal()">
+            <i class="cil-check me-2"></i> Finish
+          </button>
+        </div>
+      </form>
+    </div>
+    }
+  </div>
+</div>
+
+<!-- Confirmation Modal - Angular Based -->
+@if (showConfirmModal) {
+<div class="modal-backdrop" (click)="closeConfirmModal()"></div>
+}
+<div class="modal custom-modal" [class.show]="showConfirmModal" [class.d-block]="showConfirmModal" tabindex="-1"
+  role="dialog">
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="cil-check-circle me-2"></i>
+          Confirm Job Submission
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeConfirmModal()"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="confirmation-content">
+          <div class="alert alert-info" role="alert">
+            <i class="cil-info me-2"></i>
+            Please review the following information before submitting:
+          </div>
+
+          <div class="summary-section">
+            <h6 class="fw-bold mb-3">Job Summary</h6>
+            <div class="row mb-2">
+              <div class="col-5 text-muted">Client:</div>
+              <div class="col-7 fw-semibold">{{ selectedClientName || '-' }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-5 text-muted">Transaction Type:</div>
+              <div class="col-7 fw-semibold">{{ selectedTransactionType || '-' }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-5 text-muted">Amount:</div>
+              <div class="col-7 fw-semibold">₱{{ jobDetailsForm.get('amount')?.value | number:'1.2-2' }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-5 text-muted">Origin:</div>
+              <div class="col-7 fw-semibold">{{ shipmentFreightForm.get('origin')?.value || '-' }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-5 text-muted">Destination:</div>
+              <div class="col-7 fw-semibold">{{ shipmentFreightForm.get('destination')?.value || '-' }}</div>
+            </div>
+          </div>
+
+          <p class="mb-0 mt-3">
+            <i class="cil-warning text-warning me-2"></i>
+            Are you sure you want to submit this job?
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeConfirmModal()">
+          <i class="cil-x me-2"></i>Cancel
+        </button>
+        <button type="button" class="btn btn-success" (click)="confirmSubmit()" [disabled]="isSubmitting">
+          @if (!isSubmitting) {
+          <span>
+            <i class="cil-check me-2"></i>Yes, Submit Job
+          </span>
+          }
+          @if (isSubmitting) {
+          <span>
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Submitting...
+          </span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Toast Notifications - Angular Based -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+  <!-- Success Toast -->
+  <div class="toast align-items-center border-0" [class.show]="showSuccessToast" role="alert" aria-live="assertive"
+    aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body bg-success text-white rounded">
+        <div class="d-flex align-items-center">
+          <i class="cil-check-circle me-2" style="font-size: 1.5rem;"></i>
+          <div>
+            <strong class="d-block">Success!</strong>
+            <span>{{ successMessage }}</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showSuccessToast = false"
+        aria-label="Close"></button>
+    </div>
+  </div>
+
+  <!-- Error Toast -->
+  <div class="toast align-items-center border-0" [class.show]="showErrorToast" role="alert" aria-live="assertive"
+    aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body bg-danger text-white rounded">
+        <div class="d-flex align-items-center">
+          <i class="cil-x-circle me-2" style="font-size: 1.5rem;"></i>
+          <div>
+            <strong class="d-block">Error</strong>
+            <span>{{ errorMessage }}</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showErrorToast = false"
+        aria-label="Close"></button>
+    </div>
+  </div>
+</div>

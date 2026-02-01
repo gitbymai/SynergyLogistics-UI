@@ -184,14 +184,6 @@
                 </div>
                 <div class="col-md-4">
                   <div class="detail-item">
-                    <label class="detail-label">
-                      <i class="bi bi-calendar-event"></i> Cut-off / LCT
-                    </label>
-                    <div class="detail-value">{{ job?.cutoff | date:'MM/dd/yy h:mm a' }}</div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="detail-item">
                     <label class="detail-label">Carrier</label>
                     <div class="detail-value">{{ job?.carrier || '-' }}</div>
                   </div>
@@ -297,28 +289,8 @@
                       <div class="detail-value">{{ job?.vessel || '-' }}</div>
                     </div>
                   </div>
-                  <div class="col-md-3">
-                    <div class="detail-item">
-                      <label class="detail-label">Container Size</label>
-                      <div class="detail-value">{{ job?.containerCount || '-' }}</div>
-                    </div>
-                  </div>
-                  <div class="col-md-3">
-                    <div class="detail-item">
-                      <label class="detail-label">Container Count</label>
-                      <div class="detail-value">{{ job?.containerCount || '-' }}</div>
-                    </div>
-                  </div>
                 </div>
               </div>
-              @if (job?.containerCount) {
-              <div class="detail-section">
-                <div class="detail-item">
-                  <label class="detail-label">Container Numbers</label>
-                  <div class="detail-value">{{ job?.containerCount }}</div>
-                </div>
-              </div>
-              }
             </div>
             }
 

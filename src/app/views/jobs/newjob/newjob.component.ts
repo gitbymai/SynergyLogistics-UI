@@ -134,7 +134,7 @@ export class NewjobComponent implements OnInit {
       transactionType: ['', Validators.required],
       incoterms: ['', Validators.required],
       paymentType: ['', Validators.required],
-      amount: ['', [Validators.required]]
+      amount: [0]
     });
 
     // Step 2: Common Freight Details
@@ -328,9 +328,6 @@ export class NewjobComponent implements OnInit {
       paymentTypeId: +this.jobDetailsForm.value.paymentType,
       amount: parseFloat(this.jobDetailsForm.value.amount),
 
-      cutoff: this.shipmentFreightForm.value.cutoff || null,
-      etd: this.shipmentFreightForm.value.etd || null,
-      eta: this.shipmentFreightForm.value.eta || null,
       origin: this.shipmentFreightForm.value.origin || null,
       destination: this.shipmentFreightForm.value.destination || null,
       portCfs: this.shipmentFreightForm.value.portCfs || null,
@@ -343,7 +340,6 @@ export class NewjobComponent implements OnInit {
       hbl: this.freightForm.value.hbl || null,
       vessel: this.freightForm.value.vessel || null,
       containerType: this.freightForm.value.containerType || null,
-      containerCount: this.freightForm.value.containerCount ? +this.freightForm.value.containerCount : null,
       mawb: this.freightForm.value.mawb || null,
       hawb: this.freightForm.value.hawb || null,
       flightNo: this.freightForm.value.flightNo || null,

@@ -216,9 +216,6 @@ export class JobmanagementComponent implements OnInit {
         <div class="field-row"><label>Container Type</label><div class="value">${job.containerType || '-'}</div></div>
       </div>
       <div class="col-4">
-        <div class="field-row"><label>Container Count</label><div class="value">${job.containerCount || '-'}</div></div>
-      </div>
-      <div class="col-4">
         <div class="field-row"><label>Shipper</label><div class="value">${job.shipper || '-'}</div></div>
       </div>
       <div class="col-4">
@@ -533,12 +530,6 @@ export class JobmanagementComponent implements OnInit {
           </div>
           <div class="col-4">
             <div class="field-row">
-              <label>Cut-off / LCT</label>
-              <div class="value">${formatDate(job.cutoff)}</div>
-            </div>
-          </div>
-          <div class="col-4">
-            <div class="field-row">
               <label>Carrier</label>
               <div class="value">${job.carrier || '-'}</div>
             </div>
@@ -564,12 +555,7 @@ export class JobmanagementComponent implements OnInit {
               <div class="value">${job.portCfs || '-'}</div>
             </div>
           </div>
-          <div class="col-3">
-            <div class="field-row">
-              <label>ETD → ETA</label>
-              <div class="value">${formatDate(job.etd)} → ${formatDate(job.eta)}</div>
-            </div>
-          </div>
+
         </div>
 
         <div class="print-row">

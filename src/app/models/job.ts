@@ -7,9 +7,6 @@ export interface CreateJobRequest {
   amount: number;
 
   // Shipment Freight Details
-  cutoff?: string | null;
-  etd?: string | null;
-  eta?: string | null;
   origin?: string | null;
   destination?: string | null;
   portCfs?: string | null;
@@ -23,7 +20,6 @@ export interface CreateJobRequest {
   hbl?: string | null;
   vessel?: string | null;
   containerType?: string | null;
-  containerCount?: number | null;
   mawb?: string | null;
   hawb?: string | null;
   flightNo?: string | null;
