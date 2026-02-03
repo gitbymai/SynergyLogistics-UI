@@ -81,6 +81,8 @@ export interface ChargeTransaction {
   calculatedAmount: number;
   calculatedSellingAmount: number;
 
+  processorOwner?: number;
+  processorOwnerName?: string | null;
 }
 
 export interface ChargeTransactionAuditLog {

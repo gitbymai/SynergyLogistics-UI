@@ -24,7 +24,6 @@
             <!-- LEFT COLUMN -->
             <div class="col-lg-6">
 
-
                 <!-- Client & Status -->
                 <div class="info-card mb-3">
                     <div class="info-card-header">
@@ -50,10 +49,28 @@
                             <label>Incoterms</label>
                             <span>{{ job?.incotermsName || '-' }}</span>
                         </div>
+                        @if(job && job.hbl !== null) {
                         <div class="info-row">
-                            <label>Payment Type</label>
-                            <span>{{ job?.paymentTypeName || '-' }}</span>
+                            <label>HBL</label>
+                            <span>{{ job.hbl || '-' }}</span>
                         </div>
+                        } @if(job && job.mbl !== null) {
+                        <div class="info-row">
+                            <label>MBL</label>
+                            <span>{{ job.mbl || '-' }}</span>
+                        </div>
+                        }
+                        @if(job && job.hawb !== null) {
+                        <div class="info-row">
+                            <label>HAWB</label>
+                            <span>{{ job.hawb || '-' }}</span>
+                        </div>
+                        } @if(job && job.mawb !== null) {
+                        <div class="info-row">
+                            <label>MAWB</label>
+                            <span>{{ job.mawb || '-' }}</span>
+                        </div>
+                        }
                     </div>
                 </div>
 

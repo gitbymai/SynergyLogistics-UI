@@ -502,3 +502,29 @@ $transition: all 0.3s ease;
     font-size: 2rem;
   }
 }
+
+.hero-logo {
+  margin: 3rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.company-logo {
+  max-width: 800px;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 1024px) {
+  .company-logo {
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 768px) {
+  .company-logo {
+    max-width: 400px;
+  }
+}

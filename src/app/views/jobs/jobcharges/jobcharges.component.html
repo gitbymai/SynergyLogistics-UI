@@ -39,6 +39,7 @@
 
           <th>Last Update</th>
           <th>Last Update By</th>
+          <th>In-Charge</th>
           @if(!viewSummary){
 
           <th class="text-center">Actions</th>
@@ -81,11 +82,25 @@
           }
           <td>{{ (charge.modifiedDate || charge.createdDate) | date:'MM/dd/yy h:mm a' }}</td>
           <td> {{ charge.modifiedByName || charge.createdByName }}</td>
+          <td [style.color]="!charge.processorOwnerName ? '#ffc107' : 'inherit'" 
+    [style.font-weight]="!charge.processorOwnerName ? 'bold' : 'normal'">
+  {{charge.processorOwnerName || 'UNASSIGNED'}}
+</td>
           @if(!viewSummary){
 
           <td class="text-center">
 
             @if (canProcessCharges()) {
+
+            @if(charge.chargeTransactionStatus === 'APPROVED' && (userRole ==='PROCESSOR') && (charge.processorOwnerName === '' || charge.processorOwnerName === null)){
+              
+            <button class="btn btn-primary btn-sm btn-badge-style" (click)="openOwnChargeConfirmation(charge)"
+              tooltip="Take In-Charge">
+              <i class="cil-notes me-1" title="Own Charge"></i>
+              own charge
+            </button>
+            }
+
             @if (charge.chargeTransactionStatus === 'CASH RECEIVED - FOR LIQUIDATION' && (userRole ==='PROCESSOR' ||
             userRole === 'OPSMGR' ||
             userRole === 'ADMIN')) {
@@ -97,7 +112,7 @@
             </button>
             }
 
-            @if(charge.chargeTransactionStatus === 'APPROVED' && (userRole === 'ADMIN' || userRole === 'FINANCE' ||
+            @if(charge.chargeTransactionStatus === 'APPROVED' && (charge.processorOwner !== 0 && charge.processorOwner !== null && charge.processorOwner !== undefined)  && (userRole === 'ADMIN' ||
             userRole === 'TREASURER')) {
 
             <button class="btn btn-info btn-sm btn-badge-style" tooltip="Approval to Release Cash"
@@ -107,7 +122,8 @@
             </button>
             }
 
-            @if(charge.chargeTransactionStatus === 'FOR RELEASING' && (userRole === 'ADMIN' || userRole === 'CASHIER')) {
+            @if(charge.chargeTransactionStatus === 'FOR RELEASING' && (userRole === 'ADMIN' || userRole === 'CASHIER'))
+            {
 
             <button class="btn btn-primary btn-sm btn-badge-style" tooltip="Set Cash Release"
               (click)="openCashReleaseConfirmation(charge)">
@@ -157,9 +173,11 @@
           <td class="text-end total-amount">₱{{ totalSellingAmount | number:'1.2-2' }}</td>
           <td></td>
           }
+          <td></td>
           @if (userRole === 'CASHIER' || userRole === 'PROCESSOR' || userRole === 'OPSMGR') {
           <td></td>
           }
+          <td></td>
           <td></td>
         </tr>
         @if (canViewSellingAmount()) {
@@ -170,6 +188,8 @@
             ₱{{ (totalSellingAmount - totalChargeAmount) | number:'1.2-2' }}
           </td>
           <td class="text-end total-amount"></td>
+          <td></td>
+          <td></td>
           <td></td>
           @if(!viewSummary){
 
@@ -672,6 +692,112 @@
   </div>
 </div>
 
+<!-- Own Line Charge Confirmation Modal -->
+@if (showOwnLineChargeConfirmModal) {
+<div class="modal-backdrop" (click)="closeOwnLineChargeConfirmModal()"></div>
+}
+<div class="modal custom-modal" [class.show]="showOwnLineChargeConfirmModal"
+  [class.d-block]="showOwnLineChargeConfirmModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-person-check me-2"></i> Own Line Charge
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeOwnLineChargeConfirmModal()"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Info Message -->
+        <div class="alert alert-info mb-3" role="alert">
+          <i class="bi bi-info-circle me-2"></i>
+          You are about to take ownership of this line charge transaction. This action will assign you as the processor and make this transaction eligible for processing.
+        </div>
+
+        <!-- Charge Summary -->
+        <div class="card mb-3" style="background-color: #eff6ff; border: 1px solid #93c5fd;">
+          <div class="card-body">
+            <h6 class="text-primary mb-3">
+              <i class="bi bi-receipt-cutoff me-2"></i> Transaction Details
+            </h6>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <strong class="text-muted">Charge Code:</strong>
+              </div>
+              <div class="col-md-8">
+                <span class="badge badge-code">{{ selectedCharge?.chargeCode }}</span>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <strong class="text-muted">Current Processor:</strong>
+              </div>
+              <div class="col-md-8">
+                {{ selectedCharge?.processorName || 'Unassigned' }}
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <strong class="text-muted">Category:</strong>
+              </div>
+              <div class="col-md-8">
+                {{ selectedCharge?.chargeSubCategoryName }}
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <strong class="text-muted">Amount:</strong>
+              </div>
+              <div class="col-md-8">
+                <strong class="text-primary fs-5">
+                  {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
+                </strong>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4">
+                <strong class="text-muted">Next Status:</strong>
+              </div>
+              <div class="col-md-8">
+                <span class="badge bg-primary">
+                  <i class="bi bi-person-check-fill me-1"></i>
+                  OWNED
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirmation Message -->
+        <div class="alert alert-warning mb-0" role="alert">
+          <i class="bi bi-question-circle me-2"></i>
+          Are you sure you want to take ownership of this line charge transaction?
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeOwnLineChargeConfirmModal()"
+          [disabled]="isSubmitting">
+          <i class="bi bi-x me-2"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="confirmOwnLineCharge()" [disabled]="isSubmitting">
+          @if (!isSubmitting) {
+          <span>
+            <i class="bi bi-check-circle me-2"></i> Confirm Ownership
+          </span>
+          }
+          @if (isSubmitting) {
+          <span>
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Processing...
+          </span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 @if (showAuditLogModal) {
 <div class="modal-backdrop" (click)="closeAuditLogModal()"></div>
 }
@@ -701,11 +827,12 @@
               </div>
               <div class="col-3">
                 <small class="text-muted d-block">Amount</small>
-                <strong class="small">{{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}</strong>
+                <strong class="small">{{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2'
+                  }}</strong>
               </div>
               <div class="col-3">
                 <small class="text-muted d-block">Status</small>
-                <span class="small" >
+                <span class="small">
                   {{ selectedCharge?.chargeTransactionStatus }}
                 </span>
               </div>
@@ -738,7 +865,7 @@
                       </span>
                       <small class="text-muted d-block mt-1">
                         <i class="bi bi-clock me-1"></i>
-                        {{ log.createDate | date:'MM/dd/yy h:mm a' }}
+                        {{ (log.createDate + 'Z') | date:'MM/dd/yy h:mm a':'+0800' }}
                       </small>
                     </div>
                     <div class="text-end">

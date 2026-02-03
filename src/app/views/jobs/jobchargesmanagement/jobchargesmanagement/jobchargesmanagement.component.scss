@@ -1,1 +1,46 @@
 @import url(../../../../../scss/_base.scss);
+.timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 20px;
+}
+
+.timeline-item:before {
+  content: '';
+  position: absolute;
+  left: -22px;
+  top: 8px;
+  bottom: -20px;
+  width: 2px;
+  background: #dee2e6;
+}
+
+.timeline-item:last-child:before {
+  display: none;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -28px;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #6c757d;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px #dee2e6;
+}
+
+.timeline-content {
+  margin-left: 10px;
+}
+
+.badge-code-audit {
+  background-color: #e7f3ff;
+  color: #0066cc;
+  font-weight: 500;
+}

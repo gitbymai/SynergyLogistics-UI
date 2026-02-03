@@ -97,6 +97,10 @@ export class ChargeTransactionService extends ApiService {
   confirmCashReleaseCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/actualcashrelease/${tranGuid}`, {});
   }
+  
+  ownCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
+    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/owncharge/${tranGuid}`, {});
+  }
 
   submitForClearingCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/forclearing/${tranGuid}`, {});

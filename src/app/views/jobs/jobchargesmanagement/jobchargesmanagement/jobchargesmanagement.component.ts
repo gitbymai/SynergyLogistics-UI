@@ -82,7 +82,7 @@ export class JobchargesmanagementComponent implements OnInit {
       chargeSubCategoryId: [0, [Validators.required, Validators.min(1)]],
       description: ['', Validators.maxLength(500)],
       currency: ['', Validators.required],
-      conversionRate: [{ value: 1, disabled: false }, [Validators.required, Validators.min(0.0001)]],
+      conversionRate: [{ value: 1, disabled: false }],
       amount: [0, [Validators.required, Validators.min(0)]],
       amountSelling: [0, [Validators.required, Validators.min(0)]],
       isForProcessing: [false],
@@ -108,7 +108,7 @@ export class JobchargesmanagementComponent implements OnInit {
       conversionRateControl?.clearValidators();
     } else {
       conversionRateControl?.enable();
-      conversionRateControl?.setValidators([Validators.required, Validators.min(0.0001)]);
+      // conversionRateControl?.setValidators([Validators.required, Validators.min(0.0001)]);
     }
 
     conversionRateControl?.updateValueAndValidity();
@@ -173,6 +173,7 @@ export class JobchargesmanagementComponent implements OnInit {
     });
 
   }
+
   openAddModal(): void {
     this.isEditMode = false;
     this.selectedCharge = null;
@@ -275,7 +276,9 @@ export class JobchargesmanagementComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Error rejectinng charge:', error);
+        
+        this.isSubmitting = false;
+        console.error('Error rejecting charge:', error.message);
         this.showError(error?.error?.Message || 'Failed to reject charge');
       }
     });
@@ -311,7 +314,7 @@ export class JobchargesmanagementComponent implements OnInit {
       amountSelling: this.chargeFormGroup.value.amountSelling,
       isForProcessing: this.chargeFormGroup.value.isForProcessing,
       currencyCode: this.chargeFormGroup.value.currency,
-      conversionRate: this.chargeFormGroup.value.conversionRate,
+      conversionRate: this.chargeFormGroup.value.conversionRate ?? 0,
       jobId: this.jobId,
     };
 
@@ -400,7 +403,7 @@ export class JobchargesmanagementComponent implements OnInit {
   }
 
    openViewModal(charge: ChargeTransaction): void {
- this.selectedCharge = charge;
+    this.selectedCharge = charge;
     this.activeTab = 'details'; // Reset to details tab
     this.loadAuditLogs(charge.chargeId);
     this.showViewModal = true;
@@ -472,6 +475,23 @@ export class JobchargesmanagementComponent implements OnInit {
       case 'APPROVED': return 'bi-check-circle';
       default: return 'bi-question-circle';
     }
+  }
+    getActionTypeBadge(actionType: string): string {
+    const type = actionType?.toLowerCase() || '';
+    if (type.includes('create')) return 'bg-success';
+    if (type.includes('complete')) return 'bg-purple';
+    if (type.includes('cancel')) return 'bg-danger';
+    if (type.includes('approve')) return 'bg-info';
+    return 'bg-primary';
+  }
+
+  getActionTypeClass(actionType: string): string {
+    const type = actionType?.toLowerCase() || '';
+    if (type.includes('create')) return 'action-create';
+    if (type.includes('complete')) return 'action-complete';
+    if (type.includes('cancel')) return 'action-cancel';
+    if (type.includes('approve')) return 'action-approve';
+    return 'action-update';
   }
 
   showSuccess(message: string): void {

@@ -131,36 +131,9 @@
   gap: 0.25rem;
 }
 
-/* Status Colors - Simplified Flat Design */
-.status-approved {
-  background-color: #d4edda !important;
-  color: #155724;
-  border: 1px solid #28a745;
-}
-
-.status-pending {
-  background-color: #fff3cd !important;
-  color: #856404;
-  border: 1px solid #ffc107;
-}
-
-.status-cancelled {
-  background-color: #e9ecef !important;
-  color: #495057;
-  border: 1px solid #6c757d;
-}
-
-.status-completed {
-  background-color: #d1f2eb !important;
-  color: #0f5132;
-  border: 1px solid #20c997;
-}
-
-.status-default {
-  background-color: #f8f9fa !important;
-  color: #6c757d;
-  border: 1px solid #dee2e6;
-}
+/* ============================================
+   ALL STATUS BADGE CLASSES
+   ============================================ */
 
 /* FOR APPROVAL - Yellow/Warning */
 .badge-for-approval,
@@ -194,7 +167,16 @@
   border: 1px solid #dc3545;
 }
 
+/* COMPLETED - Teal/Success */
+.badge-completed,
+.status-completed {
+  background-color: #d1f2eb;
+  color: #0f5132;
+  border: 1px solid #20c997;
+}
+
 /* FOR RELEASING - Orange */
+.badge-for-releasing,
 .status-for-releasing {
   background-color: #ffe5d0;
   color: #cc5200;
@@ -202,13 +184,49 @@
 }
 
 /* FOR LIQUIDATION - Purple */
+.badge-for-liquidation,
 .status-for-liquidation {
   background-color: #e0cffc;
   color: #59359a;
   border: 1px solid #6f42c1;
 }
 
-/* Additional Status Badges */
+/* CANCELLED - Gray */
+.badge-cancelled,
+.status-cancelled {
+  background-color: #e9ecef;
+  color: #495057;
+  border: 1px solid #6c757d;
+}
+
+/* APPROVED - Green */
+.badge-approved,
+.status-approved {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #28a745;
+}
+
+/* PENDING - Yellow/Warning (similar to FOR APPROVAL) */
+.badge-pending,
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+}
+
+/* DEFAULT - Light Gray */
+.badge-default,
+.status-default {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
+/* ============================================
+   ADDITIONAL STATUS BADGES
+   ============================================ */
+
 .badge-ongoing {
   background-color: #cfe2ff;
   color: #084298;

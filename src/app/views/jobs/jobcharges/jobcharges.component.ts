@@ -29,6 +29,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
   showCashReleasingConfirmModal = false;
   showCashReleaseConfirmModal = false;
   showFinalClosingConfirmModal = false;
+  showOwnLineChargeConfirmModal = false;
   selectedCharge: any = null;
 
   // Reactive Form
@@ -99,25 +100,18 @@ export class JobChargesComponent implements OnInit, OnChanges {
     }
   }
 
-  get total(): number {
-    const excludedStatuses = ['CANCELLED', 'REJECTED'];
-    return this.filteredCharges
-      .filter(charge => !excludedStatuses.includes(charge.chargeTransactionStatus!))
-      .reduce((sum, charge) => sum + (charge.amount || 0), 0);
-  }
-
   get totalChargeAmount(): number {
     const excludedStatuses = ['CANCELLED', 'REJECTED'];
     return this.filteredCharges
       .filter(charge => !excludedStatuses.includes(charge.chargeTransactionStatus!))
-      .reduce((sum, charge) => sum + (charge.amount || 0), 0);
+      .reduce((sum, charge) => sum + (charge.calculatedAmount || 0), 0);
   }
 
   get totalSellingAmount(): number {
     const excludedStatuses = ['CANCELLED', 'REJECTED'];
     return this.filteredCharges
       .filter(charge => !excludedStatuses.includes(charge.chargeTransactionStatus!))
-      .reduce((sum, charge) => sum + (charge.amountSelling || 0), 0);
+      .reduce((sum, charge) => sum + (charge.calculatedSellingAmount || 0), 0);
   }
 
   getColspan(): number {
@@ -153,23 +147,6 @@ export class JobChargesComponent implements OnInit, OnChanges {
     return 'bg-primary';
   }
 
- getStatusClass(status: string): string {
-  switch (status?.toUpperCase()) {
-    case 'FOR APPROVAL': return 'badge-for-approval';
-    case 'FOR CLEARING': return 'badge-released';
-    case 'CLEARED': return 'badge-cleared';
-    case 'REJECTED': return 'badge-rejected';
-    case 'COMPLETED': return 'badge-completed';
-    case 'FOR RELEASING': return 'badge-for-releasing';
-    case 'CASH RECEIVED - FOR LIQUIDATION': return 'badge-for-liquidation';
-    case 'CANCELLED': return 'badge-cancelled';
-    case 'APPROVED': return 'badge-approved';
-    case 'PENDING': return 'badge-pending';
-    case 'RELEASED': return 'badge-released';
-    default: return 'badge-default';
-  }
-}
-
   canViewSellingAmount(): boolean {
     return ['SALES', 'FINANCE', 'TREASURER', 'ADMIN'].includes(this.userRole);
   }
@@ -177,10 +154,6 @@ export class JobChargesComponent implements OnInit, OnChanges {
   canProcessCharges(): boolean {
 
     return ['ADMIN', 'PROCESSOR', 'OPSMGR', 'CASHIER', 'TREASURER', 'FINANCE'].includes(this.userRole);
-  }
-
-  processCharge(charge: ChargeTransaction) {
-    // Your processing logic here
   }
 
   loadChargeSubCategories(): void {
@@ -390,6 +363,44 @@ export class JobChargesComponent implements OnInit, OnChanges {
     });
   }
 
+  openOwnChargeConfirmation(charge:any){
+    
+    this.selectedCharge = charge;
+    this.showOwnLineChargeConfirmModal = true;
+  }
+
+  closeOwnLineChargeConfirmModal(){
+  if (!this.isSubmitting) {
+      this.showOwnLineChargeConfirmModal = false;
+      this.selectedCharge = null;
+    }
+  }
+
+  confirmOwnLineCharge(){
+    
+    this.isSubmitting = true;
+    
+    this.chargeService.ownCharge(this.selectedCharge.chargeGuid).subscribe({
+      next: (response) => {
+        this.isSubmitting = false;
+        this.showOwnLineChargeConfirmModal = false;
+
+        if (response.data) {
+          this.loadCharges();
+          this.showSuccess('Trannsaction completed!');
+          this.closeOwnLineChargeConfirmModal();
+        }
+        else {
+          this.showError(response.message || 'Failed to complete transaction');
+        }
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+        this.showError(error?.error?.Message || 'Failed to complete transaction');
+      }
+    });
+  }
+
   openSubmitClearingConfirmation(charge: any) {
     this.selectedCharge = charge;
     this.showSubmitClearingConfirmModal = true;
@@ -480,7 +491,6 @@ export class JobChargesComponent implements OnInit, OnChanges {
       next: (response) => {
         if (response.data && response.data.length > 0) {
           this.auditLogs = response.data;
-
         }
         this.isLoadingAuditLog = false;
       },

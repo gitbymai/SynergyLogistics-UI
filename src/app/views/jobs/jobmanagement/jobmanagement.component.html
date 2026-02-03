@@ -93,14 +93,6 @@
             <div class="detail-section">
               <div class="row g-4">
                 <div class="col-md-6">
-                  <div class="detail-item highlight-box">
-                    <label class="detail-label">
-                      <i class="bi bi-currency-dollar"></i> Amount
-                    </label>
-                    <div class="detail-value-large">₱{{ job?.amount | number:'1.2-2' }}</div>
-                  </div>
-                </div>
-                <div class="col-md-6">
                   <div class="detail-item">
                     <label class="detail-label">
                       <i class="bi bi-calendar"></i> Created Date
@@ -133,7 +125,7 @@
             </div>
             }
 
-            @if((userRole === 'SALES' || userRole === 'ADMIN') && job?.jobStatusName !== 'FOR APPROVAL') {
+            @if((userRole === 'SALES' || userRole === 'ADMIN' || userRole === 'OPS STAFF') && job?.jobStatusName !== 'FOR APPROVAL') {
             <div class="detail-section">
               <div class="row g-4">
                 <div class="col-md-8">
@@ -141,7 +133,7 @@
                 </div>
                 <div class="col-md-4">
                   <div class="text-end">
-                    @if(job?.jobStatusName !== 'CLOSED' && job?.jobStatusName !== 'CANCELLED' ){
+                    @if(job?.jobStatusName !== 'CLOSED' && job?.jobStatusName !== 'CANCELLED' && (userRole === 'OPS STAFF' || userRole === 'ADMIN')){
                     <button class="btn btn-approve me-2" (click)="openCloseConfirm(job)">
                       <span>Close Job</span>
                     </button>
