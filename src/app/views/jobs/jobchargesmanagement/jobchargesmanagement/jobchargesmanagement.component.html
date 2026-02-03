@@ -171,124 +171,140 @@
         </h5>
         <button type="button" class="btn-close btn-close-white" (click)="closeModal()" aria-label="Close"></button>
       </div>
+
       <div class="modal-body">
         <form [formGroup]="chargeFormGroup" class="form-professional">
-          <div class="row mb-3">
-            <!-- Charge Subcategory -->
-            <div class="col-md-12">
-              <label class="form-label">
-                <i class="bi bi-tag me-1"></i> Category <span class="text-danger">*</span>
-              </label>
-              <select class="form-select form-control-custom" formControlName="chargeSubCategoryId"
-                [class.disabled-select]="isEditMode" [style.pointer-events]="isEditMode ? 'none' : 'auto'"
-                [style.background-color]="isEditMode ? '#e9ecef' : null" [style.opacity]="isEditMode ? '0.6' : '1'">
-                <option [value]="0">Select category...</option>
-                @for (category of chargeSubCategories; track category.chargeSubCategoryId) {
-                <option [value]="category.chargeSubCategoryId">
-                  {{ category.chargeSubCategoryName }}
-                </option>
+          <div class="row">
+            <!-- LEFT COLUMN - Category and Description -->
+            <div class="col-md-6">
+              <!-- Charge Subcategory - Searchable -->
+              <div class="mb-3">
+                <div class="position-relative category-dropdown">
+                  <label class="form-label">
+                    <i class="bi bi-tag me-1"></i> Category <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" class="form-control form-control-custom" placeholder="Search or select category"
+                    [value]="categorySearch" (input)="onCategorySearchChange($any($event.target).value)"
+                    (focus)="categoryDropdownOpen = true" [disabled]="isEditMode"
+                    [style.background-color]="isEditMode ? '#e9ecef' : null" [style.opacity]="isEditMode ? '0.6' : '1'"
+                    [style.cursor]="isEditMode ? 'not-allowed' : 'text'" />
+                  @if (categoryDropdownOpen && filteredCategories.length > 0 && !isEditMode) {
+                  <ul class="dropdown-list">
+                    @for(category of filteredCategories; track category.chargeSubCategoryId){
+                    <li class="dropdown-item-custom" (click)="selectCategory(category)">
+                      {{ category.chargeSubCategoryName }}
+                    </li>
+                    }
+                  </ul>
+                  }
+                  @if (categoryDropdownOpen && filteredCategories.length === 0 && categorySearch && !isEditMode) {
+                  <ul class="dropdown-list">
+                    <li class="dropdown-item-custom text-muted">No categories found</li>
+                  </ul>
+                  }
+                  <input type="hidden" formControlName="chargeSubCategoryId" />
+                  @if (chargeFormGroup.get('chargeSubCategoryId')?.invalid &&
+                  chargeFormGroup.get('chargeSubCategoryId')?.touched) {
+                  <div class="text-danger small mt-1">
+                    Category is required
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Description -->
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="bi bi-card-text me-1"></i> Description
+                </label>
+                <textarea class="form-control form-control-custom" rows="8" formControlName="description"
+                  placeholder="Enter charge description..." [class.disabled-select]="isEditMode"
+                  [style.pointer-events]="isEditMode ? 'none' : 'auto'"
+                  [style.background-color]="isEditMode ? '#e9ecef' : null"
+                  [style.opacity]="isEditMode ? '0.6' : '1'"></textarea>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN - Financial Information -->
+            <div class="col-md-6">
+              <div class="row">
+
+                <!-- Currency -->
+                <div class="col-md-8 mb-3">
+                  <label class="form-label">
+                    <i class="bi bi-currency-exchange me-1"></i> Currency <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-select form-control-custom" formControlName="currency"
+                    [class.disabled-select]="isEditMode" [style.pointer-events]="isEditMode ? 'none' : 'auto'"
+                    [style.background-color]="isEditMode ? '#e9ecef' : null" [style.opacity]="isEditMode ? '0.6' : '1'">
+                    <option value="">Select currency...</option>
+                    <option value="PHP">PHP - Philippine Peso</option>
+                    <option value="USD">USD - US Dollar</option>
+                    <option value="SGD">SGD - Singapore Dollar</option>
+                    <option value="GBP">GBP - British Pound</option>
+                    <option value="EUR">EUR - Euro</option>
+                  </select>
+                  @if (chargeFormGroup.get('currency')?.invalid &&
+                  chargeFormGroup.get('currency')?.touched) {
+                  <div class="text-danger small mt-1">
+                    Currency is required
+                  </div>
+                  }
+                </div>
+                <!-- Conversion Rate -->
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">
+                    <i class="bi bi-calculator me-1"></i> Rate to PHP
+                  </label>
+                  <input type="number" class="form-control form-control-custom" formControlName="conversionRate"
+                    step="0.0001" placeholder="e.g., 56.50">
+                  @if (chargeFormGroup.get('currency')?.value === 'PHP') {
+                  <div class="text-muted small mt-1">
+                    <i class="bi bi-info-circle me-1"></i> Default rate
+                  </div>
+                  }
+                  @if (chargeFormGroup.get('conversionRate')?.invalid &&
+                  chargeFormGroup.get('conversionRate')?.touched &&
+                  chargeFormGroup.get('currency')?.value !== 'PHP') {
+                  <div class="text-danger small mt-1">
+                    Valid conversion rate is required
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Amount -->
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="bi bi-cash me-1"></i> Charge Amount <span class="text-danger">*</span>
+                </label>
+                <input type="number" class="form-control form-control-custom" formControlName="amount" step="0.01"
+                  placeholder="0.00">
+                @if (chargeFormGroup.get('amount')?.invalid && chargeFormGroup.get('amount')?.touched) {
+                <div class="text-danger small mt-1">
+                  Valid charge amount is required
+                </div>
                 }
-              </select>
-              @if (chargeFormGroup.get('chargeSubCategoryId')?.invalid &&
-              chargeFormGroup.get('chargeSubCategoryId')?.touched) {
-              <div class="text-danger small mt-1">
-                Category is required
               </div>
-              }
+
+              <!-- Amount Selling -->
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="bi bi-cash-coin me-1"></i> Amount Selling <span class="text-danger">*</span>
+                </label>
+                <input type="number" class="form-control form-control-custom" formControlName="amountSelling"
+                  step="0.01" placeholder="0.00">
+                @if (chargeFormGroup.get('amountSelling')?.invalid && chargeFormGroup.get('amountSelling')?.touched) {
+                <div class="text-danger small mt-1">
+                  Valid selling amount is required
+                </div>
+                }
+              </div>
             </div>
           </div>
 
-          <div class="row mb-3">
-            <!-- Currency -->
-            <div class="col-md-6">
-              <label class="form-label">
-                <i class="bi bi-currency-exchange me-1"></i> Currency <span class="text-danger">*</span>
-              </label>
-              <select class="form-select form-control-custom" formControlName="currency"
-                [class.disabled-select]="isEditMode" [style.pointer-events]="isEditMode ? 'none' : 'auto'"
-                [style.background-color]="isEditMode ? '#e9ecef' : null" [style.opacity]="isEditMode ? '0.6' : '1'">
-                <option value="">Select currency...</option>
-                <option value="PHP">PHP - Philippine Peso</option>
-                <option value="USD">USD - US Dollar</option>
-                <option value="SGD">SGD - Singapore Dollar</option>
-                <option value="GBP">GBP - British Pound</option>
-                <option value="EUR">EUR - Euro</option>
-              </select>
-              @if (chargeFormGroup.get('currency')?.invalid &&
-              chargeFormGroup.get('currency')?.touched) {
-              <div class="text-danger small mt-1">
-                Currency is required
-              </div>
-              }
-            </div>
-            <!-- Conversion Rate -->
-            <div class="col-md-6">
-              <label class="form-label">
-                <i class="bi bi-calculator me-1"></i> Conversion Rate to PHP
-              </label>
-              <input type="number" class="form-control form-control-custom" formControlName="conversionRate"
-                step="0.0001" placeholder="e.g., 56.50" [class.disabled-select]="isEditMode"
-                [style.pointer-events]="isEditMode ? 'none' : 'auto'"
-                [style.background-color]="isEditMode ? '#e9ecef' : null" [style.opacity]="isEditMode ? '0.6' : '1'">
-              @if (chargeFormGroup.get('currency')?.value === 'PHP') {
-              <div class="text-muted small mt-1">
-                <i class="bi bi-info-circle me-1"></i> Default rate (1.0) for PHP
-              </div>
-              }
-              @if (chargeFormGroup.get('conversionRate')?.invalid &&
-              chargeFormGroup.get('conversionRate')?.touched &&
-              chargeFormGroup.get('currency')?.value !== 'PHP') {
-              <div class="text-danger small mt-1">
-                Valid conversion rate is required
-              </div>
-              }
-            </div>
-          </div>
-          <div class="row mb-3">
-            <!-- Amount -->
-            <div class="col-md-6">
-              <label class="form-label">
-                <i class="bi bi-cash me-1"></i> Charge Amount <span class="text-danger">*</span>
-              </label>
-              <input type="number" class="form-control form-control-custom" formControlName="amount" step="0.01"
-                placeholder="0.00">
-              @if (chargeFormGroup.get('amount')?.invalid && chargeFormGroup.get('amount')?.touched) {
-              <div class="text-danger small mt-1">
-                Valid charge amount is required
-              </div>
-              }
-            </div>
-            <!-- Amount Selling -->
-            <div class="col-md-6">
-              <label class="form-label">
-                <i class="bi bi-cash-coin me-1"></i> Amount Selling <span class="text-danger">*</span>
-              </label>
-              <input type="number" class="form-control form-control-custom" formControlName="amountSelling" step="0.01"
-                placeholder="0.00">
-              @if (chargeFormGroup.get('amountSelling')?.invalid && chargeFormGroup.get('amountSelling')?.touched) {
-              <div class="text-danger small mt-1">
-                Valid selling amount is required
-              </div>
-              }
-            </div>
-          </div>
-
-          <!-- Description -->
-          <div class="row mb-3">
-            <div class="col-12">
-              <label class="form-label">
-                <i class="bi bi-card-text me-1"></i> Description
-              </label>
-              <textarea class="form-control form-control-custom" rows="3" formControlName="description"
-                placeholder="Enter charge description..." [class.disabled-select]="isEditMode"
-                [style.pointer-events]="isEditMode ? 'none' : 'auto'"
-                [style.background-color]="isEditMode ? '#e9ecef' : null"
-                [style.opacity]="isEditMode ? '0.6' : '1'"></textarea>
-            </div>
-          </div>
-
-          <!-- Is for Processing Checkbox -->
-          <div class="row mb-3">
+          <!-- Is for Processing Checkbox - Full Width at Bottom -->
+          <div class="row">
             <div class="col-12">
               <div class="card border-primary" style="background-color: #f8f9ff;">
                 <div class="card-body py-3">
@@ -356,18 +372,18 @@
         <div class="text-center mb-4">
           <i class="bi bi-exclamation-circle text-danger" style="font-size: 4rem;"></i>
         </div>
-        
+
         <!-- Warning Message -->
         <div class="alert alert-danger d-flex align-items-center mb-3" role="alert">
           <i class="bi bi-shield-exclamation me-2 fs-5"></i>
           <strong>This action cannot be undone!</strong>
         </div>
-        
+
         <!-- Confirmation Text -->
         <p class="text-center mb-4">
           Are you sure you want to cancel this charge?
         </p>
-        
+
         <!-- Charge Details Card -->
         <div class="card border-danger">
           <div class="card-body p-3">
@@ -378,14 +394,14 @@
               <div class="col-7">
                 <span class="badge bg-secondary">{{ selectedCharge?.chargeCode }}</span>
               </div>
-              
+
               <div class="col-5 text-muted">
                 <strong>Category:</strong>
               </div>
               <div class="col-7">
                 {{ selectedCharge?.chargeSubCategoryName }}
               </div>
-              
+
               <div class="col-5 text-muted">
                 <strong>Amount:</strong>
               </div>
@@ -394,7 +410,7 @@
                   {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
                 </strong>
               </div>
-              
+
               @if (selectedCharge?.description) {
               <div class="col-5 text-muted">
                 <strong>Description:</strong>
@@ -409,7 +425,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closeDeleteConfirm()">
           <i class="bi bi-x-circle me-2"></i> No, Keep It
@@ -741,10 +757,10 @@
                         }}</small>
                     </div>
                     }
-                      <div>
+                    <div>
                       <strong class="text-muted d-block">Processor Assigned:</strong>
                       {{ selectedCharge?.processorOwnerName || 'N/A' }}<br>
-                    
+
                     </div>
                   </div>
                 </div>
@@ -756,81 +772,81 @@
           <!-- Audit Log Tab -->
           @if (activeTab === 'audit') {
 
-   <div class="tab-pane fade show active">
-  @if (chargeAuditLogs && chargeAuditLogs.length > 0) {
-  <div class="timeline">
-    @for (log of chargeAuditLogs; track log.id) {
-    <div class="timeline-item">
-      <div class="timeline-marker" [ngClass]="getActionTypeClass(log.actionType)"></div>
-      <div class="timeline-content">
-        <div class="card mb-2 shadow-sm">
-          <div class="card-body p-2">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-              <div>
-                <span class="badge badge-sm" [ngClass]="getActionTypeBadge(log.actionType)">
-                  {{ log.actionType }}
-                </span>
-                <small class="text-muted d-block mt-1">
-                  <i class="bi bi-clock me-1"></i>
-                  {{ (log.createDate + 'Z') | date:'MM/dd/yy h:mm a':'+0800' }}
-                </small>
-              </div>
-              <div class="text-end">
-                <small class="text-muted">Modified by:</small>
-                <div class="small fw-bold">{{ log.modifiedBy }}</div>
-                @if (log.requestedBy) {
-                <small class="text-muted">Req: {{ log.requestedBy }}</small>
-                }
-              </div>
-            </div>
+          <div class="tab-pane fade show active">
+            @if (chargeAuditLogs && chargeAuditLogs.length > 0) {
+            <div class="timeline">
+              @for (log of chargeAuditLogs; track log.id) {
+              <div class="timeline-item">
+                <div class="timeline-marker" [ngClass]="getActionTypeClass(log.actionType)"></div>
+                <div class="timeline-content">
+                  <div class="card mb-2 shadow-sm">
+                    <div class="card-body p-2">
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                          <span class="badge badge-sm" [ngClass]="getActionTypeBadge(log.actionType)">
+                            {{ log.actionType }}
+                          </span>
+                          <small class="text-muted d-block mt-1">
+                            <i class="bi bi-clock me-1"></i>
+                            {{ (log.createDate + 'Z') | date:'MM/dd/yy h:mm a':'+0800' }}
+                          </small>
+                        </div>
+                        <div class="text-end">
+                          <small class="text-muted">Modified by:</small>
+                          <div class="small fw-bold">{{ log.modifiedBy }}</div>
+                          @if (log.requestedBy) {
+                          <small class="text-muted">Req: {{ log.requestedBy }}</small>
+                          }
+                        </div>
+                      </div>
 
-            <div class="row g-2 mt-2">
-              <div class="col-5">
-                <small class="text-muted">Status:</small>
-                <div class="mt-1">
-                  @if (log.previousStatus) {
-                  <span class="badge badge-sm bg-secondary">{{ log.previousStatus }}</span>
-                  <i class="bi bi-arrow-right mx-1 small"></i>
-                  }
-                  <span class="badge badge-sm" [ngClass]="getStatusClass(log.newStatus)">
-                    {{ log.newStatus }}
-                  </span>
+                      <div class="row g-2 mt-2">
+                        <div class="col-5">
+                          <small class="text-muted">Status:</small>
+                          <div class="mt-1">
+                            @if (log.previousStatus) {
+                            <span class="badge badge-sm bg-secondary">{{ log.previousStatus }}</span>
+                            <i class="bi bi-arrow-right mx-1 small"></i>
+                            }
+                            <span class="badge badge-sm" [ngClass]="getStatusClass(log.newStatus)">
+                              {{ log.newStatus }}
+                            </span>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <small class="text-muted">Amount:</small>
+                          <div class="mt-1 small fw-bold">{{ log.amount | number:'1.2-2' }}</div>
+                        </div>
+                        <div class="col-3">
+                          <small class="text-muted">Code:</small>
+                          <div class="mt-1">
+                            <span class="badge badge-sm badge-code-audit">{{ log.chargeCode }}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      @if (log.remarks) {
+                      <div class="mt-2">
+                        <small class="text-muted">Remarks:</small>
+                        <div class="alert alert-light mb-0 mt-1 p-2 small">
+                          <i class="bi bi-chat-left-quote me-1"></i>
+                          {{ log.remarks }}
+                        </div>
+                      </div>
+                      }
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="col-4">
-                <small class="text-muted">Amount:</small>
-                <div class="mt-1 small fw-bold">{{ log.amount | number:'1.2-2' }}</div>
-              </div>
-              <div class="col-3">
-                <small class="text-muted">Code:</small>
-                <div class="mt-1">
-                  <span class="badge badge-sm badge-code-audit">{{ log.chargeCode }}</span>
-                </div>
-              </div>
+              }
             </div>
-
-            @if (log.remarks) {
-            <div class="mt-2">
-              <small class="text-muted">Remarks:</small>
-              <div class="alert alert-light mb-0 mt-1 p-2 small">
-                <i class="bi bi-chat-left-quote me-1"></i>
-                {{ log.remarks }}
-              </div>
+            } @else {
+            <div class="alert alert-info text-center py-3" role="alert">
+              <i class="bi bi-info-circle me-2"></i>
+              <small>No audit log entries found for this transaction.</small>
             </div>
             }
           </div>
-        </div>
-      </div>
-    </div>
-    }
-  </div>
-  } @else {
-  <div class="alert alert-info text-center py-3" role="alert">
-    <i class="bi bi-info-circle me-2"></i>
-    <small>No audit log entries found for this transaction.</small>
-  </div>
-  }
-</div>
 
           }
         </div>

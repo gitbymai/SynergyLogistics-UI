@@ -4,6 +4,8 @@ export interface NewIctsiTransaction {
   amount: number;
   referenceNumber?: string;
   notes?: string;
+  jobId: string;
+  isReimbursement?: boolean;
 }
 
 export interface UpdateIctsiTransaction {
@@ -38,6 +40,9 @@ export interface IctsiTransaction {
   createdByName?: string;
   modifiedByName?: string;
   ictsiTransactionTypeName?: string;
+  isReimbursement?: boolean;
+  jobId?: number;
+  jobCode?: string;
 }
 
 export interface NewIctsi {

@@ -78,6 +78,12 @@
                         <th>
                             <i class="cil-notes me-2"></i> Reference #
                         </th>
+                        <th>
+                            <i class="cil-notes me-2"></i> Job Reference #
+                        </th>
+                        <th>
+                            <i class="cil-notes me-2"></i> Reimbursable
+                        </th>
                         <th class="text-center">
                             <i class="cil-calendar me-2"></i> Transaction Date
                         </th>
@@ -93,7 +99,7 @@
                     @if(getPagedTransactions().length > 0) {
                     @for(transaction of getPagedTransactions(); track transaction.ictsiTransactionId) {
                     <tr [class.inactive-row]="!transaction.isActive">
-                        <td>
+                        <td class="small">
                             <div class="d-flex align-items-center">
                                 @if(isDebitTransaction(transaction.optionIctsiTransactionTypeId)) {
                                 <span class="badge bg-danger me-2">
@@ -115,21 +121,27 @@
                             <span class="text-success fw-bold">+{{ transaction.amount | number:'1.2-2' }}</span>
                             }
                         </td>
-                        <td>
+                        <td class="text-center small">
                             @if(transaction.referenceNumber) {
                             <span>{{ transaction.referenceNumber }}</span>
                             } @else {
                             <span class="text-muted">-</span>
                             }
                         </td>
-                        <td class="text-center">
+                        <td class="text-center small">
+                            <span>{{transaction.jobCode}}</span>
+                        </td>
+                        <td class="text-center small">
+                            <span>{{transaction.isReimbursement ? 'Yes' : 'No'}}</span>
+                        </td>
+                        <td class="text-center small">
                             @if(transaction.createdDate) {
                             {{ transaction.createdDate | date:'MM/dd/yy h:mm a' }}
                             } @else {
                             <span class="text-muted">-</span>
                             }
                         </td>
-                        <td>
+                        <td class="text-center small">
                             @if(transaction.createdByName) {
                             <span>{{ transaction.createdByName }}</span>
                             } @else {
@@ -202,38 +214,37 @@
 
             <div class="modal-body">
                 <form [formGroup]="transactionForm" class="form-professional">
+                    <!-- Transaction Type and Amount -->
                     <div class="row mb-3">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <label class="form-label">
                                 <i class="cil-layers me-1"></i> Transaction Type <span class="text-danger">*</span>
                             </label>
                             <select class="form-select form-control-custom"
                                 formControlName="optionIctsiTransactionTypeId">
-                                <option value="">Select Transaction Type</option>
+                                <option value="">Select Type</option>
                                 @for(type of transactionTypes; track type.optionId) {
                                 <option [value]="type.optionId">{{ type.value }}</option>
                                 }
                             </select>
                             @if (transactionForm.get('optionIctsiTransactionTypeId')?.invalid &&
                             transactionForm.get('optionIctsiTransactionTypeId')?.touched) {
-                            <div class="text-danger small mt-1">Transaction type is required</div>
+                            <div class="text-danger small mt-1">Required</div>
                             }
                         </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <label class="form-label">
                                 <i class="cil-dollar me-1"></i> Amount <span class="text-danger">*</span>
                             </label>
                             <input type="number" class="form-control form-control-custom" formControlName="amount"
-                                placeholder="e.g., 100.00" min="0.01" step="0.01" />
+                                placeholder="0.00" min="0.01" step="0.01" />
                             @if (transactionForm.get('amount')?.invalid && transactionForm.get('amount')?.touched) {
-                            <div class="text-danger small mt-1">Amount is required (0.01 - 9999999999999999.99)</div>
+                            <div class="text-danger small mt-1">Required</div>
                             }
                         </div>
                     </div>
 
+                    <!-- Reference Number -->
                     <div class="row mb-3">
                         <div class="col-md-12">
                             <label class="form-label">
@@ -241,46 +252,90 @@
                             </label>
                             <input type="text" class="form-control form-control-custom"
                                 formControlName="referenceNumber" placeholder="e.g., INV-2024-001" maxlength="50" />
-                            @if (transactionForm.get('referenceNumber')?.invalid &&
-                            transactionForm.get('referenceNumber')?.touched) {
-                            <div class="text-danger small mt-1">Maximum 50 characters</div>
-                            }
                         </div>
                     </div>
 
-                    <div class="row mb-3">
+                    @if (isDebitSelected()) {
+                    <div class="optional-section p-2 mb-3 bg-light rounded border">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="cil-info text-primary me-2"></i>
+                            <small class="text-muted mb-0">Optional: Link to job and mark as reimbursement</small>
+                        </div>
+
+                        <!-- Job Code and Reimbursement -->
+                        <div class="row g-2">
+                            <!-- Job Code Search Field -->
+                            <div class="col-md-8">
+                                <div class="position-relative jobcode-dropdown">
+                                    <label class="form-label small mb-1">
+                                        <i class="cil-briefcase me-1"></i> Job Code
+                                    </label>
+                                    <input type="text" class="form-control form-control-sm"
+                                        placeholder="Search job code" [value]="jobCodeSearch"
+                                        (input)="onJobCodeSearchChange($any($event.target).value)"
+                                        (focus)="jobCodeDropdownOpen = true" />
+                                    @if (jobCodeDropdownOpen && filteredJobs.length > 0) {
+                                    <ul class="dropdown-list">
+                                        @for(job of filteredJobs; track job.jobId){
+                                        <li class="dropdown-item-custom" (click)="selectJobCode(job)">
+                                            <strong>{{ job.jobCode }}</strong>
+                                        </li>
+                                        }
+                                    </ul>
+                                    }
+                                    @if (jobCodeDropdownOpen && filteredJobs.length === 0 && jobCodeSearch) {
+                                    <ul class="dropdown-list">
+                                        <li class="dropdown-item-custom text-muted">No results</li>
+                                    </ul>
+                                    }
+                                    <input type="hidden" formControlName="jobCode" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 d-flex align-items-end">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="isReimbursement"
+                                        formControlName="isReimbursement">
+                                    <label class="form-check-label small" for="isReimbursement">
+                                        <i class="cil-money me-1"></i> Reimbursement
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    }
+
+                    <!-- Notes -->
+                    <div class="row mb-2">
                         <div class="col-md-12">
                             <label class="form-label">
                                 <i class="cil-note-add me-1"></i> Notes
                             </label>
-                            <textarea class="form-control form-control-custom" formControlName="notes" rows="3"
-                                placeholder="Additional notes or comments..." maxlength="1000"></textarea>
-                            @if (transactionForm.get('notes')?.invalid && transactionForm.get('notes')?.touched) {
-                            <div class="text-danger small mt-1">Maximum 1000 characters</div>
-                            }
+                            <textarea class="form-control form-control-custom" formControlName="notes" rows="2"
+                                placeholder="Additional notes..." maxlength="1000"></textarea>
                             <small class="text-muted">
-                                {{ transactionForm.get('notes')?.value?.length || 0 }} / 1000 characters
+                                {{ transactionForm.get('notes')?.value?.length || 0 }}/1000
                             </small>
                         </div>
                     </div>
                 </form>
             </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" (click)="closeTransactionModal()">
-                    <i class="cil-x me-2"></i> Cancel
+            <div class="modal-footer py-2">
+                <button type="button" class="btn btn-secondary btn-sm" (click)="closeTransactionModal()">
+                    <i class="cil-x me-1"></i> Cancel
                 </button>
-                <button type="button" class="btn btn-primary" (click)="submitTransactionForm()"
+                <button type="button" class="btn btn-primary btn-sm" (click)="submitTransactionForm()"
                     [disabled]="!transactionForm.valid || isSubmitting">
                     @if (!isSubmitting) {
                     <span>
-                        <i class="cil-check me-2"></i> Create Transaction
+                        <i class="cil-check me-1"></i> Create
                     </span>
                     }
                     @if (isSubmitting) {
                     <span>
-                        <span class="spinner-border spinner-border-sm me-2"></span>
-                        Submitting...
+                        <span class="spinner-border spinner-border-sm me-1"></span>
+                        Saving...
                     </span>
                     }
                 </button>

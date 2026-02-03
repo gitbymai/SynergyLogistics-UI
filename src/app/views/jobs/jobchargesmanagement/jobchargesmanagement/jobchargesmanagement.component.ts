@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -62,6 +62,11 @@ export class JobchargesmanagementComponent implements OnInit {
   // Dropdown options
   chargeSubCategories: ChargeSubcategory[] = [];
 
+  categorySearch = '';
+  categoryDropdownOpen = false;
+  filteredCategories: ChargeSubcategory[] = [];
+  selectedSubCategory: any | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private chargeService: ChargeTransactionService,
@@ -82,7 +87,7 @@ export class JobchargesmanagementComponent implements OnInit {
       chargeSubCategoryId: [0, [Validators.required, Validators.min(1)]],
       description: ['', Validators.maxLength(500)],
       currency: ['', Validators.required],
-      conversionRate: [{ value: 1, disabled: false }],
+      conversionRate: [0],
       amount: [0, [Validators.required, Validators.min(0)]],
       amountSelling: [0, [Validators.required, Validators.min(0)]],
       isForProcessing: [false],
@@ -113,7 +118,7 @@ export class JobchargesmanagementComponent implements OnInit {
 
     conversionRateControl?.updateValueAndValidity();
   }
-  
+
   loadJobDetails(): void {
     this.jobService.getByGuid(this.jobGuid).subscribe({
       next: (response) => {
@@ -165,6 +170,8 @@ export class JobchargesmanagementComponent implements OnInit {
           this.chargeSubCategories = response.data
             .filter((item) => item.isActive === true && item.chargeCategoryId === 1)
             .sort((a, b) => a.chargeSubCategoryName.localeCompare(b.chargeSubCategoryName));
+
+          this.filteredCategories = [...this.chargeSubCategories];
         }
       },
       error: (error) => {
@@ -172,6 +179,38 @@ export class JobchargesmanagementComponent implements OnInit {
       }
     });
 
+  }
+
+  onCategorySearchChange(searchValue: string): void {
+    this.categorySearch = searchValue;
+    this.categoryDropdownOpen = true;
+
+    if (!searchValue.trim()) {
+      this.filteredCategories = [...this.chargeSubCategories];
+      return;
+    }
+
+    const searchLower = searchValue.toLowerCase();
+    this.filteredCategories = this.chargeSubCategories.filter(category =>
+      category.chargeSubCategoryName.toLowerCase().includes(searchLower)
+    );
+  }
+
+  selectCategory(category: any): void {
+    this.selectedCategory = category;
+    this.categorySearch = category.chargeSubCategoryName;
+    this.chargeFormGroup.patchValue({ chargeSubCategoryId: category.chargeSubCategoryId });
+    this.categoryDropdownOpen = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+
+    // Close category dropdown if clicked outside
+    if (!target.closest('.category-dropdown') && this.categoryDropdownOpen) {
+      this.categoryDropdownOpen = false;
+    }
   }
 
   openAddModal(): void {
@@ -187,6 +226,10 @@ export class JobchargesmanagementComponent implements OnInit {
     });
     this.chargeFormGroup.get('chargeCode')?.enable();
     this.chargeFormGroup.get('isForProcessing')?.enable();
+    this.categorySearch = '';
+    this.selectedSubCategory = null;
+    this.filteredCategories = [...this.chargeSubCategories];
+    this.categoryDropdownOpen = false;
     this.showModal = true;
   }
 
@@ -205,6 +248,16 @@ export class JobchargesmanagementComponent implements OnInit {
       isForProcessing: charge.isForProcessing || false,
     });
 
+      // Find and set the selected category
+  const selectedCat = this.chargeSubCategories.find(
+    cat => cat.chargeSubCategoryId === charge.chargeSubCategoryId
+  );
+  
+  if (selectedCat) {
+    this.categorySearch = selectedCat.chargeSubCategoryName;
+    this.selectedSubCategory = selectedCat;
+  }
+
     // Disable charge code in edit mode
     this.chargeFormGroup.get('chargeCode')?.disable();
     this.chargeFormGroup.get('isForProcessing')?.disable();
@@ -216,6 +269,10 @@ export class JobchargesmanagementComponent implements OnInit {
     this.selectedCharge = null;
     this.chargeFormGroup.reset();
     this.chargeFormGroup.get('chargeCode')?.enable();
+    this.categorySearch = '';
+    this.selectedSubCategory = null;
+    this.filteredCategories = [...this.chargeSubCategories];
+    this.categoryDropdownOpen = false;
   }
 
   openReviewModal(charge: any) {
@@ -238,7 +295,7 @@ export class JobchargesmanagementComponent implements OnInit {
     this.isSubmitting = true;
     this.reviewAction = 'approve';
 
-    this.chargeService.approveCharge(this.selectedCharge.chargeGuid, this.reviewFormGroup.get('reviewRemarks')?.value).subscribe({
+    this.chargeService.approveCharge(this.selectedCharge.chargeGuid, this.reviewFormGroup.get('reviewRemarks')?.value ?? '').subscribe({
       next: (response) => {
         this.isSubmitting = false;
 
@@ -253,6 +310,8 @@ export class JobchargesmanagementComponent implements OnInit {
       error: (error) => {
         console.error('Error approving charge:', error);
         this.showError(error?.error?.Message || 'Failed to approve charge');
+        
+       this.isSubmitting = false
       }
     });
   }
@@ -263,7 +322,7 @@ export class JobchargesmanagementComponent implements OnInit {
     this.isSubmitting = true;
     this.reviewAction = 'reject';
 
-    this.chargeService.rejectCharge(this.selectedCharge.chargeGuid, this.reviewFormGroup.get('reviewRemarks')?.value).subscribe({
+    this.chargeService.rejectCharge(this.selectedCharge.chargeGuid, this.reviewFormGroup.get('reviewRemarks')?.value ?? '').subscribe({
       next: (response) => {
         this.isSubmitting = false;
 
@@ -276,7 +335,7 @@ export class JobchargesmanagementComponent implements OnInit {
         }
       },
       error: (error) => {
-        
+
         this.isSubmitting = false;
         console.error('Error rejecting charge:', error.message);
         this.showError(error?.error?.Message || 'Failed to reject charge');
@@ -402,7 +461,7 @@ export class JobchargesmanagementComponent implements OnInit {
       });
   }
 
-   openViewModal(charge: ChargeTransaction): void {
+  openViewModal(charge: ChargeTransaction): void {
     this.selectedCharge = charge;
     this.activeTab = 'details'; // Reset to details tab
     this.loadAuditLogs(charge.chargeId);
@@ -410,12 +469,11 @@ export class JobchargesmanagementComponent implements OnInit {
   }
 
   closeViewModal(): void {
-   this.showViewModal = false;
+    this.showViewModal = false;
     this.selectedCharge = null;
     this.chargeAuditLogs = [];
     this.activeTab = 'details';
   }
-
 
   loadAuditLogs(chargeId: number): void {
     // Call your service to load audit logs
@@ -444,7 +502,7 @@ export class JobchargesmanagementComponent implements OnInit {
   }
 
   getStatusClass(status: string | null | undefined): string {
-     if (!status) return 'bg-secondary';
+    if (!status) return 'bg-secondary';
 
     switch (status?.toUpperCase()) {
       case 'FOR APPROVAL': return 'badge-for-approval';
@@ -476,7 +534,7 @@ export class JobchargesmanagementComponent implements OnInit {
       default: return 'bi-question-circle';
     }
   }
-    getActionTypeBadge(actionType: string): string {
+  getActionTypeBadge(actionType: string): string {
     const type = actionType?.toLowerCase() || '';
     if (type.includes('create')) return 'bg-success';
     if (type.includes('complete')) return 'bg-purple';

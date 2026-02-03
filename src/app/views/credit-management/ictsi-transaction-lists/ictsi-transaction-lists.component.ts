@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ResourceService } from '../../../services/resource/resource.service';
 import { finalize } from 'rxjs';
 import { Configuration } from '../../../models/configuration';
 import { IctsiTransaction, NewIctsiTransaction, UpdateIctsiTransaction } from '../../../models/ictsi';
 import { IctsiService } from '../../../services/ictsi/ictsi.service';
+import { Job } from '../../../models/job';
+import { JobsService } from '../../../services/jobs/jobs.service';
 
 @Component({
   selector: 'app-ictsi-transaction-lists',
@@ -57,11 +58,18 @@ export class IctsiTransactionListsComponent implements OnInit {
   itemsPerPage = 10;
   totalItems = 0;
 
+  jobCodeSearch = '';
+  jobCodeDropdownOpen = false;
+  allJobs: Job[] = [];
+  filteredJobs: Job[] = [];
+  selectedJob: Job | null = null;
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private transactionService: IctsiService
+    private transactionService: IctsiService,
+    private jobService: JobsService
   ) {
     this.initializeForm();
   }
@@ -76,20 +84,78 @@ export class IctsiTransactionListsComponent implements OnInit {
         this.loadTransactions();
         this.loadResourceDetails();
         this.loadTransactionTypes();
+        this.loadJobs();
       } else {
         this.showError('Invalid resource');
         this.goBack();
       }
     });
   }
+
   initializeForm(): void {
     this.transactionForm = this.fb.group({
       optionIctsiTransactionTypeId: ['', [Validators.required]],
+      jobCode: [''],
       amount: ['', [Validators.required, Validators.min(-9999999999999999.99), Validators.max(9999999999999999.99)]],
       referenceNumber: ['', [Validators.maxLength(50)]],
       notes: ['', [Validators.maxLength(1000)]],
-      isActive: [true]
+      isActive: [true],
+      isReimbursement: [false]
     });
+  }
+
+  loadJobs(): void {
+    this.jobService.getAllJobs().subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.allJobs = response.data.filter(x => x.isActive === true);
+          this.filteredJobs = [...this.allJobs];
+        } else {
+          this.showError(response.message || 'Failed to load job codes');
+        }
+      },
+      error: (error) => {
+        console.error('Error loading job codes:', error);
+        this.showError('Failed to load job codes. Please try again.');
+      }
+    });
+  }
+
+  onJobCodeSearchChange(searchValue: string): void {
+    this.jobCodeSearch = searchValue;
+    this.jobCodeDropdownOpen = true;
+
+    if (!searchValue.trim()) {
+      this.filteredJobs = [...this.allJobs];
+      return;
+    }
+
+    const searchLower = searchValue.toLowerCase();
+    this.filteredJobs = this.allJobs.filter(jobCode =>
+      jobCode.jobCode.toLowerCase().includes(searchLower)
+    );
+  }
+
+  selectJobCode(job: Job): void {
+    this.selectedJob = job;
+    this.jobCodeSearch = `${job.jobCode}`;
+    this.transactionForm.patchValue({ jobCode: job.jobId });
+    this.jobCodeDropdownOpen = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.jobCodeDropdownOpen) {
+      return; // Exit early if dropdown is already closed
+    }
+
+    const target = event.target as HTMLElement;
+
+    const clickedInsideDropdown = target.closest('.jobcode-dropdown');
+
+    if (!clickedInsideDropdown) {
+      this.jobCodeDropdownOpen = false;
+    }
   }
 
   loadTransactionTypes(): void {
@@ -149,7 +215,9 @@ export class IctsiTransactionListsComponent implements OnInit {
       optionIctsiTransactionTypeId: this.transactionForm.value.optionIctsiTransactionTypeId,
       amount: this.transactionForm.value.amount,
       referenceNumber: this.transactionForm.value.referenceNumber || null,
-      notes: this.transactionForm.value.notes || null
+      notes: this.transactionForm.value.notes || null,
+      jobId: this.transactionForm.value.jobCode,
+      isReimbursement: this.transactionForm.value.isReimbursement
     };
 
     this.transactionService.addIctsiTransaction(createRequest)
@@ -174,6 +242,7 @@ export class IctsiTransactionListsComponent implements OnInit {
         }
       });
   }
+
   loadResourceDetails(): void {
 
     this.transactionService.getIctsiByGuid(this.ictsiGuid).subscribe({
@@ -197,12 +266,16 @@ export class IctsiTransactionListsComponent implements OnInit {
   getTransactionTypeById(id: number): Configuration | undefined {
     return this.transactionTypes.find(type => type.optionId === id);
   }
-  
+
   openNewTransactionModal(): void {
     this.selectedTransaction = null;
-    this.transactionForm.reset({ isActive: true });
+    this.transactionForm.reset({ isActive: true, isReimbursement: false });
     this.transactionForm.get('optionIctsiTransactionTypeId')?.enable();
     this.transactionForm.get('amount')?.enable();
+    this.jobCodeSearch = '';
+    this.selectedJob = null;
+    this.filteredJobs = [...this.allJobs];
+    this.jobCodeDropdownOpen = false;
     this.showTransactionModal = true;
   }
 
@@ -210,12 +283,17 @@ export class IctsiTransactionListsComponent implements OnInit {
     this.selectedTransaction = transaction;
     this.showDetailsModal = true;
   }
+
   closeTransactionModal(): void {
     this.showTransactionModal = false;
     this.transactionForm.reset();
     this.selectedTransaction = null;
     this.transactionForm.get('optionIctsiTransactionTypeId')?.enable();
     this.transactionForm.get('amount')?.enable();
+    this.jobCodeSearch = '';
+    this.selectedJob = null;
+    this.filteredJobs = [...this.allJobs];
+    this.jobCodeDropdownOpen = false;
   }
 
   closeDetailsModal(): void {
@@ -243,6 +321,18 @@ export class IctsiTransactionListsComponent implements OnInit {
       .filter(t => this.isDebitTransaction(t.optionIctsiTransactionTypeId) && t.isActive)
       .reduce((sum, transaction) => sum + transaction.amount, 0);
   }
+
+  isDebitSelected(): boolean {
+    const selectedTypeId = this.transactionForm.get('optionIctsiTransactionTypeId')?.value;
+
+    if (!selectedTypeId) {
+      return false;
+    }
+
+    // Use your existing isDebitTransaction method
+    return this.isDebitTransaction(Number(selectedTypeId));
+  }
+
 
   getPageNumbers(): number[] {
     const totalPages = this.getTotalPages();

@@ -83,7 +83,8 @@ export class JobChargesComponent implements OnInit, OnChanges {
           this.filteredCharges = this.charges.filter(charge => {
             return charge.isForProcessing === true
               && charge.isActive === true
-              && charge.amount > 0;
+              && charge.amount > 0
+              && charge.chargeCategoryName === "CHARGES";
           });
         }
       }
