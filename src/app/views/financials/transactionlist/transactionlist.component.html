@@ -113,6 +113,9 @@
             <i class="cil-layers me-2"></i> Transaction
           </th>
           <th class="text-center">
+            <i class="cil-layers me-2"></i> Reference
+          </th>
+          <th class="text-center">
             <i class="cil-task me-2"></i> Status
           </th>
           <th class="text-center">
@@ -146,6 +149,13 @@
               <td class="text-center">
                 {{ job.transactionTypeName }}
               </td>
+          <td class="text-center">
+            @if(job.hbl !== '' && job.mbl !== '') {
+    {{ job.hbl }} | {{ job.mbl }}
+  } @else  {
+      {{ job.hawb }} | {{ job.mawb }}
+    } 
+          </td>
               <td>
                 <div class="status-badge-wrapper text-center">
                   <span class="badge" [ngClass]="getStatusBadgeClass(job.jobStatusName)">

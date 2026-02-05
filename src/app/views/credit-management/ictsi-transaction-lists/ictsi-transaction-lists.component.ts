@@ -19,11 +19,13 @@ import { JobsService } from '../../../services/jobs/jobs.service';
 export class IctsiTransactionListsComponent implements OnInit {
 
   transactionForm!: FormGroup;
+  editTransactionForm!: FormGroup;
   transactions: IctsiTransaction[] = [];
   filteredTransactions: IctsiTransaction[] = [];
 
   showTransactionModal = false;
   showDetailsModal = false;
+  showEditTransactionModal = false;
   isSubmitting = false;
   isLoading = false;
 
@@ -64,6 +66,8 @@ export class IctsiTransactionListsComponent implements OnInit {
   filteredJobs: Job[] = [];
   selectedJob: Job | null = null;
 
+  debitTypeId: number = 1;
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -72,6 +76,7 @@ export class IctsiTransactionListsComponent implements OnInit {
     private jobService: JobsService
   ) {
     this.initializeForm();
+    this.initializeEditTransactionForm();
   }
 
   ngOnInit(): void {
@@ -103,6 +108,13 @@ export class IctsiTransactionListsComponent implements OnInit {
       isReimbursement: [false]
     });
   }
+
+  initializeEditTransactionForm() {
+      this.editTransactionForm = this.fb.group({
+          amount: ['', [Validators.required, Validators.min(0.01)]]
+      });
+  }
+
 
   loadJobs(): void {
     this.jobService.getAllJobs().subscribe({
@@ -284,6 +296,13 @@ export class IctsiTransactionListsComponent implements OnInit {
     this.showDetailsModal = true;
   }
 
+  openEditTransactionModal(transaction: IctsiTransaction): void{
+        this.selectedTransaction = transaction;
+    this.editTransactionForm.patchValue({
+        amount: transaction.amount
+    });
+    this.showEditTransactionModal = true;
+  }
   closeTransactionModal(): void {
     this.showTransactionModal = false;
     this.transactionForm.reset();
@@ -295,11 +314,38 @@ export class IctsiTransactionListsComponent implements OnInit {
     this.filteredJobs = [...this.allJobs];
     this.jobCodeDropdownOpen = false;
   }
+  closeEditTransactionModal() {
+    this.showEditTransactionModal = false;
+    this.editTransactionForm.reset();
+    this.selectedTransaction = null;
+}
 
   closeDetailsModal(): void {
     this.showDetailsModal = false;
     this.selectedTransaction = null;
   }
+  
+submitEditTransactionForm() {
+    if (this.editTransactionForm.valid && this.selectedTransaction) {
+        this.isSubmitting = true;
+        
+        const updatedAmount = this.editTransactionForm.get('amount')?.value;
+        
+        // Call your service to update the transaction
+        // this.transactionService.updateTransaction(this.selectedTransaction.id, { amount: updatedAmount })
+        //     .subscribe({
+        //         next: (response) => {
+        //             this.isSubmitting = false;
+        //             this.closeEditTransactionModal();
+        //             // Refresh transaction list
+        //         },
+        //         error: (error) => {
+        //             this.isSubmitting = false;
+        //             console.error('Error updating transaction:', error);
+        //         }
+        //     });
+    }
+}
 
   goBack(): void {
     this.router.navigate(['/financial/ictsi-management-list']);

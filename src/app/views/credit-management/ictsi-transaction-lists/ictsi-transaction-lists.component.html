@@ -154,6 +154,10 @@
                                     (click)="viewTransactionDetails(transaction)">
                                     <i class="cil-info"></i>
                                 </button>
+                                <button class="btn btn-sm btn-warning-outline" title="Edit Transaction"
+                                    (click)="openEditTransactionModal(transaction)">
+                                    <i class="cil-pencil"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -196,7 +200,6 @@
     </div>
 </div>
 
-<!-- Add/Edit Transaction Modal -->
 @if (showTransactionModal) {
 <div class="modal-backdrop" (click)="closeTransactionModal()"></div>
 }
@@ -344,78 +347,375 @@
     </div>
 </div>
 
-<!-- Transaction Details Modal -->
-@if (showDetailsModal) {
-<div class="modal-backdrop" (click)="closeDetailsModal()"></div>
+<!-- Edit Transaction Modal -->
+@if (showEditTransactionModal) {
+<div class="modal-backdrop" (click)="closeEditTransactionModal()"></div>
 }
-<div class="modal custom-modal" [class.show]="showDetailsModal" [class.d-block]="showDetailsModal" tabindex="-1"
+<div class="modal custom-modal" [class.show]="showEditTransactionModal" [class.d-block]="showEditTransactionModal" tabindex="-1"
     role="dialog">
-    <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
         <div class="modal-content">
-            <div class="modal-header border-0">
-                <h5 class="modal-title">Transaction Details</h5>
-                <button type="button" class="btn-close" (click)="closeDetailsModal()" aria-label="Close"></button>
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">
+                    <i class="cil-pencil me-2"></i> Edit Transaction
+                </h5>
+                <button type="button" class="btn-close" (click)="closeEditTransactionModal()"
+                    aria-label="Close"></button>
             </div>
 
-            <div class="modal-body px-4">
-                @if(selectedTransaction) {
-                <!-- Amount -->
-                <div class="text-center mb-4">
-                    @if(isDebitTransaction(selectedTransaction.optionIctsiTransactionTypeId)) {
-                    <div class="display-6 text-danger fw-bold">-{{ selectedTransaction.amount | number:'1.2-2' }}</div>
-                    } @else {
-                    <div class="display-6 text-success fw-bold">+{{ selectedTransaction.amount | number:'1.2-2' }}</div>
-                    }
-                    <div class="text-muted small mt-1">{{ selectedTransaction.transactionTypeName }}</div>
-                </div>
-
-                <!-- Balance Info -->
-                <div class="d-flex justify-content-between mb-4 pb-3 border-bottom">
+            <div class="modal-body">
+                <!-- Information Notice -->
+                <div class="alert alert-info d-flex align-items-center mb-3" role="alert">
+                    <i class="cil-info me-2"></i>
                     <div>
-                        <div class="text-muted small">Balance Before</div>
-                        <div class="fw-medium">{{ selectedTransaction.balanceBefore | number:'1.2-2' }}</div>
-                    </div>
-                    <div class="text-end">
-                        <div class="text-muted small">Balance After</div>
-                        <div class="fw-medium">{{ selectedTransaction.balanceAfter | number:'1.2-2' }}</div>
+                        <strong>Note:</strong> Only the transaction amount can be updated. All other information is displayed for reference only.
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <div class="text-muted small">Reference Number</div>
-                    <div>{{ selectedTransaction.referenceNumber }}</div>
-                </div>
+                <form [formGroup]="editTransactionForm" class="form-professional">
+                    <!-- Transaction Information Section -->
+                    <div class="info-section mb-3">
+                        <h6 class="section-title mb-3">
+                            <i class="cil-list me-2"></i> Transaction Information
+                        </h6>
 
-                <!-- Notes -->
-                <div class="mb-3">
-                    <div class="text-muted small">Notes</div>
-                    <div>{{ selectedTransaction.notes }}</div>
-                </div>
+                        <!-- Transaction Type (Read-only) -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">
+                                    <i class="cil-layers me-1"></i> Transaction Type
+                                </label>
+                                <div class="form-control form-control-custom bg-light" style="border: 1px solid #e0e0e0;">
+                                    {{ selectedTransaction?.transactionTypeName || 'N/A' }}
+                                </div>
+                            </div>
 
-                <div class="mt-4 pt-3 border-top">
-                    <div class="d-flex justify-content-between text-muted small mb-2">
-                        <span>{{ selectedTransaction.createdByName || 'Unknown' }}</span>
-                        <span>{{ selectedTransaction.createdDate | date: 'MM/dd/yy h:mm a' }}</span>
+                            <!-- Transaction Date (Read-only) -->
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">
+                                    <i class="cil-calendar me-1"></i> Transaction Date
+                                </label>
+                                <div class="form-control form-control-custom bg-light" style="border: 1px solid #e0e0e0;">
+                                    {{ selectedTransaction?.createdDate | date:'MM/dd/yy h:mm a' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reference Number (Read-only) -->
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label text-muted small">
+                                    <i class="cil-notes me-1"></i> Reference Number
+                                </label>
+                                <div class="form-control form-control-custom bg-light" style="border: 1px solid #e0e0e0;">
+                                    {{ selectedTransaction?.referenceNumber || 'N/A' }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    @if(selectedTransaction.modifiedByName && selectedTransaction.modifiedDate) {
-                    <div class="d-flex justify-content-between text-muted small">
-                        <span>Modified by {{ selectedTransaction.modifiedByName }}</span>
-                        <span>{{ selectedTransaction.modifiedDate | date: 'MM/dd/yy h:mm a' }}</span>
+
+                    <!-- Editable Amount Section -->
+                    <div class="editable-section mb-3 p-3 bg-warning-subtle rounded border border-warning">
+                        <h6 class="section-title mb-3 text-warning">
+                            <i class="cil-pencil me-2"></i> Editable Field
+                        </h6>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label class="form-label">
+                                    <i class="cil-dollar me-1"></i> Amount <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" class="form-control form-control-custom" formControlName="amount"
+                                    placeholder="0.00" min="0.01" step="0.01" />
+                                @if (editTransactionForm.get('amount')?.invalid && editTransactionForm.get('amount')?.touched) {
+                                <div class="text-danger small mt-1">Amount is required and must be greater than 0</div>
+                                }
+                                <small class="text-muted">
+                                    Original Amount: <strong>₱{{ selectedTransaction?.amount | number:'1.2-2' }}</strong>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Information (if applicable) -->
+                    @if (selectedTransaction?.optionIctsiTransactionTypeId === debitTypeId) {
+                    <div class="info-section mb-3">
+                        <h6 class="section-title mb-3">
+                            <i class="cil-briefcase me-2"></i> Job Information
+                        </h6>
+
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label class="form-label text-muted small">
+                                    <i class="cil-briefcase me-1"></i> Job Code
+                                </label>
+                                <div class="form-control form-control-custom bg-light" style="border: 1px solid #e0e0e0;">
+                                    {{ selectedTransaction?.jobCode || 'Not linked to any job' }}
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small">
+                                    <i class="cil-money me-1"></i> Reimbursement Status
+                                </label>
+                                <div class="form-control form-control-custom bg-light d-flex align-items-center" 
+                                     style="border: 1px solid #e0e0e0;">
+                                    @if (selectedTransaction?.isReimbursement) {
+                                    <span class="badge bg-success">
+                                        <i class="cil-check me-1"></i> Yes
+                                    </span>
+                                    } @else {
+                                    <span class="badge bg-secondary">
+                                        <i class="cil-x me-1"></i> No
+                                    </span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     }
-                </div>
-                }
+
+                    <!-- Notes Section -->
+                    <div class="info-section mb-2">
+                        <h6 class="section-title mb-3">
+                            <i class="cil-note-add me-2"></i> Additional Notes
+                        </h6>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label class="form-label text-muted small">
+                                    <i class="cil-note-add me-1"></i> Notes
+                                </label>
+                                <div class="form-control form-control-custom bg-light" 
+                                     style="border: 1px solid #e0e0e0; min-height: 80px; white-space: pre-wrap;">
+                                    {{ selectedTransaction?.notes || 'No notes available' }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
 
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-secondary" (click)="closeDetailsModal()">
-                    Close
+            <div class="modal-footer py-2">
+                <button type="button" class="btn btn-secondary btn-sm" (click)="closeEditTransactionModal()">
+                    <i class="cil-x me-1"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-warning btn-sm" (click)="submitEditTransactionForm()"
+                    [disabled]="!editTransactionForm.valid || isSubmitting">
+                    @if (!isSubmitting) {
+                    <span>
+                        <i class="cil-check me-1"></i> Update Amount
+                    </span>
+                    }
+                    @if (isSubmitting) {
+                    <span>
+                        <span class="spinner-border spinner-border-sm me-1"></span>
+                        Updating...
+                    </span>
+                    }
                 </button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Transaction Details Modal -->
+@if (showDetailsModal) {
+<div class="modal-backdrop" (click)="closeDetailsModal()"></div>
+}
+<div class="modal custom-modal" [class.show]="showDetailsModal" [class.d-block]="showDetailsModal" tabindex="-1"
+    role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="cil-info me-2"></i> Transaction Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" (click)="closeDetailsModal()"
+                    aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                @if(selectedTransaction) {
+                
+                <!-- Transaction Summary Card -->
+                <div class="card mb-3 bg-light border">
+                    <div class="card-body py-3">
+                        <div class="row g-3 align-items-center">
+                            <!-- Amount Display -->
+                            <div class="col-md-6 text-center border-end">
+                                <small class="text-muted d-block mb-2">Transaction Amount</small>
+                                @if(isDebitTransaction(selectedTransaction.optionIctsiTransactionTypeId)) {
+                                <div class="display-5 text-danger fw-bold">
+                                    <i class="cil-arrow-bottom me-2"></i>₱{{ selectedTransaction.amount | number:'1.2-2' }}
+                                </div>
+                                <span class="badge bg-danger-subtle text-danger mt-2">Debit</span>
+                                } @else {
+                                <div class="display-5 text-success fw-bold">
+                                    <i class="cil-arrow-top me-2"></i>₱{{ selectedTransaction.amount | number:'1.2-2' }}
+                                </div>
+                                <span class="badge bg-success-subtle text-success mt-2">Credit</span>
+                                }
+                            </div>
+
+                            <!-- Transaction Type & Status -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">Transaction Type</small>
+                                    <span class="badge badge-code-audit">{{ selectedTransaction.transactionTypeName }}</span>
+                                </div>
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">Reference Number</small>
+                                    <strong class="small">{{ selectedTransaction.referenceNumber || 'N/A' }}</strong>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Transaction Date</small>
+                                    <small><i class="cil-calendar me-1"></i>{{ selectedTransaction.createdDate | date: 'MM/dd/yy h:mm a' }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Balance Information -->
+                <div class="card mb-3 shadow-sm">
+                    <div class="card-body p-3">
+                        <h6 class="card-title mb-3">
+                            <i class="cil-wallet me-2"></i> Balance Information
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-grow-1">
+                                        <small class="text-muted d-block">Balance Before</small>
+                                        <div class="fw-bold text-primary">₱{{ selectedTransaction.balanceBefore | number:'1.2-2' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-grow-1">
+                                        <small class="text-muted d-block">Balance After</small>
+                                        <div class="fw-bold text-success">₱{{ selectedTransaction.balanceAfter | number:'1.2-2' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Balance Change Indicator -->
+                        <div class="mt-3 pt-3 border-top text-center">
+                            <small class="text-muted">Balance Change</small>
+                            @if(isDebitTransaction(selectedTransaction.optionIctsiTransactionTypeId)) {
+                            <div class="text-danger fw-bold">
+                                <i class="cil-arrow-bottom me-1"></i>-₱{{ selectedTransaction.amount | number:'1.2-2' }}
+                            </div>
+                            } @else {
+                            <div class="text-success fw-bold">
+                                <i class="cil-arrow-top me-1"></i>+₱{{ selectedTransaction.amount | number:'1.2-2' }}
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Information (if applicable) -->
+                @if(selectedTransaction.jobCode) {
+                <div class="card mb-3 shadow-sm">
+                    <div class="card-body p-3">
+                        <h6 class="card-title mb-3">
+                            <i class="cil-briefcase me-2"></i> Job Information
+                        </h6>
+                        <div class="row g-2">
+                            <div class="col-8">
+                                <small class="text-muted d-block">Job Code</small>
+                                <span class="badge badge-code-audit">{{ selectedTransaction.jobCode }}</span>
+                            </div>
+                            <div class="col-4">
+                                <small class="text-muted d-block">Reimbursement</small>
+                                @if(selectedTransaction.isReimbursement) {
+                                <span class="badge bg-success">
+                                    <i class="cil-check me-1"></i> Yes
+                                </span>
+                                } @else {
+                                <span class="badge bg-secondary">
+                                    <i class="cil-x me-1"></i> No
+                                </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+
+                <!-- Notes Section -->
+                @if(selectedTransaction.notes) {
+                <div class="card mb-3 shadow-sm">
+                    <div class="card-body p-3">
+                        <h6 class="card-title mb-2">
+                            <i class="cil-note-add me-2"></i> Notes
+                        </h6>
+                        <div class="alert alert-light mb-0 p-2 small">
+                            <i class="cil-chat-left-quote me-1"></i>
+                            {{ selectedTransaction.notes }}
+                        </div>
+                    </div>
+                </div>
+                }
+
+                <!-- Audit Trail -->
+                <div class="card shadow-sm">
+                    <div class="card-body p-3">
+                        <h6 class="card-title mb-3">
+                            <i class="cil-history me-2"></i> Audit Trail
+                        </h6>
+                        
+                        <!-- Created Info -->
+                        <div class="d-flex justify-content-between align-items-start mb-2 pb-2 border-bottom">
+                            <div>
+                                <small class="text-muted d-block">Created by</small>
+                                <div class="small fw-bold">{{ selectedTransaction.createdByName || 'Unknown' }}</div>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted d-block">Date & Time</small>
+                                <small class="fw-medium">
+                                    <i class="cil-clock me-1"></i>{{ selectedTransaction.createdDate | date: 'MM/dd/yy h:mm a' }}
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Modified Info -->
+                        @if(selectedTransaction.modifiedByName && selectedTransaction.modifiedDate) {
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <small class="text-muted d-block">Last modified by</small>
+                                <div class="small fw-bold">{{ selectedTransaction.modifiedByName }}</div>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted d-block">Date & Time</small>
+                                <small class="fw-medium">
+                                    <i class="cil-clock me-1"></i>{{ selectedTransaction.modifiedDate | date: 'MM/dd/yy h:mm a' }}
+                                </small>
+                            </div>
+                        </div>
+                        } @else {
+                        <div class="text-center text-muted small">
+                            <i class="cil-info me-1"></i> No modifications made
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                }
+            </div>
+
+            <div class="modal-footer py-2">
+                <button type="button" class="btn btn-sm btn-secondary" (click)="closeDetailsModal()">
+                    <i class="cil-x me-1"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Toast Notifications -->
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
