@@ -134,6 +134,39 @@ export const routes: Routes = [
         ]
       },
       {
+        path: 'approvals',
+        canActivate: [AuthGuard],
+        data: {
+          title: 'Approvals',
+          roles: ['admin', 'cashier', 'finance', 'treasurer', 'sales']
+        },
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./views/financials/chargelist/chargelist.component').then(m => m.ChargelistComponent),
+          },
+          {
+            path: 'pettycash',
+            canActivate: [AuthGuard],
+            loadComponent: () => import('./views/approvals/pettycash/pettycash.component').then(m => m.PettycashComponent),
+            data: {
+              title: 'Petty Cash Approval',
+              roles: ['admin', 'treasurer','sales']
+            },
+          },
+          {
+            path: 'cashdeposits',
+            canActivate: [AuthGuard],
+            loadComponent: () => import('./views/approvals/cashdeposits/cashdeposits.component').then(m => m.CashdepositsComponent),
+            data: {
+              title: 'Cash Deposit Approval',
+              roles: ['admin','treasurer']
+            },
+          }
+        ]
+      },
+      {
         path: 'jobs',
         canActivate: [AuthGuard],
         data: {

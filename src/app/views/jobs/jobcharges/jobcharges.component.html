@@ -108,7 +108,7 @@
             <button class="btn btn-success btn-sm btn-badge-style" (click)="openSubmitClearingConfirmation(charge)"
               tooltip="Submit for Clearing">
               <i class="cil-notes me-1" title="Submit for Clearing"></i>
-              for clearing
+              liquidate
             </button>
             }
 
@@ -219,30 +219,50 @@
       <div class="modal-body">
         <form [formGroup]="chargeFormGroup" class="form-professional">
           <div class="row mb-3">
+
+            
+
             <!-- Charge Subcategory -->
             <div class="col-md-6">
-              <label class="form-label">
-                <i class="bi bi-tag me-1"></i> Category <span class="text-danger">*</span>
-              </label>
-              <select class="form-select form-control-custom" formControlName="chargeSubCategoryId">
-                <option [value]="0">Select category...</option>
-                @for (category of chargeSubCategories; track category.chargeSubCategoryId) {
-                <option [value]="category.chargeSubCategoryId">
-                  {{ category.chargeSubCategoryName }}
-                </option>
-                }
-              </select>
-              @if (chargeFormGroup.get('chargeSubCategoryId')?.invalid &&
-              chargeFormGroup.get('chargeSubCategoryId')?.touched) {
-              <div class="text-danger small mt-1">
-                Category is required
+              <div class="mb-3">
+                <div class="position-relative category-dropdown">
+                  <label class="form-label">
+                    <i class="bi bi-tag me-1"></i> Category <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" class="form-control form-control-custom" placeholder="Search or select category"
+                    [value]="categorySearch" (input)="onCategorySearchChange($any($event.target).value)"
+                    (focus)="categoryDropdownOpen = true"
+                    [style.background-color]="null" [style.opacity]="'1'"
+                    [style.cursor]="'text'" />
+                  @if (categoryDropdownOpen && filteredCategories.length > 0) {
+                  <ul class="dropdown-list">
+                    @for(category of filteredCategories; track category.chargeSubCategoryId){
+                    <li class="dropdown-item-custom" (click)="selectCategory(category)">
+                      {{ category.chargeSubCategoryName }}
+                    </li>
+                    }
+                  </ul>
+                  }
+                  @if (categoryDropdownOpen && filteredCategories.length === 0 && categorySearch) {
+                  <ul class="dropdown-list">
+                    <li class="dropdown-item-custom text-muted">No categories found</li>
+                  </ul>
+                  }
+                  <input type="hidden" formControlName="chargeSubCategoryId" />
+                  @if (chargeFormGroup.get('chargeSubCategoryId')?.invalid &&
+                  chargeFormGroup.get('chargeSubCategoryId')?.touched) {
+                  <div class="text-danger small mt-1">
+                    Category is required
+                  </div>
+                  }
+                </div>
               </div>
-              }
+              
             </div>
             <!-- Amount -->
             <div class="col-md-6">
               <label class="form-label">
-                <i class="bi bi-cash me-1"></i> Charge Amount <span class="text-danger">*</span>
+                <i class="bi bi-cash me-1"></i> Amount <span class="text-danger">*</span>
               </label>
               <input type="number" class="form-control form-control-custom" formControlName="amount" step="0.01"
                 placeholder="0.00">
@@ -275,7 +295,7 @@
           [disabled]="!chargeFormGroup.valid || isSubmitting">
           @if (!isSubmitting) {
           <span>
-            <i class="bi bi-check me-2"></i> Create Charge
+            <i class="bi bi-check me-2"></i> Request
           </span>
           }
           @if (isSubmitting) {
@@ -478,6 +498,7 @@
   </div>
 </div>
 
+
 <!-- Submit for Clearing Confirmation Modal -->
 @if (showSubmitClearingConfirmModal) {
 <div class="modal-backdrop" (click)="closeSubmitClearingConfirmModal()"></div>
@@ -548,8 +569,46 @@
               <div class="col-md-8">
                 <span class="badge status-cleared">
                   <i class="bi bi-check2-circle me-1"></i>
-                  FOR CLEARING
+                  LIQUIDATE
                 </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Refund Amount Input -->
+        <div class="card mb-3" style="background-color: #fff3cd; border: 1px solid #ffc107;">
+          <div class="card-body">
+            <h6 class="text-warning mb-3">
+              <i class="bi bi-cash-coin me-2"></i> Refund Details
+            </h6>
+            <div class="row align-items-center">
+              <div class="col-md-4">
+                <label for="refundAmount" class="form-label mb-0">
+                  <strong class="text-muted">Refund Amount:</strong>
+                </label>
+              </div>
+              <div class="col-md-8">
+                <div class="input-group">
+                  <span class="input-group-text">{{ selectedCharge?.currencyCode }}</span>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="refundAmount" 
+                    [value]="refundAmount"
+                    (input)="onRefundAmountChange($event)"
+                    [max]="selectedCharge?.amount"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    [disabled]="isSubmitting">
+                </div>
+                @if (refundAmount && refundAmount > (selectedCharge?.amount || 0)) {
+                  <small class="text-danger">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    Refund amount cannot exceed {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
+                  </small>
+                }
               </div>
             </div>
           </div>
@@ -567,10 +626,11 @@
           [disabled]="isSubmitting">
           <i class="bi bi-x me-2"></i> Cancel
         </button>
-        <button type="button" class="btn btn-success" (click)="confirmSubmitClearing()" [disabled]="isSubmitting">
+        <button type="button" class="btn btn-success" (click)="confirmSubmitClearing()" 
+          [disabled]="isSubmitting || (refundAmount && refundAmount > (selectedCharge?.amount || 0))">
           @if (!isSubmitting) {
           <span>
-            <i class="bi bi-send-check me-2"></i> Submit for Clearing
+            <i class="bi bi-send-check me-2"></i> Submit
           </span>
           }
           @if (isSubmitting) {
@@ -584,7 +644,6 @@
     </div>
   </div>
 </div>
-
 
 <!-- Final Closing Confirmation Modal -->
 @if (showFinalClosingConfirmModal) {

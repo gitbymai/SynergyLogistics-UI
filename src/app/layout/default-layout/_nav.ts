@@ -31,6 +31,30 @@ export const navItems = [
     ]
   },
   {
+    name: 'Request Approvals',
+    url:'/approvals',
+    iconComponent: { name: 'cil-bell' },
+    children: [
+      {
+        name: 'Petty Cash',
+        url: '/approvals/pettycash',
+        iconComponent: { name: 'cil-credit-card' },
+        roles: ['sales', 'admin','treasurer']
+      },{
+        name: 'Refund',
+        url: '/approvals/refund',
+        iconComponent: { name: 'cil-paper-plane' },
+        roles: ['sales', 'admin','treasurer','cashier']
+      },
+      {
+        name: 'Cash Deposit',
+        url: '/approvals/cashdeposits',
+        iconComponent: { name: 'cil-basket' },
+        roles: ['admin', 'finance', 'treasurer']
+      },
+    ]
+  },
+  {
     name: 'Financial Management',
     url: '/financial',
     iconComponent: { name: 'cil-file' },

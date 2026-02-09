@@ -1,4 +1,4 @@
-import { Component, input, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CardModule, TableModule } from '@coreui/angular';
@@ -24,6 +24,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
   isLoading: boolean = false;
   isSubmitting: boolean = false;
   showModal: boolean = false;
+  selectedCategory: string = '';
 
   showSubmitClearingConfirmModal = false;
   showCashReleasingConfirmModal = false;
@@ -43,13 +44,20 @@ export class JobChargesComponent implements OnInit, OnChanges {
 
 
   // Dropdown options
+
+  categorySearch = '';
+  categoryDropdownOpen = false;
+  selectedSubCategory: any | null = null;
   chargeSubCategories: ChargeSubcategory[] = [];
+  filteredCategories: ChargeSubcategory[] = [];
 
   filteredCharges: ChargeTransaction[] = [];
 
   showAuditLogModal = false;
   isLoadingAuditLog = false;
   auditLogs: ChargeTransactionAuditLog[] = [];
+
+  refundAmount: number = 0;
 
   constructor(private fb: FormBuilder,
 
@@ -79,7 +87,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
       }
       else {
         if (changes['charges'] && changes['charges'].currentValue) {
-          
+
           this.filteredCharges = this.charges.filter(charge => {
             return charge.isForProcessing === true
               && charge.isActive === true
@@ -165,6 +173,8 @@ export class JobChargesComponent implements OnInit, OnChanges {
           this.chargeSubCategories = response.data
             .filter((item) => item.isActive === true && item.chargeCategoryId === 1)
             .sort((a, b) => a.chargeSubCategoryName.localeCompare(b.chargeSubCategoryName));
+
+          this.filteredCategories = [...this.chargeSubCategories];
         }
       },
       error: (error) => {
@@ -225,6 +235,11 @@ export class JobChargesComponent implements OnInit, OnChanges {
       currency: 'PHP',
       conversionRate: 1
     });
+
+    this.categorySearch = '';
+    this.selectedSubCategory = null;
+    this.filteredCategories = [...this.chargeSubCategories];
+    this.categoryDropdownOpen = false;
     this.showModal = true;
   }
 
@@ -244,6 +259,11 @@ export class JobChargesComponent implements OnInit, OnChanges {
     this.isSubmitting = true;
 
     this.createCharge();
+  }
+
+  onRefundAmountChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.refundAmount = parseFloat(input.value) || 0;
   }
 
   createCharge(): void {
@@ -364,23 +384,23 @@ export class JobChargesComponent implements OnInit, OnChanges {
     });
   }
 
-  openOwnChargeConfirmation(charge:any){
-    
+  openOwnChargeConfirmation(charge: any) {
+
     this.selectedCharge = charge;
     this.showOwnLineChargeConfirmModal = true;
   }
 
-  closeOwnLineChargeConfirmModal(){
-  if (!this.isSubmitting) {
+  closeOwnLineChargeConfirmModal() {
+    if (!this.isSubmitting) {
       this.showOwnLineChargeConfirmModal = false;
       this.selectedCharge = null;
     }
   }
 
-  confirmOwnLineCharge(){
-    
+  confirmOwnLineCharge() {
+
     this.isSubmitting = true;
-    
+
     this.chargeService.ownCharge(this.selectedCharge.chargeGuid).subscribe({
       next: (response) => {
         this.isSubmitting = false;
@@ -454,7 +474,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
   confirmSubmitClearing() {
     this.isSubmitting = true;
 
-    this.chargeService.submitForClearingCharge(this.selectedCharge.chargeGuid).subscribe({
+    this.chargeService.submitForClearingCharge(this.selectedCharge.chargeGuid, this.refundAmount).subscribe({
       next: (response) => {
         this.isSubmitting = false;
         this.showSubmitClearingConfirmModal = false;
@@ -473,6 +493,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
         this.showError(error?.error?.Message || 'Failed to release charge for cashing');
       }
     });
+
   }
 
   openAuditLogModal(charge: ChargeTransaction): void {
@@ -500,6 +521,39 @@ export class JobChargesComponent implements OnInit, OnChanges {
         this.isLoadingAuditLog = false;
       }
     });
+  }
+
+  onCategorySearchChange(searchValue: string): void {
+    this.categorySearch = searchValue;
+    this.categoryDropdownOpen = true;
+
+    if (!searchValue.trim()) {
+      this.filteredCategories = [...this.chargeSubCategories];
+      return;
+    }
+
+    const searchLower = searchValue.toLowerCase();
+    this.filteredCategories = this.chargeSubCategories.filter(category =>
+      category.chargeSubCategoryName.toLowerCase().includes(searchLower)
+    );
+  }
+
+
+  selectCategory(category: any): void {
+    this.selectedCategory = category;
+    this.categorySearch = category.chargeSubCategoryName;
+    this.chargeFormGroup.patchValue({ chargeSubCategoryId: category.chargeSubCategoryId });
+    this.categoryDropdownOpen = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+
+    // Close category dropdown if clicked outside
+    if (!target.closest('.category-dropdown') && this.categoryDropdownOpen) {
+      this.categoryDropdownOpen = false;
+    }
   }
 
   showSuccess(message: string): void {
