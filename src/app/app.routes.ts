@@ -152,7 +152,16 @@ export const routes: Routes = [
             loadComponent: () => import('./views/approvals/pettycash/pettycash.component').then(m => m.PettycashComponent),
             data: {
               title: 'Petty Cash Approval',
-              roles: ['admin', 'treasurer','sales']
+              roles: ['admin', 'treasurer','cashier','sales']
+            },
+          },
+          {
+            path: 'pettycash/approval/:jobGuid',
+            canActivate: [AuthGuard],
+            loadComponent: () => import('./views/approvals/pettycash-approval/pettycash-approval.component').then(m => m.PettycashApprovalComponent),
+            data: {
+              title: 'Petty Cash Approval',
+              roles: ['admin', 'treasurer','cashier']
             },
           },
           {

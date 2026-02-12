@@ -75,11 +75,11 @@ export class ChargeTransactionService extends ApiService {
     return this.http.get<ApiResponse<ChargeTransactionAuditLog[]>>(`${this.apiUrl}/job/charges-audit/${chargeId}`);
   }
   approveCharge(tranGuid: string, comments: string): Observable<ApiResponse<ChargeTransaction>> {
-    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/approvecharge/${tranGuid}`, {comments});
+    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/approvecharge/${tranGuid}`, { comments });
   }
 
   rejectCharge(tranGuid: string, comments: string): Observable<ApiResponse<ChargeTransaction>> {
-    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/rejectcharge/${tranGuid}`, {comments});
+    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/rejectcharge/${tranGuid}`, { comments });
   }
 
   cancelCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
@@ -97,12 +97,28 @@ export class ChargeTransactionService extends ApiService {
   confirmCashReleaseCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/actualcashrelease/${tranGuid}`, {});
   }
-  
+
   ownCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/owncharge/${tranGuid}`, {});
   }
 
-  submitForClearingCharge(tranGuid: string, amount: number): Observable<ApiResponse<ChargeTransaction>> {
-    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/forclearing/${tranGuid}/${amount}`, {});
+  submitForClearingCharge(
+    guid: string,
+    amount: number,
+    referenceNumber?: string,
+    notes?: string
+  ): Observable<ApiResponse<ChargeTransaction>> {
+
+    const body = {
+      guid,
+      amount,
+      referenceNumber: referenceNumber || null,
+      notes: notes || null
+    };
+
+    return this.http.put<ApiResponse<ChargeTransaction>>(
+      `${this.apiUrl}/job/jobtransaction/forclearing`,
+      body
+    );
   }
 }

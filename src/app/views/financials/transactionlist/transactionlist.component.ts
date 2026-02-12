@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -14,7 +14,10 @@ import { Configuration } from '../../../models/configuration';
   templateUrl: './transactionlist.component.html',
   styleUrl: './transactionlist.component.scss'
 })
-export class TransactionlistComponent implements OnInit {
+export class TransactionlistComponent implements OnInit, OnChanges {
+
+  @Input() filterCriteria: string = '';
+  pageTitle: string = 'Job Transaction List';
 
   jobs: Job[] = [];
   filterJobStatus: Configuration[] = [];
@@ -45,10 +48,50 @@ export class TransactionlistComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.loadJobList();
+    if(this.filterCriteria === null || this.filterCriteria === undefined || this.filterCriteria === '') {
+      this.pageTitle = 'Job Transaction List';
+      this.loadJobList();
+    }
+
     this.loadFilterOptionFields();
     this.loadJobTransactionTypes();
 
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+
+    if (changes['filterCriteria'] && changes['filterCriteria'].currentValue) {
+
+      if (this.filterCriteria === 'pettycash') {
+
+        this.pageTitle = 'Petty Cash Request List';
+
+        var userRole = this.authService.getCurrentUserRole();
+
+        if (userRole === 'CASHIER') {
+          this.loadAllJobWithPettyCashRelatedRequestCashier();
+        }
+        else if (userRole === 'TREASURER') {
+          this.loadAllJobWithPettyCashRelatedRequestTreasurer();
+        }
+        else if(userRole === 'SALES'){
+
+          this.loadAllJobWithPettyCashRelatedRequestSales();
+
+        }
+        else {
+          this.loadJobList();
+        }
+      }
+
+    }
+    else {
+
+      this.pageTitle = 'Job Transaction List';
+
+      this.loadJobList();
+
+    }
   }
 
   loadJobList() {
@@ -76,6 +119,86 @@ export class TransactionlistComponent implements OnInit {
 
     });
   }
+
+  loadAllJobWithPettyCashRelatedRequestCashier() {
+
+    this.jobService.getAllJobsByCashierWithRequest().subscribe({
+
+      next: (response) => {
+
+        if (response.success && response.data?.length) {
+          this.jobs = response.data
+            .filter(c => c.isActive)
+            .map(job => ({
+              ...job,
+              agingDays: this.calculateAgingDays(job.createdDate)
+            }))
+            .sort((a, b) => b.jobId - a.jobId);
+
+          this.filteredJobs = [...this.jobs];
+        }
+
+      },
+      error: (error) => {
+        console.error('API returned error:', error.message);
+      }
+
+    });
+
+  }
+
+  loadAllJobWithPettyCashRelatedRequestTreasurer() {
+
+   this.jobService.getAllJobsByTreasurerWithRequest().subscribe({
+
+      next: (response) => {
+
+        if (response.success && response.data?.length) {
+          this.jobs = response.data
+            .filter(c => c.isActive)
+            .map(job => ({
+              ...job,
+              agingDays: this.calculateAgingDays(job.createdDate)
+            }))
+            .sort((a, b) => b.jobId - a.jobId);
+
+          this.filteredJobs = [...this.jobs];
+        }
+
+      },
+      error: (error) => {
+        console.error('API returned error:', error.message);
+      }
+    });
+    
+  }
+
+  loadAllJobWithPettyCashRelatedRequestSales() {
+
+   this.jobService.getAllJobsBySalesWithRequest().subscribe({
+
+      next: (response) => {
+
+        if (response.success && response.data?.length) {
+          this.jobs = response.data
+            .filter(c => c.isActive)
+            .map(job => ({
+              ...job,
+              agingDays: this.calculateAgingDays(job.createdDate)
+            }))
+            .sort((a, b) => b.jobId - a.jobId);
+
+          this.filteredJobs = [...this.jobs];
+        }
+
+      },
+      error: (error) => {
+        console.error('API returned error:', error.message);
+      }
+    });
+    
+  }
+
 
   calculateAgingDays(createdDate: string | Date | null | undefined): number {
     if (!createdDate) {
@@ -114,7 +237,7 @@ export class TransactionlistComponent implements OnInit {
     });
 
   }
-  
+
   loadJobTransactionTypes(): void {
     this.jobService.getJobTransactionTypes().subscribe({
       next: (response) => {
@@ -212,7 +335,17 @@ export class TransactionlistComponent implements OnInit {
   }
 
   viewJob(job: any) {
+    if(this.filterCriteria === 'pettycash') {
+      if(this.authService.getCurrentUserRole() === 'SALES'){
+        this.router.navigate(['/jobs/jobmanagement', job.jobGuid, 'charges']);
+      }else{
+
+      this.router.navigate(['/approvals/pettycash/approval/', job.jobGuid]);
+      }
+    }else {
+
     this.router.navigate(['/jobs/financials/chargelists/', job.jobGuid]);
+    }
   }
 
   getStatusBadgeClass(status: string): string {

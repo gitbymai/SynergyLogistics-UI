@@ -58,6 +58,8 @@ export class JobChargesComponent implements OnInit, OnChanges {
   auditLogs: ChargeTransactionAuditLog[] = [];
 
   refundAmount: number = 0;
+  referenceNumber: string = '';
+  refundNotes: string = '';
 
   constructor(private fb: FormBuilder,
 
@@ -102,7 +104,8 @@ export class JobChargesComponent implements OnInit, OnChanges {
         this.filteredCharges = this.charges.filter(charge => {
           return charge.isForProcessing === true
             && charge.isActive === true
-            && charge.amount > 0;
+            && charge.amount > 0
+            && charge.chargeCategoryName === "CHARGES";
         });
       }
 
@@ -207,6 +210,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
             this.charges = response.data;
             if (response.data.length) {
               this.jobCode = response.data[0].jobCode;
+              
               this.filteredCharges = this.charges.filter(charge => {
                 return charge.isForProcessing === true
                   && charge.isActive === true
@@ -264,6 +268,14 @@ export class JobChargesComponent implements OnInit, OnChanges {
   onRefundAmountChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.refundAmount = parseFloat(input.value) || 0;
+  }
+
+  onReferenceNumberChange(event: Event): void {
+    this.referenceNumber = (event.target as HTMLInputElement).value;
+  }
+
+  onRefundNotesChange(event: Event): void {
+    this.refundNotes = (event.target as HTMLTextAreaElement).value;
   }
 
   createCharge(): void {
@@ -357,6 +369,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
     if (!this.isSubmitting) {
       this.showCashReleaseConfirmModal = false;
       this.selectedCharge = null;
+      this.refundAmount = 0;
     }
   }
 
@@ -431,6 +444,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
     if (!this.isSubmitting) {
       this.showSubmitClearingConfirmModal = false;
       this.selectedCharge = null;
+      this.refundAmount = 0;
     }
   }
 
@@ -472,9 +486,10 @@ export class JobChargesComponent implements OnInit, OnChanges {
   }
 
   confirmSubmitClearing() {
+
     this.isSubmitting = true;
 
-    this.chargeService.submitForClearingCharge(this.selectedCharge.chargeGuid, this.refundAmount).subscribe({
+    this.chargeService.submitForClearingCharge(this.selectedCharge.chargeGuid, this.refundAmount, this.referenceNumber, this.refundNotes).subscribe({
       next: (response) => {
         this.isSubmitting = false;
         this.showSubmitClearingConfirmModal = false;
