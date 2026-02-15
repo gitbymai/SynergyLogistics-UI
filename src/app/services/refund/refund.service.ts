@@ -17,7 +17,7 @@ export class RefundService extends ApiService {
     super(http);  // Call parent constructor
   }
 
-  getallRefunds(): Observable<ApiResponse<Refund[]>> {
+  getallRefund(): Observable<ApiResponse<Refund[]>> {
     return this.http.get<ApiResponse<Refund[]>>(`${this.apiUrl}/refund/list`);
   }
 

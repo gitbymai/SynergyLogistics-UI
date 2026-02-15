@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Job, JobStatus } from '../../../models/job';
+import { Job } from '../../../models/job';
 import { JobsService } from '../../../services/jobs/jobs.service';
 import { Configuration } from '../../../models/configuration';
 import { JobTransactionType } from '../../../models/jobtransactiontype';

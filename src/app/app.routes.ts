@@ -84,16 +84,7 @@ export const routes: Routes = [
           {
             path: '',
             loadComponent: () =>
-              import('./views/financials/chargelist/chargelist.component').then(m => m.ChargelistComponent),
-          },
-          {
-            path: 'cash-advance-requests',
-            canActivate: [AuthGuard],
-            loadComponent: () => import('./views/cashadvancerequest/lists/lists.component').then(m => m.ListsComponent),
-            data: {
-              title: 'Cash Advance Requests',
-              roles: ['admin', 'cashier', 'finance', 'treasurer']
-            },
+              import('./views/dashboard/dashboard.component').then(m => m.DashboardComponent),
           },
           {
             path: 'credit-management-list',
@@ -138,13 +129,13 @@ export const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
           title: 'Approvals',
-          roles: ['admin', 'cashier', 'finance', 'treasurer', 'sales']
+          roles: ['admin', 'cashier', 'finance', 'treasurer', 'sales','opsmgr','processor']
         },
         children: [
           {
             path: '',
             loadComponent: () =>
-              import('./views/financials/chargelist/chargelist.component').then(m => m.ChargelistComponent),
+              import('./views/dashboard/dashboard.component').then(m => m.DashboardComponent),
           },
           {
             path: 'pettycash',
@@ -172,7 +163,49 @@ export const routes: Routes = [
               title: 'Cash Deposit Approval',
               roles: ['admin','treasurer']
             },
+          },
+          {
+            path: 'owned-transactions',
+            canActivate: [AuthGuard],
+            loadComponent: () => import('./views/approvals/transactions/owned-transactions/owned-transactions.component').then(m => m.OwnedTransactionsComponent),
+            data: {
+              title: 'Owned Transactions',
+              roles: ['admin','processor','opsmgr']
+            },
+          },
+          {
+            path: 'waiting-for-ownership',
+            canActivate: [AuthGuard],
+            loadComponent: () => import('./views/approvals/transactions/waiting-for-ownership/waiting-for-ownership.component').then(m => m.WaitingForOwnershipComponent),
+            data: {
+              title: 'Waiting for Ownership',
+              roles: ['admin','processor','opsmgr']
+            },
           }
+        ]
+      },
+      {
+        path: 'report',
+        canActivate: [AuthGuard],
+        data: {
+          title: 'Reports',
+          roles: ['admin', 'cashier', 'finance', 'treasurer','sales']
+        },
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./views/dashboard/dashboard.component').then(m => m.DashboardComponent),
+          },
+          {
+            path: 'liquidations',
+            canActivate: [AuthGuard],
+            loadComponent: () => import('./views/report/liquidations/liquidations.component').then(m => m.LiquidationsComponent),
+            data: {
+              title: 'Released & Refunds',
+              roles: ['admin', 'treasurer','cashier']
+            },
+          },
         ]
       },
       {
@@ -186,7 +219,7 @@ export const routes: Routes = [
           {
             path: '',
             loadComponent: () =>
-              import('./views/jobs/jobs.component').then(m => m.JobsComponent),
+              import('./views/dashboard/dashboard.component').then(m => m.DashboardComponent),
           },
           {
             path: 'new',

@@ -1,23 +1,25 @@
 import { Component, OnInit } from '@angular/core';
 import { JobChargesComponent } from '../../jobs/jobcharges/jobcharges.component';
 import { ChargeTransaction } from '../../../models/chargetransaction';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { JobsService } from '../../../services/jobs/jobs.service';
 import { AuthService } from '../../../services/auth.service';
+import { Job } from '../../../models/job';
 
 @Component({
   selector: 'app-pettycash-approval',
-  imports: [JobChargesComponent],
+  imports: [JobChargesComponent, RouterModule],
   templateUrl: './pettycash-approval.component.html',
   styleUrl: './pettycash-approval.component.scss',
 })
 export class PettycashApprovalComponent implements OnInit {
 
+  job: Job | null = null;
   charges: ChargeTransaction[] = [];
-  isLoading = true;
-  errorMessage = '';
   jobGuid: string = "";
   userRole: string = "";
+  isLoading = true;
+  errorMessage = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -39,7 +41,29 @@ export class PettycashApprovalComponent implements OnInit {
     }
 
     this.userRole = this.authService.getCurrentUserRole() || '';
-    this.loadJobRelatedTransaction(jobGuid);
+    this.loadJobDetails(jobGuid);
+  }
+
+  loadJobDetails(jobGuid: string): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.jobService.getByGuid(jobGuid).subscribe({
+      next: (job) => {
+        this.job = job;
+        this.isLoading = false;
+        this.loadJobRelatedTransaction(jobGuid);
+      },
+      error: (error) => {
+        console.error('Error loading job details:', error);
+        this.errorMessage = error.message || 'Failed to load job details. Please try again.';
+        this.isLoading = false;
+
+        setTimeout(() => {
+          this.router.navigate(['/jobs/list']);
+        }, 3000);
+      }
+    });
   }
 
   loadJobRelatedTransaction(jobGuid: string): void {
@@ -74,19 +98,6 @@ export class PettycashApprovalComponent implements OnInit {
         }
       });
     }
-    else if(this.userRole === 'SALES') {
-      this.jobService.getAllChargeTransactionByGuidBySales(jobGuid).subscribe({
-        next: (success) => {
-
-          this.jobGuid = jobGuid;
-          this.charges = success.data;
-        },
-        error: (error) => {
-
-          console.error('Error loading job details:', error);
-        }
-      });
-    }
     else {
 
       this.jobService.getAllChargeTransactionByGuid(jobGuid).subscribe({
@@ -102,4 +113,5 @@ export class PettycashApprovalComponent implements OnInit {
       });
     }
   }
+
 }

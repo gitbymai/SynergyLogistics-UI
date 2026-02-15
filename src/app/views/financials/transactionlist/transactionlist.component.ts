@@ -48,7 +48,7 @@ export class TransactionlistComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
 
-    if(this.filterCriteria === null || this.filterCriteria === undefined || this.filterCriteria === '') {
+    if (this.filterCriteria === null || this.filterCriteria === undefined || this.filterCriteria === '') {
       this.pageTitle = 'Job Transaction List';
       this.loadJobList();
     }
@@ -74,7 +74,7 @@ export class TransactionlistComponent implements OnInit, OnChanges {
         else if (userRole === 'TREASURER') {
           this.loadAllJobWithPettyCashRelatedRequestTreasurer();
         }
-        else if(userRole === 'SALES'){
+        else if (userRole === 'SALES') {
 
           this.loadAllJobWithPettyCashRelatedRequestSales();
 
@@ -82,6 +82,20 @@ export class TransactionlistComponent implements OnInit, OnChanges {
         else {
           this.loadJobList();
         }
+      }
+
+      else if (this.filterCriteria === 'transactions_owned_by_user') {
+
+        this.pageTitle = 'My Transactions';
+        this.loadAllJobTrasactionsAssignedToUser();
+
+      }
+      else if (this.filterCriteria === 'transactions_waiting_for_ownership') {
+
+        this.pageTitle = 'Transactions Waiting for Ownership';
+
+        this.loadAllJobTrasactionNoOwnership();
+
       }
 
     }
@@ -149,7 +163,7 @@ export class TransactionlistComponent implements OnInit, OnChanges {
 
   loadAllJobWithPettyCashRelatedRequestTreasurer() {
 
-   this.jobService.getAllJobsByTreasurerWithRequest().subscribe({
+    this.jobService.getAllJobsByTreasurerWithRequest().subscribe({
 
       next: (response) => {
 
@@ -170,12 +184,12 @@ export class TransactionlistComponent implements OnInit, OnChanges {
         console.error('API returned error:', error.message);
       }
     });
-    
+
   }
 
   loadAllJobWithPettyCashRelatedRequestSales() {
 
-   this.jobService.getAllJobsBySalesWithRequest().subscribe({
+    this.jobService.getAllJobsBySalesWithRequest().subscribe({
 
       next: (response) => {
 
@@ -196,9 +210,58 @@ export class TransactionlistComponent implements OnInit, OnChanges {
         console.error('API returned error:', error.message);
       }
     });
-    
+
   }
 
+  loadAllJobTrasactionsAssignedToUser() {
+    this.jobService.getAllJobTransactionAssignedToUser().subscribe({
+
+      next: (response) => {
+
+        if (response.success && response.data?.length) {
+          this.jobs = response.data
+            .filter(c => c.isActive)
+            .map(job => ({
+              ...job,
+              agingDays: this.calculateAgingDays(job.createdDate)
+            }))
+            .sort((a, b) => b.jobId - a.jobId);
+
+          this.filteredJobs = [...this.jobs];
+        }
+
+      },
+      error: (error) => {
+        console.error('API returned error:', error.message);
+      }
+    });
+
+  }
+
+  loadAllJobTrasactionNoOwnership() {
+    this.jobService.getAllJobTransactionNoAssignedUser().subscribe({
+
+      next: (response) => {
+
+        if (response.success && response.data?.length) {
+          this.jobs = response.data
+            .filter(c => c.isActive)
+            .map(job => ({
+              ...job,
+              agingDays: this.calculateAgingDays(job.createdDate)
+            }))
+            .sort((a, b) => b.jobId - a.jobId);
+
+          this.filteredJobs = [...this.jobs];
+        }
+
+      },
+      error: (error) => {
+        console.error('API returned error:', error.message);
+      }
+    });
+
+  }
 
   calculateAgingDays(createdDate: string | Date | null | undefined): number {
     if (!createdDate) {
@@ -335,16 +398,16 @@ export class TransactionlistComponent implements OnInit, OnChanges {
   }
 
   viewJob(job: any) {
-    if(this.filterCriteria === 'pettycash') {
-      if(this.authService.getCurrentUserRole() === 'SALES'){
+    if (this.filterCriteria === 'pettycash') {
+      if (this.authService.getCurrentUserRole() === 'SALES') {
         this.router.navigate(['/jobs/jobmanagement', job.jobGuid, 'charges']);
-      }else{
+      } else {
 
-      this.router.navigate(['/approvals/pettycash/approval/', job.jobGuid]);
+        this.router.navigate(['/approvals/pettycash/approval/', job.jobGuid]);
       }
-    }else {
+    } else {
 
-    this.router.navigate(['/jobs/financials/chargelists/', job.jobGuid]);
+      this.router.navigate(['/jobs/financials/chargelists/', job.jobGuid]);
     }
   }
 

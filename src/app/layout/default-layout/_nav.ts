@@ -42,6 +42,18 @@ export const navItems = [
         roles: ['admin','treasurer','cashier','sales']
       },
       {
+        name: 'Owned Transactions',
+        url: '/approvals/owned-transactions',
+        iconComponent: { name: 'cil-layers' },
+        roles: ['admin','processor','opsmgr']
+      },
+      {
+        name: 'Waiting for Ownership',
+        url: '/approvals/waiting-for-ownership',
+        iconComponent: { name: 'cil-layers' },
+        roles: ['admin','processor','opsmgr']
+      },
+      {
         name: 'Cash Deposit',
         url: '/approvals/cashdeposits',
         iconComponent: { name: 'cil-basket' },
@@ -54,12 +66,6 @@ export const navItems = [
     url: '/financial',
     iconComponent: { name: 'cil-file' },
     children: [
-      {
-        name: 'Cash Advance Requests',
-        url: '/financial/cash-advance-requests',
-        iconComponent: { name: 'cil-dollar' },
-        roles: ['admin','cashier','treasurer', 'finance']
-      },
       {
         name: 'Credit Management',
         url: '/financial/credit-management-list',
@@ -75,21 +81,21 @@ export const navItems = [
     ]
   },
   {
-    name:'Reports',
+    name:'Reports & Monitoring',
     url:'/report',
     iconComponent: { name: 'cil-chart' },
     children: [
       {
-        name: 'Refund',
-        url: '/report/liquidation',
+        name: 'Released Petty Cash',
+        url: '/report/liquidations',
         iconComponent: { name: 'cil-paper-plane' },
-        roles: ['sales', 'admin','treasurer','cashier']
+        roles: ['admin','treasurer','cashier']
       },
       {
-        name: 'Petty Cash',
-        url: '/report/pettycash',
-        iconComponent: { name: 'cil-file' },
-        roles: ['admin', 'finance', 'treasurer']
+        name: 'Actual Refunds',
+        url: '/report/liquidations',
+        iconComponent: { name: 'cil-paper-plane' },
+        roles: ['admin','treasurer','cashier']
       }
     ]
   },
