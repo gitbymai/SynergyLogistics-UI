@@ -38,8 +38,12 @@ export class JobsService extends ApiService {
     return this.http.get<ApiResponse<JobTransactionType[]>>(`${this.apiUrl}/jobtransactiontype`);
   }
 
-  getAllJobs(): Observable<ApiResponse<Job[]>> {
-    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/job-list`);
+  getAllJobs(dateFrom?: string, dateTo?: string): Observable<ApiResponse<Job[]>> {
+    let params = new HttpParams();
+    if (dateFrom) params = params.set('dateFrom', dateFrom);
+    if (dateTo) params = params.set('dateTo', dateTo);
+
+    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/job-list`, { params });
   }
 
   getAllJobsByCashierWithRequest(): Observable<ApiResponse<Job[]>> {
@@ -57,7 +61,7 @@ export class JobsService extends ApiService {
   getAllJobTransactionAssignedToUser(): Observable<ApiResponse<Job[]>> {
     return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/getall-assigned-to-user`);
   }
-  
+
   getAllJobTransactionNoAssignedUser(): Observable<ApiResponse<Job[]>> {
     return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/getall-no-assigned`);
   }

@@ -1,107 +1,142 @@
-<div class="card my-4 shadow-sm">
-  <div class="card-header bg-primary text-white">
-    <div class="d-flex justify-content-between align-items-center">
-      <h4 class="mb-0">
-        <i class="bi bi-cash-coin me-2"></i> Charges Management
-        <span class="badge badge-code">{{ jobCode }}</span>
-      </h4>
-      <button class="btn btn-light btn-sm" type="button" (click)="openAddModal()">
-        <i class="bi bi-plus-circle me-2"></i> Add Charge
+<div class="list-wrapper">
+
+  <!-- ── Page Header ── -->
+  <header class="list-header">
+    <div class="list-header-left">
+      <div class="list-label">Operations · Job Management</div>
+      <h1 class="list-title">
+        Charges Management
+        <span class="ref-chip" style="font-size: 14px; vertical-align: middle; margin-left: 8px;">{{ jobCode }}</span>
+      </h1>
+    </div>
+    <div class="list-header-right">
+      <button class="btn btn-primary" type="button" (click)="openAddModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        Add Charge
       </button>
     </div>
-  </div>
+  </header>
 
-  <div class="card-body">
+  <!-- ── Table Card ── -->
+  <div class="table-card">
 
-    <!-- Loading Spinner -->
+    <!-- Loading -->
     @if (isLoading) {
-    <div class="text-center py-5">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
+    <div style="text-align: center; padding: 64px 32px; color: var(--ink-muted);">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor" stroke-width="2" class="spin" style="margin-bottom: 12px;">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 3v3m0 12v3m9-9h-3M6 12H3m15.364-6.364-2.121 2.121M8.757 15.243l-2.121 2.121M18.364 18.364l-2.121-2.121M8.757 8.757 6.636 6.636" />
+      </svg>
+      <p style="font-size: 13px;">Loading charges...</p>
     </div>
     }
 
-    <!-- Charges Table -->
     @if (!isLoading) {
-    <div class="table-responsive">
-      <table class="table table-hover table-custom mb-0">
+    <div style="overflow-x: auto;">
+      <table>
         <thead>
           <tr>
             <th>Code</th>
             <th>Item</th>
-            <th>Status</th>
-            <th>Charge Amount</th>
-            <th>Calculated Charge Amount</th>
-            <th>Selling Amount</th>
-            <th>Calculated Selling Amount</th>
+            <th class="text-center">Status</th>
+            <th class="text-right">Charge Amt</th>
+            <th class="text-right">Calc. Charge</th>
+            <th class="text-right">Selling Amt</th>
+            <th class="text-right">Calc. Selling</th>
             <th>Created By</th>
             <th>Last Update</th>
-            <th>Actions</th>
+            <th class="text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
           @for (charge of filteredCharges; track charge) {
           <tr>
             <td>
-              <div class="code-cell">
-                <span class="code-text">{{ charge.chargeCode }}</span>
-              </div>
-            </td>
-            <td>
-              <span class="code-text">
-                {{ charge.chargeSubCategoryName }}
+              <span class="cell-mono" style="color: var(--accent); font-weight: 600;">
+                {{ charge.chargeCode }}
               </span>
             </td>
             <td>
-              <div class="status-badge-wrapper">
-                <span class="badge" [ngClass]="getStatusClass(charge.chargeTransactionStatus || '')">
-                  {{ charge.chargeTransactionStatus }}
-                </span>
-              </div>
+              <span class="cell-primary">{{ charge.chargeSubCategoryName }}</span>
             </td>
-            <td class="text-end">
-              <span class="code-text">{{ charge.currencyCode }} {{ charge.amount | number:'1.2-2' }}</span>
-            </td>
-            <td class="text-end">
-              <span class="code-text">PHP {{ charge.calculatedAmount | number:'1.2-2' }}</span>
-            </td>
-            <td class="text-end">
-              <span class="code-text">{{ charge.currencyCode }} {{ charge.amountSelling | number:'1.2-2' }}</span>
-            </td>
-            <td class="text-end">
-              <span class="code-text">PHP {{ charge.calculatedSellingAmount | number:'1.2-2' }}</span>
-            </td>
-            <td>
-              <span class="code-text">{{ charge.createdByName }}</span>
-            </td>
-            <td>
-              <span class="code-text">
-                {{ (charge.modifiedDate || charge.createdDate) | date:'MM/dd/yy h:mm a' }}
+            <td class="text-center">
+              <span class="status-chip" [ngClass]="getStatusClass(charge.chargeTransactionStatus || '')">
+                {{ charge.chargeTransactionStatus }}
               </span>
             </td>
+            <td class="text-right">
+              <span class="cell-mono" style="font-size: 12px;">
+                {{ charge.currencyCode }} {{ charge.amount | number:'1.2-2' }}
+              </span>
+            </td>
+            <td class="text-right">
+              <span class="amount-positive">PHP {{ charge.calculatedAmount | number:'1.2-2' }}</span>
+            </td>
+            <td class="text-right">
+              <span class="cell-mono" style="font-size: 12px;">
+                {{ charge.currencyCode }} {{ charge.amountSelling | number:'1.2-2' }}
+              </span>
+            </td>
+            <td class="text-right">
+              <span class="amount-positive">PHP {{ charge.calculatedSellingAmount | number:'1.2-2' }}</span>
+            </td>
             <td>
-              <div class="btn-group" role="group" aria-label="Action buttons">
-                @if(charge.chargeTransactionStatus === 'FOR APPROVAL'){
-                <button class="btn btn-sm btn-success-outline" (click)="openReviewModal(charge)" title="Review Request">
-                  <i class="cil-list"></i>
+              <span class="cell-sub" style="font-size: 12px;">{{ charge.createdByName }}</span>
+            </td>
+            <td>
+              <span class="cell-mono" style="font-size: 11px; color: var(--ink-muted);">
+                {{ (charge.modifiedDate || charge.createdDate) | date:'MM/dd/yy' }}<br />
+                {{ (charge.modifiedDate || charge.createdDate) | date:'h:mm a' }}
+              </span>
+            </td>
+            <td class="text-center">
+              <div style="display: inline-flex; gap: 4px; align-items: center;">
+                @if (charge.chargeTransactionStatus === 'FOR APPROVAL') {
+                <button class="action-btn" style="color: #0369a1; border-color: #e0f2fe; background: #e0f2fe;"
+                  (click)="openReviewModal(charge)" title="Review Request">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
+                  Review
                 </button>
                 }
-                <button class="btn btn-sm btn-primary-outline" (click)="openEditModal(charge)" title="Edit Charge"
+                <button class="action-btn" (click)="openEditModal(charge)" title="Edit Charge"
                   [disabled]="charge.chargeTransactionStatus !== 'APPROVED'"
-                  [style.opacity]="charge.chargeTransactionStatus !== 'APPROVED' ? '0.5' : '1'"
+                  [style.opacity]="charge.chargeTransactionStatus !== 'APPROVED' ? '0.4' : '1'"
                   [style.pointer-events]="charge.chargeTransactionStatus !== 'APPROVED' ? 'none' : 'auto'">
-                  <i class="cil-pencil"></i>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Edit
                 </button>
-                <button class="btn btn-sm btn-danger-outline" (click)="deleteCharge(charge)" title="Cancel Charge"
+                <button class="action-btn" style="color: var(--red); border-color: #fdecea; background: #fdecea;"
+                  (click)="deleteCharge(charge)" title="Cancel Charge"
                   [disabled]="charge.chargeTransactionStatus !== 'APPROVED'"
-                  [style.opacity]="charge.chargeTransactionStatus !== 'APPROVED' ? '0.5' : '1'"
+                  [style.opacity]="charge.chargeTransactionStatus !== 'APPROVED' ? '0.4' : '1'"
                   [style.pointer-events]="charge.chargeTransactionStatus !== 'APPROVED' ? 'none' : 'auto'">
-                  <i class="cil-trash"></i>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Cancel
                 </button>
-                <button class="btn btn-sm btn-primary-outline" (click)="openViewModal(charge)"
-                  title="Open Charge Details">
-                  <i class="cil-spreadsheet"></i>
+                <button class="action-btn" (click)="openViewModal(charge)" title="View Details">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  View
                 </button>
               </div>
             </td>
@@ -109,30 +144,34 @@
           }
           @if (filteredCharges.length === 0) {
           <tr>
-            <td colspan="7" class="text-center text-muted py-4">
-              <i class="bi bi-inbox" style="font-size: 2rem;"></i>
-              <div class="mt-2">No charges found</div>
+            <td colspan="10">
+              <div class="empty-state">
+                <div class="empty-icon">◻</div>
+                <p>No charges found</p>
+              </div>
             </td>
           </tr>
           }
         </tbody>
         @if (filteredCharges.length > 0) {
         <tfoot>
-          <tr class="table-light">
-            <td colspan="6" class="text-end fw-bold total-label">Total Charge Amount:</td>
-            <td class="text-end fw-bold total-amount">PHP {{ totalChargeAmount | number:'1.2-2' }}</td>
+          <tr>
+            <td colspan="6" class="text-right"><span class="total-label">Total Charge Amount</span></td>
+            <td class="text-right"><span class="total-amount">PHP {{ totalChargeAmount | number:'1.2-2' }}</span></td>
             <td colspan="3"></td>
           </tr>
-          <tr class="table-light">
-            <td colspan="6" class="text-end fw-bold total-label">Total Selling Amount:</td>
-            <td class="text-end fw-bold total-amount text-primary">PHP {{ totalSellingAmount | number:'1.2-2' }}</td>
+          <tr>
+            <td colspan="6" class="text-right"><span class="total-label">Total Selling Amount</span></td>
+            <td class="text-right"><span class="total-amount">PHP {{ totalSellingAmount | number:'1.2-2' }}</span></td>
             <td colspan="3"></td>
           </tr>
-          <tr class="table-secondary">
-            <td colspan="6" class="text-end fw-bold total-label">Total Profit:</td>
-            <td class="text-end fw-bold total-amount"
-              [style.color]="(totalSellingAmount - totalChargeAmount) >= 0 ? '#198754' : '#dc3545'">
-              PHP {{ (totalSellingAmount - totalChargeAmount) | number:'1.2-2' }}
+          <tr>
+            <td colspan="6" class="text-right"><span class="total-label">Total Profit</span></td>
+            <td class="text-right">
+              <span class="total-amount"
+                [style.color]="(totalSellingAmount - totalChargeAmount) >= 0 ? 'var(--green)' : 'var(--red)'">
+                PHP {{ (totalSellingAmount - totalChargeAmount) | number:'1.2-2' }}
+              </span>
             </td>
             <td colspan="3"></td>
           </tr>
@@ -140,57 +179,50 @@
         }
       </table>
     </div>
-    }
 
-    <!-- Summary Badge -->
-    @if (!isLoading) {
-    <div class="mt-3 d-flex justify-content-between align-items-center">
-      <span class="badge bg-secondary fs-6">
-        {{ filteredCharges.length }} charge(s) found
-      </span>
+    <!-- Footer Count -->
+    <div class="list-footer">
+      <div class="footer-count">
+        <strong>{{ filteredCharges.length }}</strong> charge(s) found
+      </div>
     </div>
     }
   </div>
 </div>
 
-<!-- Add/Edit Modal -->
+
+<!-- ── Add / Edit Modal ── -->
 @if (showModal) {
 <div class="modal-backdrop" (click)="closeModal()"></div>
 }
 <div class="modal custom-modal" [class.show]="showModal" [class.d-block]="showModal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">
-          @if (isEditMode) {
-          <i class="bi bi-pencil me-2"></i> Edit Charge
-          }
-          @if (!isEditMode) {
-          <i class="bi bi-plus-circle me-2"></i> Add New Charge
-          }
+      <div class="modal-header" style="background: #1a3a6b; color: #fff;">
+        <h5 class="modal-title" style="font-family: 'Sora', sans-serif; font-weight: 600; font-size: 16px;">
+          @if (isEditMode) { Edit Charge } @else { Add New Charge }
         </h5>
         <button type="button" class="btn-close btn-close-white" (click)="closeModal()" aria-label="Close"></button>
       </div>
 
-      <div class="modal-body">
-        <form [formGroup]="chargeFormGroup" class="form-professional">
+      <div class="modal-body" style="padding: 28px;">
+        <form [formGroup]="chargeFormGroup">
           <div class="row">
-            <!-- LEFT COLUMN - Category and Description -->
+
+            <!-- LEFT: Category & Description -->
             <div class="col-md-6">
-              <!-- Charge Subcategory - Searchable -->
               <div class="mb-3">
                 <div class="position-relative category-dropdown">
-                  <label class="form-label">
-                    <i class="bi bi-tag me-1"></i> Category <span class="text-danger">*</span>
+                  <label class="filter-label" style="margin-bottom: 6px; display: block;">
+                    Category <span style="color: var(--red);">*</span>
                   </label>
-                  <input type="text" class="form-control form-control-custom" placeholder="Search or select category"
+                  <input type="text" class="filter-input" style="width: 100%;" placeholder="Search or select category"
                     [value]="categorySearch" (input)="onCategorySearchChange($any($event.target).value)"
                     (focus)="categoryDropdownOpen = true" [disabled]="isEditMode"
-                    [style.background-color]="isEditMode ? '#e9ecef' : null" [style.opacity]="isEditMode ? '0.6' : '1'"
-                    [style.cursor]="isEditMode ? 'not-allowed' : 'text'" />
+                    [style.opacity]="isEditMode ? '0.5' : '1'" [style.cursor]="isEditMode ? 'not-allowed' : 'text'" />
                   @if (categoryDropdownOpen && filteredCategories.length > 0 && !isEditMode) {
                   <ul class="dropdown-list">
-                    @for(category of filteredCategories; track category.chargeSubCategoryId){
+                    @for (category of filteredCategories; track category.chargeSubCategoryId) {
                     <li class="dropdown-item-custom" (click)="selectCategory(category)">
                       {{ category.chargeSubCategoryName }}
                     </li>
@@ -199,152 +231,111 @@
                   }
                   @if (categoryDropdownOpen && filteredCategories.length === 0 && categorySearch && !isEditMode) {
                   <ul class="dropdown-list">
-                    <li class="dropdown-item-custom text-muted">No categories found</li>
+                    <li class="dropdown-item-custom" style="color: var(--ink-muted);">No categories found</li>
                   </ul>
                   }
                   <input type="hidden" formControlName="chargeSubCategoryId" />
                   @if (chargeFormGroup.get('chargeSubCategoryId')?.invalid &&
                   chargeFormGroup.get('chargeSubCategoryId')?.touched) {
-                  <div class="text-danger small mt-1">
-                    Category is required
-                  </div>
+                  <div style="font-size: 11px; color: var(--red); margin-top: 4px;">Category is required</div>
                   }
                 </div>
               </div>
 
-              <!-- Description -->
               <div class="mb-3">
-                <label class="form-label">
-                  <i class="bi bi-card-text me-1"></i> Description
-                </label>
-                <textarea class="form-control form-control-custom" rows="8" formControlName="description"
-                  placeholder="Enter charge description..." [class.disabled-select]="isEditMode"
-                  [style.pointer-events]="isEditMode ? 'none' : 'auto'"
-                  [style.background-color]="isEditMode ? '#e9ecef' : null"
-                  [style.opacity]="isEditMode ? '0.6' : '1'"></textarea>
+                <label class="filter-label" style="margin-bottom: 6px; display: block;">Description</label>
+                <textarea class="filter-input" style="width: 100%; resize: vertical; min-height: 160px;" rows="8"
+                  formControlName="description" placeholder="Enter charge description..."
+                  [style.opacity]="isEditMode ? '0.5' : '1'"
+                  [style.pointer-events]="isEditMode ? 'none' : 'auto'"></textarea>
               </div>
             </div>
 
-            <!-- RIGHT COLUMN - Financial Information -->
+            <!-- RIGHT: Financial -->
             <div class="col-md-6">
-              <div class="row">
-
-                <!-- Currency -->
-                <div class="col-md-8 mb-3">
-                  <label class="form-label">
-                    <i class="bi bi-currency-exchange me-1"></i> Currency <span class="text-danger">*</span>
-                  </label>
-                  <select class="form-select form-control-custom" formControlName="currency"
-                    [class.disabled-select]="isEditMode" [style.pointer-events]="isEditMode ? 'none' : 'auto'"
-                    [style.background-color]="isEditMode ? '#e9ecef' : null" [style.opacity]="isEditMode ? '0.6' : '1'">
-                    <option value="">Select currency...</option>
-                    <option value="PHP">PHP - Philippine Peso</option>
-                    <option value="USD">USD - US Dollar</option>
-                    <option value="SGD">SGD - Singapore Dollar</option>
-                    <option value="GBP">GBP - British Pound</option>
-                    <option value="EUR">EUR - Euro</option>
-                  </select>
-                  @if (chargeFormGroup.get('currency')?.invalid &&
-                  chargeFormGroup.get('currency')?.touched) {
-                  <div class="text-danger small mt-1">
-                    Currency is required
-                  </div>
-                  }
-                </div>
-                <!-- Conversion Rate -->
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">
-                    <i class="bi bi-calculator me-1"></i> Rate to PHP
-                  </label>
-                  <input type="number" class="form-control form-control-custom" formControlName="conversionRate"
-                    step="0.0001" placeholder="e.g., 56.50">
-                  @if (chargeFormGroup.get('currency')?.value === 'PHP') {
-                  <div class="text-muted small mt-1">
-                    <i class="bi bi-info-circle me-1"></i> Default rate
-                  </div>
-                  }
-                  @if (chargeFormGroup.get('conversionRate')?.invalid &&
-                  chargeFormGroup.get('conversionRate')?.touched &&
-                  chargeFormGroup.get('currency')?.value !== 'PHP') {
-                  <div class="text-danger small mt-1">
-                    Valid conversion rate is required
-                  </div>
-                  }
-                </div>
-              </div>
-
-              <!-- Amount -->
+              <!-- Currency + Rate row — flex instead of Bootstrap grid -->
+<!-- Currency + Rate row -->
+<div style="display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; overflow: hidden;">
+  <div style="flex: 2; min-width: 0;">
+    <label class="filter-label" style="margin-bottom: 6px; display: block;">
+      Currency <span style="color: var(--red);">*</span>
+    </label>
+    <select class="filter-input" style="width: 100%; min-width: 0;" formControlName="currency"
+      [style.opacity]="isEditMode ? '0.5' : '1'" [style.pointer-events]="isEditMode ? 'none' : 'auto'">
+      <option value="">Select currency...</option>
+      <option value="PHP">PHP - Philippine Peso</option>
+      <option value="USD">USD - US Dollar</option>
+      <option value="SGD">SGD - Singapore Dollar</option>
+      <option value="GBP">GBP - British Pound</option>
+      <option value="EUR">EUR - Euro</option>
+    </select>
+    @if (chargeFormGroup.get('currency')?.invalid && chargeFormGroup.get('currency')?.touched) {
+      <div style="font-size: 11px; color: var(--red); margin-top: 4px;">Currency is required</div>
+    }
+  </div>
+  <div style="flex: 1; min-width: 0; max-width: 120px;">
+    <label class="filter-label" style="margin-bottom: 6px; display: block;">Rate to PHP</label>
+    <input type="number" class="filter-input" style="width: 100%; min-width: 0;"
+      formControlName="conversionRate" step="0.0001" placeholder="56.50" />
+    @if (chargeFormGroup.get('currency')?.value === 'PHP') {
+      <div style="font-size: 11px; color: var(--ink-muted); margin-top: 4px;">Default rate</div>
+    }
+  </div>
+</div>
               <div class="mb-3">
-                <label class="form-label">
-                  <i class="bi bi-cash me-1"></i> Charge Amount <span class="text-danger">*</span>
+                <label class="filter-label" style="margin-bottom: 6px; display: block;">
+                  Charge Amount <span style="color: var(--red);">*</span>
                 </label>
-                <input type="number" class="form-control form-control-custom" formControlName="amount" step="0.01"
-                  placeholder="0.00">
+                <input type="number" class="filter-input" style="width: 100%;" formControlName="amount" step="0.01"
+                  placeholder="0.00" />
                 @if (chargeFormGroup.get('amount')?.invalid && chargeFormGroup.get('amount')?.touched) {
-                <div class="text-danger small mt-1">
-                  Valid charge amount is required
-                </div>
+                <div style="font-size: 11px; color: var(--red); margin-top: 4px;">Valid charge amount is required</div>
                 }
               </div>
 
-              <!-- Amount Selling -->
               <div class="mb-3">
-                <label class="form-label">
-                  <i class="bi bi-cash-coin me-1"></i> Amount Selling <span class="text-danger">*</span>
+                <label class="filter-label" style="margin-bottom: 6px; display: block;">
+                  Amount Selling <span style="color: var(--red);">*</span>
                 </label>
-                <input type="number" class="form-control form-control-custom" formControlName="amountSelling"
-                  step="0.01" placeholder="0.00">
+                <input type="number" class="filter-input" style="width: 100%;" formControlName="amountSelling"
+                  step="0.01" placeholder="0.00" />
                 @if (chargeFormGroup.get('amountSelling')?.invalid && chargeFormGroup.get('amountSelling')?.touched) {
-                <div class="text-danger small mt-1">
-                  Valid selling amount is required
-                </div>
+                <div style="font-size: 11px; color: var(--red); margin-top: 4px;">Valid selling amount is required</div>
                 }
               </div>
-            </div>
-          </div>
 
-          <!-- Is for Processing Checkbox - Full Width at Bottom -->
-          <div class="row">
-            <div class="col-12">
-              <div class="card border-primary" style="background-color: #f8f9ff;">
-                <div class="card-body py-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" formControlName="isForProcessing"
-                      id="isForProcessingCheck" style="width: 1.25rem; height: 1.25rem;"
-                      [style.cursor]="isEditMode ? 'not-allowed' : 'pointer'">
-                    <label class="form-check-label fw-semibold ms-2" for="isForProcessingCheck"
-                      [class.text-muted]="isEditMode" [style.cursor]="isEditMode ? 'not-allowed' : 'pointer'"
-                      style="font-size: 1.05rem;">
-                      <i class="bi bi-gear-fill me-2 text-primary"></i> Is for processing
-                    </label>
+              <!-- Is For Processing -->
+              <div
+                style="background: var(--accent-light); border: 1px solid var(--rule); border-radius: 8px; padding: 16px; margin-top: 8px;">
+                <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer;"
+                  [style.cursor]="isEditMode ? 'not-allowed' : 'pointer'">
+                  <input type="checkbox" formControlName="isForProcessing" id="isForProcessingCheck"
+                    style="width: 16px; height: 16px; margin-top: 2px; accent-color: var(--accent);"
+                    [style.cursor]="isEditMode ? 'not-allowed' : 'pointer'" />
+                  <div>
+                    <div
+                      style="font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--ink);">
+                      Is for processing
+                    </div>
+                    <div style="font-size: 11.5px; color: var(--ink-muted); margin-top: 3px;">
+                      Check this to make this charge available for processors to process.
+                    </div>
                   </div>
-                  <small class="text-muted d-block mt-2 ms-5">
-                    <i class="bi bi-info-circle-fill me-1 text-info"></i>Check this box to make this charge available
-                    for processors to process
-                  </small>
-                </div>
+                </label>
               </div>
             </div>
           </div>
         </form>
       </div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeModal()">
-          <i class="bi bi-x me-2"></i> Cancel
-        </button>
+      <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 16px 24px; gap: 10px;">
+        <button type="button" class="btn btn-ghost" (click)="closeModal()">Cancel</button>
         <button type="button" class="btn btn-primary" (click)="onSubmit()"
           [disabled]="!chargeFormGroup.valid || isSubmitting">
-          @if (!isSubmitting) {
-          <span>
-            <i class="bi bi-check me-2"></i> {{ isEditMode ? 'Update Charge' : 'Create Charge' }}
-          </span>
-          }
-          @if (isSubmitting) {
-          <span>
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            Submitting...
-          </span>
+          @if (!isSubmitting) { {{ isEditMode ? 'Update Charge' : 'Create Charge' }} }
+          @else {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Submitting...
           }
         </button>
       </div>
@@ -352,95 +343,82 @@
   </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
+
+<!-- ── Cancel Confirmation Modal ── -->
 @if (showDeleteConfirmModal) {
 <div class="modal-backdrop" (click)="closeDeleteConfirm()"></div>
 }
 <div class="modal custom-modal" [class.show]="showDeleteConfirmModal" [class.d-block]="showDeleteConfirmModal"
   tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title">
-          <i class="bi bi-exclamation-triangle-fill me-2"></i> Cancel Charge
+      <div class="modal-header" style="background: var(--red); color: #fff;">
+        <h5 class="modal-title" style="font-family: 'Sora', sans-serif; font-weight: 600; font-size: 16px;">
+          Cancel Charge
         </h5>
         <button type="button" class="btn-close btn-close-white" (click)="closeDeleteConfirm()"
           aria-label="Close"></button>
       </div>
-      <div class="modal-body p-4">
-        <!-- Warning Icon -->
-        <div class="text-center mb-4">
-          <i class="bi bi-exclamation-circle text-danger" style="font-size: 4rem;"></i>
+
+      <div class="modal-body" style="padding: 28px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24"
+            stroke="var(--red)" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+          </svg>
         </div>
 
-        <!-- Warning Message -->
-        <div class="alert alert-danger d-flex align-items-center mb-3" role="alert">
-          <i class="bi bi-shield-exclamation me-2 fs-5"></i>
-          <strong>This action cannot be undone!</strong>
+        <div class="confirm-notice" style="background: #fdecea; color: var(--red);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          This action cannot be undone!
         </div>
 
-        <!-- Confirmation Text -->
-        <p class="text-center mb-4">
+        <p style="text-align: center; font-size: 13.5px; color: var(--ink-soft); margin: 16px 0;">
           Are you sure you want to cancel this charge?
         </p>
 
-        <!-- Charge Details Card -->
-        <div class="card border-danger">
-          <div class="card-body p-3">
-            <div class="row g-2 small">
-              <div class="col-5 text-muted">
-                <strong>Charge Code:</strong>
-              </div>
-              <div class="col-7">
-                <span class="badge bg-secondary">{{ selectedCharge?.chargeCode }}</span>
-              </div>
-
-              <div class="col-5 text-muted">
-                <strong>Category:</strong>
-              </div>
-              <div class="col-7">
-                {{ selectedCharge?.chargeSubCategoryName }}
-              </div>
-
-              <div class="col-5 text-muted">
-                <strong>Amount:</strong>
-              </div>
-              <div class="col-7">
-                <strong class="text-danger">
-                  {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
-                </strong>
-              </div>
-
-              @if (selectedCharge?.description) {
-              <div class="col-5 text-muted">
-                <strong>Description:</strong>
-              </div>
-              <div class="col-7">
-                <small class="text-truncate d-block" [title]="selectedCharge?.description">
-                  {{ selectedCharge?.description }}
-                </small>
-              </div>
-              }
-            </div>
+        <div class="summary-card" style="border-color: #fdecea;">
+          <div class="summary-card-title">Charge Details</div>
+          <div class="summary-row">
+            <span class="summary-key">Charge Code</span>
+            <span class="summary-val">
+              <span class="cell-mono" style="color: var(--accent);">{{ selectedCharge?.chargeCode }}</span>
+            </span>
           </div>
+          <div class="summary-row">
+            <span class="summary-key">Category</span>
+            <span class="summary-val">{{ selectedCharge?.chargeSubCategoryName }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">Amount</span>
+            <span class="summary-val" style="color: var(--red);">
+              {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
+            </span>
+          </div>
+          @if (selectedCharge?.description) {
+          <div class="summary-row">
+            <span class="summary-key">Description</span>
+            <span class="summary-val" style="font-size: 12px; font-weight: 400; color: var(--ink-muted);">
+              {{ selectedCharge?.description }}
+            </span>
+          </div>
+          }
         </div>
       </div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeDeleteConfirm()">
-          <i class="bi bi-x-circle me-2"></i> No, Keep It
-        </button>
-        <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="isSubmitting">
-          @if (!isSubmitting) {
-          <span>
-            <i class="bi bi-trash-fill me-2"></i> Yes, Cancel Charge
-          </span>
-          }
-          @if (isSubmitting) {
-          <span>
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            Cancelling...
-          </span>
+      <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 16px 24px; gap: 10px;">
+        <button type="button" class="btn btn-ghost" (click)="closeDeleteConfirm()">No, Keep It</button>
+        <button type="button" class="btn btn-primary" style="background: var(--red);" (click)="confirmDelete()"
+          [disabled]="isSubmitting">
+          @if (!isSubmitting) { Yes, Cancel Charge }
+          @else {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Cancelling...
           }
         </button>
       </div>
@@ -448,7 +426,8 @@
   </div>
 </div>
 
-<!-- Review Charge Modal -->
+
+<!-- ── Review Modal ── -->
 @if (showReviewModal) {
 <div class="modal-backdrop" (click)="closeReviewModal()"></div>
 }
@@ -456,118 +435,77 @@
   role="dialog">
   <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">
-          <i class="bi bi-clipboard-check me-2"></i> Review Charge
+      <div class="modal-header" style="background: #1a3a6b; color: #fff;">
+        <h5 class="modal-title" style="font-family: 'Sora', sans-serif; font-weight: 600; font-size: 16px;">
+          Review Charge
         </h5>
         <button type="button" class="btn-close btn-close-white" (click)="closeReviewModal()"
           aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <!-- Charge Details -->
-        <div class="card mb-3" style="background-color: #f8f9ff; border: 1px solid #bbdefb;">
-          <div class="card-body">
-            <h6 class="text-primary mb-3">
-              <i class="bi bi-info-circle me-2"></i> Charge Details
-            </h6>
-            <div class="row mb-2">
-              <div class="col-md-4">
-                <strong class="text-muted">Charge Code:</strong>
-              </div>
-              <div class="col-md-8">
-                <span class="badge badge-code">{{ selectedCharge?.chargeCode }}</span>
-              </div>
-            </div>
-            <div class="row mb-2">
-              <div class="col-md-4">
-                <strong class="text-muted">Category:</strong>
-              </div>
-              <div class="col-md-8">
-                {{ selectedCharge?.chargeSubCategoryName }}
-              </div>
-            </div>
-            <div class="row mb-2">
-              <div class="col-md-4">
-                <strong class="text-muted">Amount:</strong>
-              </div>
-              <div class="col-md-8">
-                <strong class="text-primary">
-                  {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
-                </strong>
-              </div>
-            </div>
-            <div class="row mb-2">
-              <div class="col-md-4">
-                <strong class="text-muted">Amount Selling:</strong>
-              </div>
-              <div class="col-md-8">
-                <strong class="text-success">
-                  {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amountSelling | number:'1.2-2' }}
-                </strong>
-              </div>
-            </div>
-            @if (selectedCharge?.description) {
-            <div class="row">
-              <div class="col-md-4">
-                <strong class="text-muted">Description:</strong>
-              </div>
-              <div class="col-md-8">
-                <div class="remarks-content">
-                  {{ selectedCharge?.description }}
-                </div>
-              </div>
-            </div>
-            }
+
+      <div class="modal-body" style="padding: 24px;">
+        <div class="summary-card" style="margin-bottom: 20px;">
+          <div class="summary-card-title">Charge Details</div>
+          <div class="summary-row">
+            <span class="summary-key">Charge Code</span>
+            <span class="summary-val cell-mono" style="color: var(--accent);">{{ selectedCharge?.chargeCode }}</span>
           </div>
+          <div class="summary-row">
+            <span class="summary-key">Category</span>
+            <span class="summary-val">{{ selectedCharge?.chargeSubCategoryName }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">Amount</span>
+            <span class="summary-val" style="color: var(--accent);">
+              {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
+            </span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">Amount Selling</span>
+            <span class="summary-val" style="color: var(--green);">
+              {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amountSelling | number:'1.2-2' }}
+            </span>
+          </div>
+          @if (selectedCharge?.description) {
+          <div class="summary-row">
+            <span class="summary-key">Description</span>
+            <span class="summary-val" style="font-weight: 400; font-size: 12px;">{{ selectedCharge?.description
+              }}</span>
+          </div>
+          }
         </div>
 
-        <form [formGroup]="reviewFormGroup" class="form-professional">
-          <div class="row mb-3">
-            <div class="col-12">
-              <label class="form-label">
-                <i class="bi bi-card-text me-1"></i> Approval / Rejection comment(s):
-              </label>
-              <textarea class="form-control form-control-custom" rows="3" formControlName="reviewRemarks"
-                placeholder="Enter comment(s)..."></textarea>
-            </div>
-          </div>
+        <form [formGroup]="reviewFormGroup">
+          <label class="filter-label" style="margin-bottom: 6px; display: block;">Approval / Rejection
+            Comment(s)</label>
+          <textarea class="filter-input" style="width: 100%; resize: vertical; min-height: 80px;" rows="3"
+            formControlName="reviewRemarks" placeholder="Enter comment(s)..."></textarea>
         </form>
 
-        <!-- Warning Alert -->
-        <div class="alert alert-warning" role="alert">
-          <i class="bi bi-info-circle me-2"></i>
+        <div class="confirm-notice" style="margin-top: 16px; background: #fef3e2; color: #92520a;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 8v4m0 4h.01" />
+          </svg>
           Please review the charge details carefully before making a decision.
         </div>
       </div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeReviewModal()">
-          <i class="bi bi-x me-2"></i> Cancel
-        </button>
-        <button type="button" class="btn btn-danger" (click)="rejectCharge()" [disabled]="isSubmitting">
-          @if (!isSubmitting || reviewAction !== 'reject') {
-          <span>
-            <i class="bi bi-x-circle me-2"></i> Reject
-          </span>
-          }
-          @if (isSubmitting && reviewAction === 'reject') {
-          <span>
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            Rejecting...
-          </span>
+      <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 16px 24px; gap: 10px;">
+        <button type="button" class="btn btn-ghost" (click)="closeReviewModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" style="background: var(--red);" (click)="rejectCharge()"
+          [disabled]="isSubmitting">
+          @if (!isSubmitting || reviewAction !== 'reject') { Reject }
+          @else {
+          <span class="spinner-border spinner-border-sm me-2"></span> Rejecting...
           }
         </button>
-        <button type="button" class="btn btn-success" (click)="approveCharge()" [disabled]="isSubmitting">
-          @if (!isSubmitting || reviewAction !== 'approve') {
-          <span>
-            <i class="bi bi-check-circle me-2"></i> Approve
-          </span>
-          }
-          @if (isSubmitting && reviewAction === 'approve') {
-          <span>
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            Approving...
-          </span>
+        <button type="button" class="btn btn-primary" style="background: var(--green);" (click)="approveCharge()"
+          [disabled]="isSubmitting">
+          @if (!isSubmitting || reviewAction !== 'approve') { Approve }
+          @else {
+          <span class="spinner-border spinner-border-sm me-2"></span> Approving...
           }
         </button>
       </div>
@@ -575,7 +513,8 @@
   </div>
 </div>
 
-<!-- View Charge Transaction Modal -->
+
+<!-- ── View / Audit Modal ── -->
 @if (showViewModal) {
 <div class="modal-backdrop" (click)="closeViewModal()"></div>
 }
@@ -583,186 +522,196 @@
   role="dialog">
   <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">
-          <i class="bi bi-eye me-2"></i> Charge Transaction Details
+      <div class="modal-header" style="background: #1a3a6b; color: #fff;">
+        <h5 class="modal-title" style="font-family: 'Sora', sans-serif; font-weight: 600; font-size: 16px;">
+          Charge Transaction Details
         </h5>
         <button type="button" class="btn-close btn-close-white" (click)="closeViewModal()" aria-label="Close"></button>
       </div>
 
-      <!-- Scrollable Modal Body -->
-      <div class="modal-body p-3">
-        <!-- Nav Tabs -->
-        <ul class="nav nav-tabs mb-3 sticky-top bg-white" style="top: 0; z-index: 10;" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" (click)="activeTab = 'details'" [class.active]="activeTab === 'details'"
-              type="button">
-              <i class="bi bi-info-circle me-1"></i> Details
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" (click)="activeTab = 'audit'" [class.active]="activeTab === 'audit'" type="button">
-              <i class="bi bi-clock-history me-1"></i> Audit Log
-            </button>
-          </li>
-        </ul>
+      <div class="modal-body" style="padding: 0;">
 
-        <!-- Tab Content -->
-        <div class="tab-content" style="max-height: 50vh; overflow: hidden auto;">
+        <!-- Tab Nav -->
+        <div
+          style="display: flex; gap: 0; border-bottom: 1px solid var(--rule); background: var(--rule-light); padding: 0 20px;">
+          <button class="view-tab" [class.active]="activeTab === 'details'" (click)="activeTab = 'details'"
+            type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 8v4m0 4h.01" />
+            </svg>
+            Details
+          </button>
+          <button class="view-tab" [class.active]="activeTab === 'audit'" (click)="activeTab = 'audit'" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Audit Log
+          </button>
+        </div>
+
+        <div style="padding: 24px; max-height: 55vh; overflow-y: auto;">
+
           <!-- Details Tab -->
           @if (activeTab === 'details') {
-          <div class="tab-pane fade show active">
-            <!-- Basic Information -->
-            <div class="card mb-3 border">
-              <div class="card-header bg-light py-2">
-                <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Basic Information</h6>
-              </div>
-              <div class="card-body p-3">
-                <div class="row g-3 small">
-                  <div class="col-6">
-                    <strong class="text-muted d-block mb-1">Charge Code:</strong>
-                    <span class="badge bg-secondary">{{ selectedCharge?.chargeCode }}</span>
-                  </div>
-                  <div class="col-6">
-                    <strong class="text-muted d-block mb-1">Status:</strong>
-                    <span class="badge" [ngClass]="getStatusClass(selectedCharge?.chargeTransactionStatus ?? '')">
-                      {{ selectedCharge?.chargeTransactionStatus }}
+
+          <div class="section-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 8v4m0 4h.01" />
+            </svg>
+            Basic Information
+          </div>
+          <div class="summary-card" style="margin-bottom: 20px;">
+            <div class="summary-row">
+              <span class="summary-key">Charge Code</span>
+              <span class="summary-val cell-mono" style="color: var(--accent);">{{ selectedCharge?.chargeCode }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Status</span>
+              <span class="summary-val">
+                <span class="status-chip" [ngClass]="getStatusClass(selectedCharge?.chargeTransactionStatus ?? '')">
+                  {{ selectedCharge?.chargeTransactionStatus }}
+                </span>
+              </span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Category</span>
+              <span class="summary-val">{{ selectedCharge?.chargeCategoryName }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Sub-Category</span>
+              <span class="summary-val">{{ selectedCharge?.chargeSubCategoryName }}</span>
+            </div>
+          </div>
+
+          <div class="section-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Financial Information
+          </div>
+          <div class="summary-card" style="margin-bottom: 20px;">
+            <div class="summary-row">
+              <span class="summary-key">Currency</span>
+              <span class="summary-val"><span class="ref-chip">{{ selectedCharge?.currencyCode }}</span></span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Conversion Rate</span>
+              <span class="summary-val cell-mono">{{ selectedCharge?.conversionRate | number:'1.4-4' }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Amount</span>
+              <span class="summary-val" style="color: var(--accent);">{{ selectedCharge?.currencyCode }} {{
+                selectedCharge?.amount | number:'1.2-2' }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Calculated (PHP)</span>
+              <span class="summary-val"><span class="amount-positive">PHP {{ selectedCharge?.calculatedAmount |
+                  number:'1.2-2' }}</span></span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Amount Selling</span>
+              <span class="summary-val" style="color: var(--green);">{{ selectedCharge?.currencyCode }} {{
+                selectedCharge?.amountSelling | number:'1.2-2' }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Calculated Selling (PHP)</span>
+              <span class="summary-val"><span class="amount-positive">PHP {{ selectedCharge?.calculatedSellingAmount |
+                  number:'1.2-2' }}</span></span>
+            </div>
+          </div>
+
+          @if (selectedCharge?.description) {
+          <div class="section-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
+            </svg>
+            Description
+          </div>
+          <div class="summary-card" style="margin-bottom: 20px;">
+            <p style="font-size: 13px; color: var(--ink-soft); margin: 0;">{{ selectedCharge?.description }}</p>
+          </div>
+          }
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="section-title">Status Flags</div>
+              <div class="summary-card">
+                <div class="summary-row">
+                  <span class="summary-key">Is Active</span>
+                  <span class="summary-val">
+                    <span class="status-chip" [class.bg-success]="selectedCharge?.isActive"
+                      [class.bg-secondary]="!selectedCharge?.isActive">
+                      {{ selectedCharge?.isActive ? 'Yes' : 'No' }}
                     </span>
-                  </div>
-                  <div class="col-6">
-                    <strong class="text-muted d-block mb-1">Category:</strong>
-                    <span>{{ selectedCharge?.chargeCategoryName }}</span>
-                  </div>
-                  <div class="col-6">
-                    <strong class="text-muted d-block mb-1">Sub-Category:</strong>
-                    <span>{{ selectedCharge?.chargeSubCategoryName }}</span>
-                  </div>
+                  </span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-key">For Processing</span>
+                  <span class="summary-val">
+                    <span class="status-chip" [class.bg-success]="selectedCharge?.isForProcessing"
+                      [class.bg-secondary]="!selectedCharge?.isForProcessing">
+                      {{ selectedCharge?.isForProcessing ? 'Yes' : 'No' }}
+                    </span>
+                  </span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-key">For Disbursement</span>
+                  <span class="summary-val">
+                    <span class="status-chip" [class.bg-success]="selectedCharge?.isForDisbursement"
+                      [class.bg-secondary]="!selectedCharge?.isForDisbursement">
+                      {{ selectedCharge?.isForDisbursement ? 'Yes' : 'No' }}
+                    </span>
+                  </span>
                 </div>
               </div>
             </div>
-
-            <!-- Financial Information -->
-            <div class="card mb-3 border">
-              <div class="card-header bg-light py-2">
-                <h6 class="mb-0"><i class="bi bi-currency-exchange me-2"></i>Financial Information</h6>
-              </div>
-              <div class="card-body p-3">
-                <div class="row g-3 small">
-                  <div class="col-6">
-                    <strong class="text-muted d-block mb-1">Currency:</strong>
-                    <span class="badge bg-info">{{ selectedCharge?.currencyCode }}</span>
-                  </div>
-                  <div class="col-6">
-                    <strong class="text-muted d-block mb-1">Conversion Rate:</strong>
-                    <span>{{ selectedCharge?.conversionRate | number:'1.4-4' }}</span>
-                  </div>
-                  <div class="col-6">
-                    <strong class="text-muted d-block mb-1">Amount:</strong>
-                    <strong class="text-primary">{{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount |
-                      number:'1.2-2' }}</strong>
-                  </div>
-                  <div class="col-6">
-                    <strong class="text-muted d-block mb-1">Calculated (PHP):</strong>
-                    <strong class="text-primary">PHP {{ selectedCharge?.calculatedAmount | number:'1.2-2' }}</strong>
-                  </div>
-                  <div class="col-6">
-                    <strong class="text-muted d-block mb-1">Amount Selling:</strong>
-                    <strong class="text-success">{{ selectedCharge?.currencyCode }} {{ selectedCharge?.amountSelling |
-                      number:'1.2-2' }}</strong>
-                  </div>
-                  <div class="col-6">
-                    <strong class="text-muted d-block mb-1">Calculated Selling (PHP):</strong>
-                    <strong class="text-success">PHP {{ selectedCharge?.calculatedSellingAmount | number:'1.2-2'
-                      }}</strong>
-                  </div>
+            <div class="col-md-6">
+              <div class="section-title">Audit Trail</div>
+              <div class="summary-card">
+                <div class="summary-row">
+                  <span class="summary-key">Created By</span>
+                  <span class="summary-val" style="font-size: 12px;">
+                    {{ selectedCharge?.createdByName || 'N/A' }}<br />
+                    <span style="font-weight: 400; color: var(--ink-muted);">{{ selectedCharge?.createdDate |
+                      date:'MM/dd/yy h:mm a' }}</span>
+                  </span>
                 </div>
-              </div>
-            </div>
-
-            <!-- Description -->
-            @if (selectedCharge?.description) {
-            <div class="card mb-3 border">
-              <div class="card-header bg-light py-2">
-                <h6 class="mb-0"><i class="bi bi-card-text me-2"></i>Description</h6>
-              </div>
-              <div class="card-body p-3">
-                <small>{{ selectedCharge?.description }}</small>
-              </div>
-            </div>
-            }
-
-            <!-- Flags & Audit -->
-            <div class="row g-3">
-              <div class="col-md-6">
-                <div class="card border">
-                  <div class="card-header bg-light py-2">
-                    <h6 class="mb-0"><i class="bi bi-toggles me-2"></i>Status Flags</h6>
-                  </div>
-                  <div class="card-body p-3">
-                    <div class="form-check mb-2">
-                      <input class="form-check-input" type="checkbox" [checked]="selectedCharge?.isActive" disabled>
-                      <label class="form-check-label small">Is Active</label>
-                    </div>
-                    <div class="form-check mb-2">
-                      <input class="form-check-input" type="checkbox" [checked]="selectedCharge?.isForProcessing"
-                        disabled>
-                      <label class="form-check-label small">Is For Processing</label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" [checked]="selectedCharge?.isForDisbursement"
-                        disabled>
-                      <label class="form-check-label small">Is For Disbursement</label>
-                    </div>
-                  </div>
+                @if (selectedCharge?.modifiedBy) {
+                <div class="summary-row">
+                  <span class="summary-key">Modified By</span>
+                  <span class="summary-val" style="font-size: 12px;">
+                    {{ selectedCharge?.modifiedByName || 'N/A' }}<br />
+                    <span style="font-weight: 400; color: var(--ink-muted);">{{ selectedCharge?.modifiedDate |
+                      date:'MM/dd/yy h:mm a' }}</span>
+                  </span>
                 </div>
-              </div>
-              <div class="col-md-6">
-                <div class="card border">
-                  <div class="card-header bg-light py-2">
-                    <h6 class="mb-0"><i class="bi bi-person-circle me-2"></i>Audit Trail</h6>
-                  </div>
-                  <div class="card-body p-3 small">
-                    <div class="mb-2">
-                      <strong class="text-muted d-block">Created By:</strong>
-                      {{ selectedCharge?.createdByName || 'N/A' }}<br>
-                      <small class="text-muted">{{ selectedCharge?.createdDate | date:'MM/dd/yy h:mm a' }}</small>
-                    </div>
-                    @if (selectedCharge?.modifiedBy) {
-                    <div class="mb-2">
-                      <strong class="text-muted d-block">Modified By:</strong>
-                      {{ selectedCharge?.modifiedByName || 'N/A' }}<br>
-                      <small class="text-muted">{{ selectedCharge?.modifiedDate | date:'MM/dd/yy h:mm a' }}</small>
-                    </div>
-                    }
-                    @if (selectedCharge?.completedBy) {
-                    <div class="mb-2">
-                      <strong class="text-muted d-block">Completed By:</strong>
-                      {{ selectedCharge?.completedByName || 'N/A' }}<br>
-                      <small class="text-muted">{{ selectedCharge?.completedDate | date:'MM/dd/yy h:mm a'
-                        }}</small>
-                    </div>
-                    }
-                    @if (selectedCharge?.closedBy) {
-                    <div class="mb-2">
-                      <strong class="text-muted d-block">Closed By:</strong>
-                      {{ selectedCharge?.closedByName || 'N/A' }}<br>
-                      <small class="text-muted">{{ selectedCharge?.closeDate | date:'MM/dd/yy h:mm a' }}</small>
-                    </div>
-                    }
-                    @if (selectedCharge?.cancelledBy) {
-                    <div>
-                      <strong class="text-muted d-block">Cancelled By:</strong>
-                      {{ selectedCharge?.cancelledByName || 'N/A' }}<br>
-                      <small class="text-muted">{{ selectedCharge?.cancelledDate | date:'MM/dd/yy h:mm a'
-                        }}</small>
-                    </div>
-                    }
-                    <div>
-                      <strong class="text-muted d-block">Processor Assigned:</strong>
-                      {{ selectedCharge?.processorOwnerName || 'N/A' }}<br>
-
-                    </div>
-                  </div>
+                }
+                @if (selectedCharge?.completedBy) {
+                <div class="summary-row">
+                  <span class="summary-key">Completed By</span>
+                  <span class="summary-val" style="font-size: 12px;">{{ selectedCharge?.completedByName || 'N/A'
+                    }}</span>
+                </div>
+                }
+                @if (selectedCharge?.cancelledBy) {
+                <div class="summary-row">
+                  <span class="summary-key">Cancelled By</span>
+                  <span class="summary-val" style="font-size: 12px;">{{ selectedCharge?.cancelledByName || 'N/A'
+                    }}</span>
+                </div>
+                }
+                <div class="summary-row">
+                  <span class="summary-key">Processor</span>
+                  <span class="summary-val" style="font-size: 12px;">{{ selectedCharge?.processorOwnerName || 'N/A'
+                    }}</span>
                 </div>
               </div>
             </div>
@@ -771,131 +720,108 @@
 
           <!-- Audit Log Tab -->
           @if (activeTab === 'audit') {
-
-          <div class="tab-pane fade show active">
-            @if (chargeAuditLogs && chargeAuditLogs.length > 0) {
-            <div class="timeline">
-              @for (log of chargeAuditLogs; track log.id) {
-              <div class="timeline-item">
-                <div class="timeline-marker" [ngClass]="getActionTypeClass(log.actionType)"></div>
-                <div class="timeline-content">
-                  <div class="card mb-2 shadow-sm">
-                    <div class="card-body p-2">
-                      <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div>
-                          <span class="badge badge-sm" [ngClass]="getActionTypeBadge(log.actionType)">
-                            {{ log.actionType }}
-                          </span>
-                          <small class="text-muted d-block mt-1">
-                            <i class="bi bi-clock me-1"></i>
-                            {{ (log.createDate + 'Z') | date:'MM/dd/yy h:mm a':'+0800' }}
-                          </small>
-                        </div>
-                        <div class="text-end">
-                          <small class="text-muted">Modified by:</small>
-                          <div class="small fw-bold">{{ log.modifiedBy }}</div>
-                          @if (log.requestedBy) {
-                          <small class="text-muted">Req: {{ log.requestedBy }}</small>
-                          }
-                        </div>
+          @if (chargeAuditLogs && chargeAuditLogs.length > 0) {
+          <div class="timeline">
+            @for (log of chargeAuditLogs; track log.id) {
+            <div class="timeline-item">
+              <div class="timeline-marker" [ngClass]="getActionTypeClass(log.actionType)"></div>
+              <div class="timeline-content">
+                <div class="summary-card" style="margin-bottom: 12px;">
+                  <div
+                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                    <div>
+                      <span class="status-chip" [ngClass]="getActionTypeBadge(log.actionType)">{{ log.actionType
+                        }}</span>
+                      <div class="cell-sub" style="margin-top: 4px;">
+                        {{ (log.createDate + 'Z') | date:'MM/dd/yy h:mm a':'+0800' }}
                       </div>
-
-                      <div class="row g-2 mt-2">
-                        <div class="col-5">
-                          <small class="text-muted">Status:</small>
-                          <div class="mt-1">
-                            @if (log.previousStatus) {
-                            <span class="badge badge-sm bg-secondary">{{ log.previousStatus }}</span>
-                            <i class="bi bi-arrow-right mx-1 small"></i>
-                            }
-                            <span class="badge badge-sm" [ngClass]="getStatusClass(log.newStatus)">
-                              {{ log.newStatus }}
-                            </span>
-                          </div>
-                        </div>
-                        <div class="col-4">
-                          <small class="text-muted">Amount:</small>
-                          <div class="mt-1 small fw-bold">{{ log.amount | number:'1.2-2' }}</div>
-                        </div>
-                        <div class="col-3">
-                          <small class="text-muted">Code:</small>
-                          <div class="mt-1">
-                            <span class="badge badge-sm badge-code-audit">{{ log.chargeCode }}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      @if (log.remarks) {
-                      <div class="mt-2">
-                        <small class="text-muted">Remarks:</small>
-                        <div class="alert alert-light mb-0 mt-1 p-2 small">
-                          <i class="bi bi-chat-left-quote me-1"></i>
-                          {{ log.remarks }}
-                        </div>
-                      </div>
+                    </div>
+                    <div style="text-align: right;">
+                      <div class="cell-sub">Modified by</div>
+                      <div class="cell-primary" style="font-size: 12px;">{{ log.modifiedBy }}</div>
+                      @if (log.requestedBy) {
+                      <div class="cell-sub">Req: {{ log.requestedBy }}</div>
                       }
                     </div>
                   </div>
+                  <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px;">
+                    <div>
+                      <div class="cell-sub">Status</div>
+                      <div style="display: flex; align-items: center; gap: 4px; margin-top: 4px;">
+                        @if (log.previousStatus) {
+                        <span class="status-chip bg-secondary" style="font-size: 9px;">{{ log.previousStatus }}</span>
+                        <span style="color: var(--ink-muted);">→</span>
+                        }
+                        <span class="status-chip" [ngClass]="getStatusClass(log.newStatus)" style="font-size: 9px;">{{
+                          log.newStatus }}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="cell-sub">Amount</div>
+                      <div class="cell-primary" style="margin-top: 4px;">{{ log.amount | number:'1.2-2' }}</div>
+                    </div>
+                    <div>
+                      <div class="cell-sub">Code</div>
+                      <div class="cell-mono" style="margin-top: 4px; color: var(--accent);">{{ log.chargeCode }}</div>
+                    </div>
+                  </div>
+                  @if (log.remarks) {
+                  <div
+                    style="margin-top: 10px; padding: 8px 12px; background: var(--rule-light); border-radius: 6px; font-size: 12px; color: var(--ink-soft); border-left: 3px solid var(--rule);">
+                    {{ log.remarks }}
+                  </div>
+                  }
                 </div>
               </div>
-              }
-            </div>
-            } @else {
-            <div class="alert alert-info text-center py-3" role="alert">
-              <i class="bi bi-info-circle me-2"></i>
-              <small>No audit log entries found for this transaction.</small>
             </div>
             }
           </div>
-
+          } @else {
+          <div class="empty-state">
+            <div class="empty-icon">◻</div>
+            <p>No audit log entries found for this transaction.</p>
+          </div>
+          }
           }
         </div>
       </div>
 
-      <div class="modal-footer py-2">
-        <button type="button" class="btn btn-sm btn-secondary" (click)="closeViewModal()">
-          <i class="bi bi-x me-2"></i> Close
-        </button>
+      <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 12px 20px;">
+        <button type="button" class="btn btn-ghost" (click)="closeViewModal()">Close</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Toast Notifications -->
+
+<!-- ── Toast Notifications ── -->
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
-  <!-- Success Toast -->
-  <div class="toast align-items-center border-0" [class.show]="showSuccessToast" role="alert" aria-live="assertive"
-    aria-atomic="true">
+  <div class="toast align-items-center border-0" [class.show]="showSuccessToast" role="alert">
     <div class="d-flex">
-      <div class="toast-body bg-success text-white rounded">
-        <div class="d-flex align-items-center">
-          <i class="bi bi-check-circle me-2" style="font-size: 1.5rem;"></i>
-          <div>
-            <strong class="d-block">Success!</strong>
-            <span>{{ successMessage }}</span>
-          </div>
-        </div>
+      <div class="toast-body rounded"
+        style="background: var(--green-light); color: var(--green); display: flex; align-items: center; gap: 10px; font-size: 13px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+        <div><strong style="display: block;">Success!</strong>{{ successMessage }}</div>
       </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showSuccessToast = false"
+      <button type="button" class="btn-close me-2 m-auto" (click)="showSuccessToast = false"
         aria-label="Close"></button>
     </div>
   </div>
-
-  <!-- Error Toast -->
-  <div class="toast align-items-center border-0" [class.show]="showErrorToast" role="alert" aria-live="assertive"
-    aria-atomic="true">
+  <div class="toast align-items-center border-0" [class.show]="showErrorToast" role="alert">
     <div class="d-flex">
-      <div class="toast-body bg-danger text-white rounded">
-        <div class="d-flex align-items-center">
-          <i class="bi bi-x-circle me-2" style="font-size: 1.5rem;"></i>
-          <div>
-            <strong class="d-block">Error</strong>
-            <span>{{ errorMessage }}</span>
-          </div>
-        </div>
+      <div class="toast-body rounded"
+        style="background: #fdecea; color: var(--red); display: flex; align-items: center; gap: 10px; font-size: 13px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <path d="m15 9-6 6M9 9l6 6" />
+        </svg>
+        <div><strong style="display: block;">Error</strong>{{ errorMessage }}</div>
       </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showErrorToast = false"
-        aria-label="Close"></button>
+      <button type="button" class="btn-close me-2 m-auto" (click)="showErrorToast = false" aria-label="Close"></button>
     </div>
   </div>
 </div>

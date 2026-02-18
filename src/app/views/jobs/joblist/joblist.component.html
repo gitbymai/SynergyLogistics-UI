@@ -3,7 +3,7 @@
   <!-- ── Page Header ── -->
   <header class="list-header">
     <div class="list-header-left">
-      <div class="list-label">Operations · Freight Management</div>
+      <div class="list-label">Operations</div>
       <h1 class="list-title">Job List</h1>
     </div>
     <div class="list-header-right">
@@ -27,67 +27,120 @@
   </header>
 
   <!-- ── Filter Panel ── -->
-  @if (showFilters) {
-  <div class="filter-panel">
-    <div class="filter-panel-header">
-      <span>Filter Options</span>
-      <button class="btn btn-ghost" style="padding: 5px 12px; font-size: 11.5px;" (click)="clearFilters()">Clear All</button>
-    </div>
-    <div class="filter-panel-body">
-      <div class="filter-group">
-        <label class="filter-label">Status</label>
-        <select class="filter-input" [(ngModel)]="filters.status" (change)="applyFilters()">
-          <option value="">All Statuses</option>
-          @for (status of filterJobStatus; track status.optionId) {
-            <option [value]="status.value">{{ status.value }}</option>
-          }
-        </select>
-      </div>
-      <div class="filter-group">
-        <label class="filter-label">Transaction Type</label>
-        <select class="filter-input" [(ngModel)]="filters.transactionType" (change)="applyFilters()">
-          <option value="">All Types</option>
-          @for (type of filterJobTransactionTypeList; track type.jobTransactionTypeId) {
-            <option [value]="type.jobTransactionType" [attr.data-freight-type]="type.jobTransactionTypePrefix">
-              {{ type.jobTransactionType }}
-            </option>
-          }
-        </select>
-      </div>
-      <div class="filter-group">
-        <label class="filter-label">Payment Type</label>
-        <select class="filter-input" [(ngModel)]="filters.paymentType" (change)="applyFilters()">
-          <option value="">All Payment Types</option>
-          @for (payment of filterPaymenTypeList; track payment.optionId) {
-            <option [value]="payment.value">{{ payment.value }}</option>
-          }
-        </select>
-      </div>
-      <div class="filter-group">
-        <label class="filter-label">Incoterms</label>
-        <select class="filter-input" [(ngModel)]="filters.incoterms" (change)="applyFilters()">
-          <option value="">All Incoterms</option>
-          @for (term of filterIncotermsList; track term.optionId) {
-            <option [value]="term.value">{{ term.value }}</option>
-          }
-        </select>
-      </div>
-      <div class="filter-group">
-        <label class="filter-label">Customer</label>
-        <input type="text" class="filter-input" placeholder="Enter customer name"
-          [(ngModel)]="filters.customer" (input)="applyFilters()" />
-      </div>
-      <div class="filter-group">
-        <label class="filter-label">Date From</label>
-        <input type="date" class="filter-input" [(ngModel)]="filters.dateFrom" (change)="applyFilters()" />
-      </div>
-      <div class="filter-group">
-        <label class="filter-label">Date To</label>
-        <input type="date" class="filter-input" [(ngModel)]="filters.dateTo" (change)="applyFilters()" />
-      </div>
-    </div>
+@if (showFilters) {
+<div class="filter-panel">
+  <div class="filter-panel-header">
+    <span>Filter Options</span>
+    <button class="btn btn-ghost" style="padding: 5px 12px; font-size: 11.5px;" (click)="clearFilters()">Clear All</button>
   </div>
-  }
+  <div class="filter-panel-body">
+
+    <!-- ── Date Range: Generate Data ── -->
+    <div class="filter-section">
+      <div class="filter-section-label">
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+        </svg>
+        Date Range — Generate Report
+      </div>
+      <div class="filter-section-body">
+        <div class="filter-group">
+          <label class="filter-label">Date From</label>
+          <input type="date" class="filter-input" [(ngModel)]="filters.dateFrom"
+            (change)="onDateFromChange()" />
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Date To</label>
+          <input type="date" class="filter-input" [(ngModel)]="filters.dateTo"
+            [min]="filters.dateFrom" [max]="maxDateTo"
+            (change)="onDateToChange()" />
+          @if (dateRangeError) {
+            <span class="filter-error">Date range cannot exceed 1 month.</span>
+          }
+        </div>
+        <div class="filter-group" style="justify-content: flex-end;">
+          <label class="filter-label">&nbsp;</label>
+          <button class="btn btn-primary" (click)="generateReport()" [disabled]="isLoading">
+            @if (isLoading) {
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="spin">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v3m0 12v3m9-9h-3M6 12H3m15.364-6.364-2.121 2.121M8.757 15.243l-2.121 2.121M18.364 18.364l-2.121-2.121M8.757 8.757 6.636 6.636"/>
+              </svg>
+              Generating...
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+              </svg>
+              Generate
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Separator ── -->
+    <div class="filter-separator">
+      <span>Filter Results</span>
+    </div>
+
+    <!-- ── Data Filters ── -->
+    <div class="filter-section">
+      <div class="filter-section-label">
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M7 10h10M11 16h2"/>
+        </svg>
+        Narrow Current Results
+      </div>
+      <div class="filter-section-body">
+        <div class="filter-group">
+          <label class="filter-label">Status</label>
+          <select class="filter-input" [(ngModel)]="filters.status" (change)="applyFilters()">
+            <option value="">All Statuses</option>
+            @for (status of filterJobStatus; track status.optionId) {
+              <option [value]="status.value">{{ status.value }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Transaction Type</label>
+          <select class="filter-input" [(ngModel)]="filters.transactionType" (change)="applyFilters()">
+            <option value="">All Types</option>
+            @for (type of filterJobTransactionTypeList; track type.jobTransactionTypeId) {
+              <option [value]="type.jobTransactionType" [attr.data-freight-type]="type.jobTransactionTypePrefix">
+                {{ type.jobTransactionType }}
+              </option>
+            }
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Payment Type</label>
+          <select class="filter-input" [(ngModel)]="filters.paymentType" (change)="applyFilters()">
+            <option value="">All Payment Types</option>
+            @for (payment of filterPaymenTypeList; track payment.optionId) {
+              <option [value]="payment.value">{{ payment.value }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Incoterms</label>
+          <select class="filter-input" [(ngModel)]="filters.incoterms" (change)="applyFilters()">
+            <option value="">All Incoterms</option>
+            @for (term of filterIncotermsList; track term.optionId) {
+              <option [value]="term.value">{{ term.value }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Customer</label>
+          <input type="text" class="filter-input" placeholder="Enter customer name"
+            [(ngModel)]="filters.customer" (input)="applyFilters()" />
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+}
 
   <!-- ── Table Card ── -->
   <div class="table-card">

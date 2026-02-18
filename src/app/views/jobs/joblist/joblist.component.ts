@@ -43,6 +43,9 @@ export class JoblistComponent implements OnInit {
     dateTo: ''
   };
 
+  isLoading = false;
+  maxDateTo: string = '';
+  dateRangeError: boolean = false;
   constructor(private router: Router, private jobService: JobsService) { }
 
   ngOnInit(): void {
@@ -357,6 +360,77 @@ calculateAgingDays(createdDate: string | Date | null | undefined): number {
     if (this.filters.dateFrom) count++;
     if (this.filters.dateTo) count++;
     return count;
+  }
+
+  
+  generateReport(): void {
+    if (!this.filters.dateFrom || !this.filters.dateTo) {
+      // both dates required — you can swap this for a toast/alert
+      alert('Please select both a Date From and Date To before generating.');
+      return;
+    }
+
+    this.isLoading = true;
+    this.jobs = [];
+    this.filteredJobs = [];
+
+    this.jobService.getAllJobs(this.filters.dateFrom, this.filters.dateTo).subscribe({
+    next: (response) => {
+      if (response.success && response.data?.length) {
+        this.jobs = response.data
+          .filter(c => c.isActive)
+          .map(job => ({
+            ...job,
+            agingDays: this.calculateAgingDays(job.createdDate)
+          }))
+          .sort((a, b) => b.jobId - a.jobId);
+
+        this.filteredJobs = [...this.jobs];
+        this.currentPage = 1;
+        this.isLoading = false;
+      }
+    },
+    error: (error) => {
+      console.error('API returned error:', error.message);
+        this.isLoading = false;
+    }
+  });
+  }
+
+  onDateFromChange(): void {
+    this.dateRangeError = false;
+
+    if (this.filters.dateFrom) {
+      const from = new Date(this.filters.dateFrom);
+      const max = new Date(from);
+      max.setMonth(max.getMonth() + 1);
+
+      // Clamp to same day one month later
+      this.maxDateTo = max.toISOString().split('T')[0];
+
+      // If existing dateTo exceeds the new max, reset it
+      if (this.filters.dateTo && new Date(this.filters.dateTo) > max) {
+        this.filters.dateTo = '';
+        this.dateRangeError = false;
+      }
+    } else {
+      this.maxDateTo = '';
+    }
+  }
+
+  onDateToChange(): void {
+    if (!this.filters.dateFrom || !this.filters.dateTo) return;
+
+    const from = new Date(this.filters.dateFrom);
+    const to = new Date(this.filters.dateTo);
+    const max = new Date(from);
+    max.setMonth(max.getMonth() + 1);
+
+    this.dateRangeError = to > max;
+
+    if (this.dateRangeError) {
+      this.filters.dateTo = '';
+    }
   }
 
 }

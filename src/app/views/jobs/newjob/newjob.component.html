@@ -1,208 +1,221 @@
-<div class="card my-4 shadow-sm">
-  <div class="card-header bg-primary text-white">
-    <h4 class="mb-0">Create New Job</h4>
+<div class="list-wrapper">
+
+  <!-- ── Page Header ── -->
+  <header class="list-header">
+    <div class="list-header-left">
+      <div class="list-label">Operations · Freight Management</div>
+      <h1 class="list-title">Create New Job</h1>
+    </div>
+  </header>
+
+  <!-- ── Step Navigation ── -->
+  <div class="step-nav">
+    @for (s of [1, 2, 3]; track s) {
+      <button class="step-btn" type="button"
+        [class.active]="currentStep === s"
+        [class.completed]="currentStep > s"
+        [disabled]="s > currentStep + 1"
+        (click)="goToStep(s)">
+        <span class="step-number">
+          @if (currentStep > s) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+          } @else {
+            {{ s }}
+          }
+        </span>
+        <span class="step-label">
+          {{ s === 1 ? 'Job Details' : s === 2 ? 'Cargo & Routing' : 'Freight Details' }}
+        </span>
+      </button>
+      @if (s < 3) {
+        <div class="step-connector" [class.active]="currentStep > s"></div>
+      }
+    }
   </div>
 
-  <div class="card-body">
-    <!-- Step Navigation -->
-    <ul class="nav nav-pills nav-pills-custom mb-4">
-      @for (s of [1, 2, 3]; track s) {
-      <li class="nav-item">
-        <button class="nav-link" type="button" [class.active]="currentStep === s" [disabled]="s > currentStep + 1"
-          (click)="goToStep(s)">
-          <span class="step-number">{{ s }}</span>
-          <span class="step-label">{{
-            s === 1
-            ? 'Job Details'
-            : s === 2
-            ? 'Cargo & Routing'
-            : 'Freight Details'
-            }}</span>
-        </button>
-      </li>
-      }
-    </ul>
+  <!-- ── Step Content ── -->
+  <div class="table-card" style="padding: 32px;">
 
     <!-- STEP 1: Job Details -->
     @if (currentStep === 1) {
     <div class="step-content">
-      <form [formGroup]="jobDetailsForm" class="form-professional">
-        <h5 class="section-title">
-          <i class="cil-briefcase"></i> Basic Job Information
-        </h5>
-        <!-- Client -->
+      <form [formGroup]="jobDetailsForm">
+        <div class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
+          </svg>
+          Basic Job Information
+        </div>
+
         <div class="row mb-3">
           <div class="col-md-8 col-lg-6">
             <div class="position-relative client-dropdown">
-              <label class="form-label">
-                <i class="cil-user"></i> Client
-              </label>
-              <input type="text" class="form-control form-control-custom" placeholder="Search or select client"
+              <label class="filter-label" style="margin-bottom: 6px; display: block;">Client</label>
+              <input type="text" class="filter-input" style="width: 100%;" placeholder="Search or select client"
                 [value]="clientSearch" (input)="onClientSearchChange($event.target.value)"
                 (focus)="clientDropdownOpen = true" />
               @if (clientDropdownOpen && filteredClients.length > 0) {
-              <ul class="dropdown-list">
-                @for(client of filteredClients; track client.customerId){
-                <li class="dropdown-item-custom" (click)="selectClient(client)">
-                  {{ client.customerName }}
-                </li>
-                }
-              </ul>
+                <ul class="dropdown-list">
+                  @for (client of filteredClients; track client.customerId) {
+                    <li class="dropdown-item-custom" (click)="selectClient(client)">{{ client.customerName }}</li>
+                  }
+                </ul>
               }
               <input type="hidden" formControlName="clientInformation" />
             </div>
           </div>
         </div>
-        <!-- Transaction + Incoterms -->
+
         <div class="row mb-3">
-          <div class="col-md-8 col-lg-6 mb-3">
-            <label class="form-label">
-              <i class="cil-swap-horizontal"></i> Transaction Type
-            </label>
-            <select formControlName="transactionType" class="form-select form-control-custom"
+          <div class="col-md-8 col-lg-6">
+            <label class="filter-label" style="margin-bottom: 6px; display: block;">Transaction Type</label>
+            <select formControlName="transactionType" class="filter-input" style="width: 100%;"
               (change)="onTransactionTypeChange($event)">
               <option value="">Select Transaction</option>
-              @for(type of jobTransactionTypeList; track type.jobTransactionTypeId){
-              <option [value]="type.jobTransactionTypeId" [attr.data-freight-type]="type.jobTransactionTypePrefix">
-                {{ type.jobTransactionType }}
-              </option>
+              @for (type of jobTransactionTypeList; track type.jobTransactionTypeId) {
+                <option [value]="type.jobTransactionTypeId" [attr.data-freight-type]="type.jobTransactionTypePrefix">
+                  {{ type.jobTransactionType }}
+                </option>
               }
             </select>
           </div>
         </div>
-        <!-- Payment + Amount -->
+
         <div class="row mb-3">
           <div class="col-md-6 mb-3">
-            <label class="form-label">
-              <i class="cil-credit-card"></i> Payment Type
-            </label>
-            <select formControlName="paymentType" class="form-select form-control-custom">
+            <label class="filter-label" style="margin-bottom: 6px; display: block;">Payment Type</label>
+            <select formControlName="paymentType" class="filter-input" style="width: 100%;">
               <option value="">Select Payment</option>
-              @for (payment of paymenTypeList; track payment.optionId){
-              <option [value]="payment.optionId">
-                {{ payment.value }}
-              </option>
+              @for (payment of paymenTypeList; track payment.optionId) {
+                <option [value]="payment.optionId">{{ payment.value }}</option>
               }
             </select>
           </div>
-
           <div class="col-md-4">
-            <label class="form-label">
-              <i class="cil-tags"></i> Incoterms
-            </label>
-            <select formControlName="incoterms" class="form-select form-control-custom">
+            <label class="filter-label" style="margin-bottom: 6px; display: block;">Incoterms</label>
+            <select formControlName="incoterms" class="filter-input" style="width: 100%;">
               <option value="">Select Incoterms</option>
-              @for(term of incotermsList; track term.optionId){
-              <option [value]="term.optionId">
-                {{ term.value }}
-              </option>
+              @for (term of incotermsList; track term.optionId) {
+                <option [value]="term.optionId">{{ term.value }}</option>
               }
             </select>
-          </div>
-          <div class="col-md-2 mb-3" hidden="hidden">
-            <label class="form-label">
-              <i class="cil-dollar"></i> Amount
-            </label>
-            <input type="text" class="form-control form-control-custom" formControlName="amount" appNumberFormat
-              placeholder="0.00" />
-            @if (jobDetailsForm.get('amount')?.invalid && jobDetailsForm.get('amount')?.touched) {
-            <div class="text-danger small mt-1">
-              Please enter a valid amount.
-            </div>
-            }
           </div>
         </div>
+
         <div class="step-actions">
-          <button class="btn btn-primary btn-custom" type="button" (click)="nextStep()"
-            [disabled]="!jobDetailsForm.valid">
-            Next <i class="cil-arrow-right ms-2"></i>
+          <span></span>
+          <button class="btn btn-primary" type="button" (click)="nextStep()" [disabled]="!jobDetailsForm.valid">
+            Next
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
           </button>
         </div>
       </form>
     </div>
     }
 
-    <!-- STEP 2: Common Freight Details -->
+    <!-- STEP 2: Cargo & Routing -->
     @if (currentStep === 2) {
     <div class="step-content">
-      <form [formGroup]="shipmentFreightForm" class="form-professional">
-        <h5 class="section-title">
-          <i class="cil-location-pin"></i> Routing & Location
-        </h5>
+      <form [formGroup]="shipmentFreightForm">
+        <div class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <circle cx="12" cy="11" r="3"/>
+          </svg>
+          Routing & Location
+        </div>
+
         <div class="row mb-4">
           <div class="col-md-6 mb-3">
-            <label class="form-label">Origin / Port of Loading</label>
-            <input type="text" class="form-control form-control-custom" formControlName="origin" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block;">Origin / Port of Loading</label>
+            <input type="text" class="filter-input" style="width: 100%;" formControlName="origin" />
           </div>
           <div class="col-md-6 mb-3">
-            <label class="form-label">Destination / Port of Discharge</label>
-            <input type="text" class="form-control form-control-custom" formControlName="destination" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block;">Destination / Port of Discharge</label>
+            <input type="text" class="filter-input" style="width: 100%;" formControlName="destination" />
           </div>
           <div class="col-md-6 mb-3">
-            <label class="form-label">Port / CFS</label>
-            <input type="text" class="form-control form-control-custom" formControlName="portCfs" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block;">Port / CFS</label>
+            <input type="text" class="filter-input" style="width: 100%;" formControlName="portCfs" />
           </div>
         </div>
-        <h5 class="section-title">
-          <i class="cil-layers"></i> Shipment Details
-        </h5>
+
+        <div class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+          </svg>
+          Shipment Details
+        </div>
+
         <div class="row">
           <div class="col-md-4 mb-3">
-            <label class="form-label">Commodity</label>
-            <input type="text" class="form-control form-control-custom" formControlName="commodity" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block;">Commodity</label>
+            <input type="text" class="filter-input" style="width: 100%;" formControlName="commodity" />
           </div>
           <div class="col-md-4 mb-3">
-            <label class="form-label">Volume (m³)</label>
-            <input type="number" step="0.001" class="form-control form-control-custom" formControlName="volume" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block;">Volume (m³)</label>
+            <input type="number" step="0.001" class="filter-input" style="width: 100%;" formControlName="volume" />
           </div>
           <div class="col-md-4 mb-3">
-            <label class="form-label">Gross Weight (kg)</label>
-            <input type="number" step="0.01" class="form-control form-control-custom" formControlName="grossWeight" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block;">Gross Weight (kg)</label>
+            <input type="number" step="0.01" class="filter-input" style="width: 100%;" formControlName="grossWeight" />
           </div>
           <div class="col-md-4 mb-3">
-            <label class="form-label">Number of Packages</label>
-            <input type="number" class="form-control form-control-custom" formControlName="numberOfPackages" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block;">Number of Packages</label>
+            <input type="number" class="filter-input" style="width: 100%;" formControlName="numberOfPackages" />
           </div>
         </div>
+
         <div class="step-actions">
-          <button class="btn btn-secondary btn-custom-secondary" type="button" (click)="previousStep()">
-            <i class="cil-arrow-left me-2"></i> Previous
+          <button class="btn btn-ghost" type="button" (click)="previousStep()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Previous
           </button>
-          <button class="btn btn-primary btn-custom" type="button" (click)="nextStep()"
-            [disabled]="!shipmentFreightForm.valid">
-            Next <i class="cil-arrow-right ms-2"></i>
+          <button class="btn btn-primary" type="button" (click)="nextStep()" [disabled]="!shipmentFreightForm.valid">
+            Next
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
           </button>
         </div>
       </form>
     </div>
     }
 
-    <!-- STEP 3: Freight Mode Details -->
+    <!-- STEP 3: Freight Details -->
     @if (currentStep === 3) {
     <div class="step-content">
-      <form [formGroup]="freightForm" class="form-professional">
-        <h5 class="section-title">
-          <i class="cil-airplane-mode"></i> Freight Mode Details ({{ freightTypeLabel }})
-        </h5>
-        <!-- SEA FIELDS -->
+      <form [formGroup]="freightForm">
+        <div class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3m0 0h3l3 3v4a2 2 0 01-2 2h-1"/>
+          </svg>
+          Freight Mode Details — {{ freightTypeLabel }}
+        </div>
+
         @if (isSeaFreight) {
-        <div>
           <div class="row mb-4">
             <div class="col-md-6 mb-3">
-              <label class="form-label">MBL Reference</label>
-              <input type="text" class="form-control form-control-custom" formControlName="mbl" />
+              <label class="filter-label" style="margin-bottom: 6px; display: block;">MBL Reference</label>
+              <input type="text" class="filter-input" style="width: 100%;" formControlName="mbl" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">HBL Reference</label>
-              <input type="text" class="form-control form-control-custom" formControlName="hbl" />
+              <label class="filter-label" style="margin-bottom: 6px; display: block;">HBL Reference</label>
+              <input type="text" class="filter-input" style="width: 100%;" formControlName="hbl" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Vessel</label>
-              <input type="text" class="form-control form-control-custom" formControlName="vessel" />
+              <label class="filter-label" style="margin-bottom: 6px; display: block;">Vessel</label>
+              <input type="text" class="filter-input" style="width: 100%;" formControlName="vessel" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Container Type</label>
-              <select class="form-select form-control-custom" formControlName="containerType">
+              <label class="filter-label" style="margin-bottom: 6px; display: block;">Container Type</label>
+              <select class="filter-input" style="width: 100%;" formControlName="containerType">
                 <option value="">Select Size</option>
                 <option value="20GP">20GP</option>
                 <option value="40GP">40GP</option>
@@ -210,194 +223,177 @@
               </select>
             </div>
           </div>
-        </div>
         }
-        <!-- AIR FIELDS -->
+
         @if (isAirFreight) {
-        <div>
           <div class="row mb-4">
             <div class="col-md-6 mb-3">
-              <label class="form-label">MAWB Reference</label>
-              <input type="text" class="form-control form-control-custom" formControlName="mawb" />
+              <label class="filter-label" style="margin-bottom: 6px; display: block;">MAWB Reference</label>
+              <input type="text" class="filter-input" style="width: 100%;" formControlName="mawb" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">HAWB Reference</label>
-              <input type="text" class="form-control form-control-custom" formControlName="hawb" />
+              <label class="filter-label" style="margin-bottom: 6px; display: block;">HAWB Reference</label>
+              <input type="text" class="filter-input" style="width: 100%;" formControlName="hawb" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Flight No.</label>
-              <input type="text" class="form-control form-control-custom" formControlName="flightNo" />
+              <label class="filter-label" style="margin-bottom: 6px; display: block;">Flight No.</label>
+              <input type="text" class="filter-input" style="width: 100%;" formControlName="flightNo" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Chargeable Weight (kg)</label>
-              <input type="number" step="0.01" class="form-control form-control-custom"
-                formControlName="chargeableWeight" />
+              <label class="filter-label" style="margin-bottom: 6px; display: block;">Chargeable Weight (kg)</label>
+              <input type="number" step="0.01" class="filter-input" style="width: 100%;" formControlName="chargeableWeight" />
             </div>
           </div>
-        </div>
         }
-        <h5 class="section-title">
-          <i class="cil-people"></i> References & Parties
-        </h5>
+
+        <div class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/>
+          </svg>
+          References & Parties
+        </div>
+
         <div class="row">
           <div class="col-md-6 mb-3">
-            <label class="form-label">BL / AWB / Booking No.</label>
-            <input type="text" class="form-control form-control-custom" formControlName="bookingNo" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block;">BL / AWB / Booking No.</label>
+            <input type="text" class="filter-input" style="width: 100%;" formControlName="bookingNo" />
           </div>
           <div class="col-md-6 mb-3">
-            <label class="form-label">Carrier / Airline</label>
-            <input type="text" class="form-control form-control-custom" formControlName="carrier" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block;">Carrier / Airline</label>
+            <input type="text" class="filter-input" style="width: 100%;" formControlName="carrier" />
           </div>
           <div class="col-md-6 mb-3">
-            <label class="form-label">Shipper</label>
-            <input type="text" class="form-control form-control-custom" formControlName="shipper" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block;">Shipper</label>
+            <input type="text" class="filter-input" style="width: 100%;" formControlName="shipper" />
           </div>
           <div class="col-md-6 mb-3">
-            <label class="form-label">Consignee</label>
-            <input type="text" class="form-control form-control-custom" formControlName="consignee" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block;">Consignee</label>
+            <input type="text" class="filter-input" style="width: 100%;" formControlName="consignee" />
           </div>
           <div class="col-md-6 mb-3">
             <div class="position-relative agency-dropdown">
-              <label class="form-label">Agent</label>
-              <input type="text" class="form-control form-control-custom" placeholder="Search or select agent"
+              <label class="filter-label" style="margin-bottom: 6px; display: block;">Agent</label>
+              <input type="text" class="filter-input" style="width: 100%;" placeholder="Search or select agent"
                 [value]="agencySearch" (input)="onAgencySearchChange($any($event.target).value)"
                 (focus)="agencyDropdownOpen = true" />
               @if (agencyDropdownOpen && filteredAgencies.length > 0) {
-              <ul class="dropdown-list">
-                @for(agency of filteredAgencies; track agency.agencyGuid){
-                <li class="dropdown-item-custom" (click)="selectAgency(agency)">
-                  {{ agency.agentName }}
-                </li>
-                }
-              </ul>
+                <ul class="dropdown-list">
+                  @for (agency of filteredAgencies; track agency.agencyGuid) {
+                    <li class="dropdown-item-custom" (click)="selectAgency(agency)">{{ agency.agentName }}</li>
+                  }
+                </ul>
               }
               <input type="hidden" formControlName="agent" />
             </div>
           </div>
           <div class="col-md-12 mb-3">
-            <label class="form-label">Remarks</label>
-            <textarea rows="3" class="form-control form-control-custom" formControlName="remarks"></textarea>
+            <label class="filter-label" style="margin-bottom: 6px; display: block;">Remarks</label>
+            <textarea rows="3" class="filter-input" style="width: 100%; resize: vertical; min-height: 80px;"
+              formControlName="remarks"></textarea>
           </div>
         </div>
+
         <div class="step-actions">
-          <button class="btn btn-secondary btn-custom-secondary" type="button" (click)="previousStep()">
-            <i class="cil-arrow-left me-2"></i> Previous
+          <button class="btn btn-ghost" type="button" (click)="previousStep()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Previous
           </button>
-          <button class="btn btn-success btn-custom-success" type="button" (click)="showConfirmationModal()">
-            <i class="cil-check me-2"></i> Finish
+          <button class="btn btn-primary" style="background: #0f7b50;" type="button" (click)="showConfirmationModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+            Finish
           </button>
         </div>
       </form>
     </div>
     }
+
   </div>
 </div>
 
-<!-- Confirmation Modal - Angular Based -->
+<!-- ── Confirmation Modal ── -->
 @if (showConfirmModal) {
-<div class="modal-backdrop" (click)="closeConfirmModal()"></div>
+  <div class="modal-backdrop" (click)="closeConfirmModal()"></div>
 }
-<div class="modal custom-modal" [class.show]="showConfirmModal" [class.d-block]="showConfirmModal" tabindex="-1"
-  role="dialog">
+<div class="modal custom-modal" [class.show]="showConfirmModal" [class.d-block]="showConfirmModal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">
-          <i class="cil-check-circle me-2"></i>
+      <div class="modal-header" style="background: #1a3a6b; color: #fff;">
+        <h5 class="modal-title" style="font-family: 'Sora', sans-serif; font-weight: 600; font-size: 16px;">
           Confirm Job Submission
         </h5>
-        <button type="button" class="btn-close btn-close-white" (click)="closeConfirmModal()"
-          aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white" (click)="closeConfirmModal()" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <div class="confirmation-content">
-          <div class="alert alert-info" role="alert">
-            <i class="cil-info me-2"></i>
-            Please review the following information before submitting:
+      <div class="modal-body" style="padding: 24px;">
+        <div class="confirm-notice">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/>
+          </svg>
+          Please review the following information before submitting.
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-title">Job Summary</div>
+          <div class="summary-row">
+            <span class="summary-key">Client</span>
+            <span class="summary-val">{{ selectedClientName || '—' }}</span>
           </div>
-
-          <div class="summary-section">
-            <h6 class="fw-bold mb-3">Job Summary</h6>
-            <div class="row mb-2">
-              <div class="col-5 text-muted">Client:</div>
-              <div class="col-7 fw-semibold">{{ selectedClientName || '-' }}</div>
-            </div>
-            <div class="row mb-2">
-              <div class="col-5 text-muted">Transaction Type:</div>
-              <div class="col-7 fw-semibold">{{ selectedTransactionType || '-' }}</div>
-            </div>
-            <div class="row mb-2">
-              <div class="col-5 text-muted">Origin:</div>
-              <div class="col-7 fw-semibold">{{ shipmentFreightForm.get('origin')?.value || '-' }}</div>
-            </div>
-            <div class="row mb-2">
-              <div class="col-5 text-muted">Destination:</div>
-              <div class="col-7 fw-semibold">{{ shipmentFreightForm.get('destination')?.value || '-' }}</div>
-            </div>
+          <div class="summary-row">
+            <span class="summary-key">Transaction Type</span>
+            <span class="summary-val">{{ selectedTransactionType || '—' }}</span>
           </div>
-
-          <p class="mb-0 mt-3">
-            <i class="cil-warning text-warning me-2"></i>
-            Are you sure you want to submit this job?
-          </p>
+          <div class="summary-row">
+            <span class="summary-key">Origin</span>
+            <span class="summary-val">{{ shipmentFreightForm.get('origin')?.value || '—' }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">Destination</span>
+            <span class="summary-val">{{ shipmentFreightForm.get('destination')?.value || '—' }}</span>
+          </div>
+        </div>
+        <div style="font-size: 12.5px; color: #8a8fa3; margin-top: 16px;">
+          Are you sure you want to submit this job?
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeConfirmModal()">
-          <i class="cil-x me-2"></i>Cancel
-        </button>
-        <button type="button" class="btn btn-success" (click)="confirmSubmit()" [disabled]="isSubmitting">
-          @if (!isSubmitting) {
-          <span>
-            <i class="cil-check me-2"></i>Yes, Submit Job
-          </span>
-          }
-          @if (isSubmitting) {
-          <span>
+      <div class="modal-footer" style="border-top: 1px solid #e2e5ee; padding: 16px 24px; gap: 10px;">
+        <button type="button" class="btn btn-ghost" (click)="closeConfirmModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" style="background: #0f7b50;"
+          (click)="confirmSubmit()" [disabled]="isSubmitting">
+          @if (!isSubmitting) { Yes, Submit Job }
+          @else {
             <span class="spinner-border spinner-border-sm me-2"></span>
             Submitting...
-          </span>
           }
         </button>
       </div>
     </div>
   </div>
 </div>
-<!-- Toast Notifications - Angular Based -->
+
+<!-- ── Toast Notifications ── -->
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
-  <!-- Success Toast -->
-  <div class="toast align-items-center border-0" [class.show]="showSuccessToast" role="alert" aria-live="assertive"
-    aria-atomic="true">
+  <div class="toast align-items-center border-0" [class.show]="showSuccessToast" role="alert">
     <div class="d-flex">
-      <div class="toast-body bg-success text-white rounded">
-        <div class="d-flex align-items-center">
-          <i class="cil-check-circle me-2" style="font-size: 1.5rem;"></i>
-          <div>
-            <strong class="d-block">Success!</strong>
-            <span>{{ successMessage }}</span>
-          </div>
-        </div>
+      <div class="toast-body rounded" style="background: #e6f7f1; color: #0f7b50; display: flex; align-items: center; gap: 10px; font-size: 13px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
+        <div><strong style="display: block;">Success!</strong>{{ successMessage }}</div>
       </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showSuccessToast = false"
-        aria-label="Close"></button>
+      <button type="button" class="btn-close me-2 m-auto" (click)="showSuccessToast = false" aria-label="Close"></button>
     </div>
   </div>
-
-  <!-- Error Toast -->
-  <div class="toast align-items-center border-0" [class.show]="showErrorToast" role="alert" aria-live="assertive"
-    aria-atomic="true">
+  <div class="toast align-items-center border-0" [class.show]="showErrorToast" role="alert">
     <div class="d-flex">
-      <div class="toast-body bg-danger text-white rounded">
-        <div class="d-flex align-items-center">
-          <i class="cil-x-circle me-2" style="font-size: 1.5rem;"></i>
-          <div>
-            <strong class="d-block">Error</strong>
-            <span>{{ errorMessage }}</span>
-          </div>
-        </div>
+      <div class="toast-body rounded" style="background: #fdecea; color: #c0392b; display: flex; align-items: center; gap: 10px; font-size: 13px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/>
+        </svg>
+        <div><strong style="display: block;">Error</strong>{{ errorMessage }}</div>
       </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showErrorToast = false"
-        aria-label="Close"></button>
+      <button type="button" class="btn-close me-2 m-auto" (click)="showErrorToast = false" aria-label="Close"></button>
     </div>
   </div>
 </div>

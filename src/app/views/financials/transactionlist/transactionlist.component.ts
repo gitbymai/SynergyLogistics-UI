@@ -41,7 +41,9 @@ export class TransactionlistComponent implements OnInit, OnChanges {
     dateFrom: '',
     dateTo: ''
   };
-
+  isLoading = false;
+  maxDateTo = '';
+  dateRangeError = false;
   constructor(private router: Router, private jobService: JobsService, private authService: AuthService) {
 
   }
@@ -62,41 +64,7 @@ export class TransactionlistComponent implements OnInit, OnChanges {
 
     if (changes['filterCriteria'] && changes['filterCriteria'].currentValue) {
 
-      if (this.filterCriteria === 'pettycash') {
-
-        this.pageTitle = 'Petty Cash Request List';
-
-        var userRole = this.authService.getCurrentUserRole();
-
-        if (userRole === 'CASHIER') {
-          this.loadAllJobWithPettyCashRelatedRequestCashier();
-        }
-        else if (userRole === 'TREASURER') {
-          this.loadAllJobWithPettyCashRelatedRequestTreasurer();
-        }
-        else if (userRole === 'SALES') {
-
-          this.loadAllJobWithPettyCashRelatedRequestSales();
-
-        }
-        else {
-          this.loadJobList();
-        }
-      }
-
-      else if (this.filterCriteria === 'transactions_owned_by_user') {
-
-        this.pageTitle = 'My Transactions';
-        this.loadAllJobTrasactionsAssignedToUser();
-
-      }
-      else if (this.filterCriteria === 'transactions_waiting_for_ownership') {
-
-        this.pageTitle = 'Transactions Waiting for Ownership';
-
-        this.loadAllJobTrasactionNoOwnership();
-
-      }
+      this.applyFilterCriteriaParameter();
 
     }
     else {
@@ -108,8 +76,47 @@ export class TransactionlistComponent implements OnInit, OnChanges {
     }
   }
 
+  applyFilterCriteriaParameter() {
+    if (this.filterCriteria === 'pettycash') {
+
+      this.pageTitle = 'Petty Cash Request List';
+
+      var userRole = this.authService.getCurrentUserRole();
+
+      if (userRole === 'CASHIER') {
+        this.loadAllJobWithPettyCashRelatedRequestCashier();
+      }
+      else if (userRole === 'TREASURER') {
+        this.loadAllJobWithPettyCashRelatedRequestTreasurer();
+      }
+      else if (userRole === 'SALES') {
+
+        this.loadAllJobWithPettyCashRelatedRequestSales();
+
+      }
+      else {
+        this.loadJobList();
+      }
+    }
+
+    else if (this.filterCriteria === 'transactions_owned_by_user') {
+
+      this.pageTitle = 'My Transactions';
+      this.loadAllJobTrasactionsAssignedToUser();
+
+    }
+    else if (this.filterCriteria === 'transactions_waiting_for_ownership') {
+
+      this.pageTitle = 'Transactions Waiting for Ownership';
+
+      this.loadAllJobTrasactionNoOwnership();
+
+    }
+  }
+
   loadJobList() {
 
+    this.isLoading = true;
     this.jobService.getAllJobs().subscribe({
 
       next: (response) => {
@@ -124,11 +131,14 @@ export class TransactionlistComponent implements OnInit, OnChanges {
             .sort((a, b) => b.jobId - a.jobId);
 
           this.filteredJobs = [...this.jobs];
+          this.currentPage = 1;
+          this.isLoading = false;
         }
 
       },
       error: (error) => {
         console.error('API returned error:', error.message);
+        this.isLoading = false;
       }
 
     });
@@ -136,6 +146,7 @@ export class TransactionlistComponent implements OnInit, OnChanges {
 
   loadAllJobWithPettyCashRelatedRequestCashier() {
 
+    this.isLoading = true;
     this.jobService.getAllJobsByCashierWithRequest().subscribe({
 
       next: (response) => {
@@ -150,11 +161,14 @@ export class TransactionlistComponent implements OnInit, OnChanges {
             .sort((a, b) => b.jobId - a.jobId);
 
           this.filteredJobs = [...this.jobs];
+          this.currentPage = 1;
+          this.isLoading = false;
         }
 
       },
       error: (error) => {
         console.error('API returned error:', error.message);
+        this.isLoading = false;
       }
 
     });
@@ -162,7 +176,7 @@ export class TransactionlistComponent implements OnInit, OnChanges {
   }
 
   loadAllJobWithPettyCashRelatedRequestTreasurer() {
-
+    this.isLoading = true;
     this.jobService.getAllJobsByTreasurerWithRequest().subscribe({
 
       next: (response) => {
@@ -177,11 +191,14 @@ export class TransactionlistComponent implements OnInit, OnChanges {
             .sort((a, b) => b.jobId - a.jobId);
 
           this.filteredJobs = [...this.jobs];
+          this.currentPage = 1;
+          this.isLoading = false;
         }
 
       },
       error: (error) => {
         console.error('API returned error:', error.message);
+        this.isLoading = false;
       }
     });
 
@@ -189,6 +206,7 @@ export class TransactionlistComponent implements OnInit, OnChanges {
 
   loadAllJobWithPettyCashRelatedRequestSales() {
 
+    this.isLoading = true;
     this.jobService.getAllJobsBySalesWithRequest().subscribe({
 
       next: (response) => {
@@ -203,17 +221,21 @@ export class TransactionlistComponent implements OnInit, OnChanges {
             .sort((a, b) => b.jobId - a.jobId);
 
           this.filteredJobs = [...this.jobs];
+          this.currentPage = 1;
+          this.isLoading = false;
         }
 
       },
       error: (error) => {
         console.error('API returned error:', error.message);
+        this.isLoading = false;
       }
     });
 
   }
 
   loadAllJobTrasactionsAssignedToUser() {
+    this.isLoading = true;
     this.jobService.getAllJobTransactionAssignedToUser().subscribe({
 
       next: (response) => {
@@ -228,17 +250,21 @@ export class TransactionlistComponent implements OnInit, OnChanges {
             .sort((a, b) => b.jobId - a.jobId);
 
           this.filteredJobs = [...this.jobs];
+          this.currentPage = 1;
+          this.isLoading = false;
         }
 
       },
       error: (error) => {
         console.error('API returned error:', error.message);
+        this.isLoading = false;
       }
     });
 
   }
 
   loadAllJobTrasactionNoOwnership() {
+    this.isLoading = true;
     this.jobService.getAllJobTransactionNoAssignedUser().subscribe({
 
       next: (response) => {
@@ -253,11 +279,14 @@ export class TransactionlistComponent implements OnInit, OnChanges {
             .sort((a, b) => b.jobId - a.jobId);
 
           this.filteredJobs = [...this.jobs];
+          this.currentPage = 1;
+          this.isLoading = false;
         }
 
       },
       error: (error) => {
         console.error('API returned error:', error.message);
+        this.isLoading = false;
       }
     });
 
@@ -336,8 +365,7 @@ export class TransactionlistComponent implements OnInit, OnChanges {
           job.customerName,
           job.transactionTypeName,
           job.jobStatusName,
-          job.origin,
-          job.jobId.toString()
+          job.origin
         ];
         return searchableFields.some(field =>
           field?.toLowerCase().includes(term)
@@ -503,5 +531,63 @@ export class TransactionlistComponent implements OnInit, OnChanges {
     if (this.filters.dateTo) count++;
     return count;
   }
+  onDateFromChange(): void {
+    this.dateRangeError = false;
+    if (this.filters.dateFrom) {
+      const max = new Date(this.filters.dateFrom);
+      max.setMonth(max.getMonth() + 1);
+      this.maxDateTo = max.toISOString().split('T')[0];
+      if (this.filters.dateTo && new Date(this.filters.dateTo) > max) {
+        this.filters.dateTo = '';
+      }
+    } else {
+      this.maxDateTo = '';
+    }
+  }
 
+  onDateToChange(): void {
+    if (!this.filters.dateFrom || !this.filters.dateTo) return;
+    const max = new Date(this.filters.dateFrom);
+    max.setMonth(max.getMonth() + 1);
+    this.dateRangeError = new Date(this.filters.dateTo) > max;
+    if (this.dateRangeError) this.filters.dateTo = '';
+  }
+
+  generateReport(): void {
+    if (!this.filters.dateFrom || !this.filters.dateTo) {
+      alert('Please select both Date From and Date To.');
+      return;
+    }
+    this.isLoading = true;
+    this.jobs = [];
+    this.filteredJobs = [];
+
+    if (this.filterCriteria === null || this.filterCriteria === undefined || this.filterCriteria === '') {
+      this.pageTitle = 'Job Transaction List';
+      this.loadJobList();
+    }
+
+    this.jobService.getAllJobs(this.filters.dateFrom, this.filters.dateTo).subscribe({
+      next: (response) => {
+        if (response.success && response.data?.length) {
+          this.jobs = response.data
+            .filter(c => c.isActive)
+            .map(job => ({
+              ...job,
+              agingDays: this.calculateAgingDays(job.createdDate)
+            }))
+            .sort((a, b) => b.jobId - a.jobId);;
+        }
+
+        this.filteredJobs = [...this.jobs];
+        this.currentPage = 1;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error(error);
+        this.isLoading = false;
+      }
+    });
+
+  }
 }
