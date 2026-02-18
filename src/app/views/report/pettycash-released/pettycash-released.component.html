@@ -1,1 +1,175 @@
-<p>pettycash-released works!</p>
+<div class="card my-4 shadow-sm">
+  <div class="card-header bg-primary text-white">
+    <div class="d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">
+        <i class="cil-money me-2"></i> Actual Released Petty Cash Report
+      </h4>
+      <div class="d-flex gap-2 align-items-center">
+        <div class="search-wrapper" style="width: 250px;">
+          <i class="cil-search search-icon"></i>
+          <input type="text" class="form-control form-control-custom search-input" placeholder="Search charges..."
+            [value]="searchTerm" (input)="onSearchInput($event)" />
+        </div>
+        <button class="btn btn-light btn-sm filter-btn-compact" (click)="toggleFilters()">
+          <i class="cil-filter" style="font-size: 11px;"></i>
+          <span class="d-none d-md-inline filter-text">{{ showFilters ? 'Hide' : 'Show' }}</span>
+          @if (hasActiveFilters()) {
+          <span class="badge bg-danger ms-1 badge-xs">{{ activeFilterCount() }}</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Panel -->
+  @if (showFilters) {
+  <div class="filter-panel">
+    <div class="filter-header">
+      <h6 class="mb-0">
+        <i class="cil-filter me-2"></i> Filter Options
+      </h6>
+      <button class="btn btn-sm btn-primary" (click)="clearFilters()">
+        <i class="cil-x me-1"></i> Clear All
+      </button>
+    </div>
+    <div class="filter-body">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-calendar me-1"></i> Date From
+          </label>
+          <input type="date" class="form-control form-control-custom" [value]="filters.dateFrom"
+            (change)="onDateFromChange($event)" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="cil-calendar me-1"></i> Date To
+          </label>
+          <input type="date" class="form-control form-control-custom" [value]="filters.dateTo"
+            (change)="onDateToChange($event)" />
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+<!-- Charges Table -->
+<div class="table-responsive">
+  <table class="table table-hover table-custom">
+    <thead>
+      <tr>
+        <th class="text-center">
+          <i class="cil-code me-2"></i> Job Code
+        </th>
+        <th class="text-center">
+          <i class="cil-file me-2"></i> Airwaybill/Bill of Lading
+        </th>
+        <th class="text-center">
+          <i class="cil-notes me-2"></i> Charge Code
+        </th>
+        <th class="text-center">
+          <i class="cil-dollar me-2"></i> Amount
+        </th>
+        <th class="text-center">
+          <i class="cil-calendar me-2"></i> Created Date
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      @if(paginatedCharges.length > 0) {
+        @for (charge of paginatedCharges; track charge.chargeId) {
+        <tr>
+          <!-- Job Code -->
+          <td class="text-center">
+            <strong>{{ charge.jobCode }}</strong>
+          </td>
+
+          <!-- Airwaybill / Bill of Lading -->
+          <td class="text-center">
+            @if(charge.houseBillLading !== '' && charge.masterBillLading !== '') {
+              {{ charge.houseBillLading }} | {{ charge.masterBillLading }}
+            } @else if(charge.houseAirwayBill !== '' && charge.masterAirwayBill !== '') {
+              {{ charge.houseAirwayBill }} | {{ charge.masterAirwayBill }}
+            } @else {
+              <span class="text-muted">-</span>
+            }
+          </td>
+
+          <!-- Charge Code -->
+          <td class="text-center">
+            <strong>{{ charge.chargeCode }}</strong>
+            @if(charge.chargeSubCategoryName) {
+              <div class="small text-muted">{{ charge.chargeSubCategoryName }}</div>
+            }
+          </td>
+
+          <!-- Amount -->
+          <td class="text-center">
+            <strong class="text-primary">{{ charge.amount | currency:charge.currencyCode }}</strong>
+            @if(charge.conversionRate && charge.conversionRate !== 1) {
+              <div class="small text-muted">Rate: {{ charge.conversionRate }}</div>
+            }
+          </td>
+
+          <!-- Created Date -->
+          <td class="text-center">
+            @if(charge.createdDate) {
+              {{ charge.createdDate | date:'MM/dd/yy h:mm a' }}
+            } @else {
+              <span class="text-muted">-</span>
+            }
+            @if(charge.processorOwnerName) {
+              <div class="small text-muted">by {{ charge.processorOwnerName }}</div>
+            }
+          </td>
+        </tr>
+        }
+      } @else {
+      <tr>
+        <td colspan="8" class="text-center text-muted py-4">
+          <i class="cil-inbox me-2" style="font-size: 2rem;"></i>
+          <div class="mt-2">No charges found</div>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+<nav aria-label="Page navigation" class="mt-4">
+  <ul class="pagination justify-content-center">
+    <li class="page-item" [class.disabled]="currentPage === 1">
+      <button class="page-link" type="button" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+        <i class="cil-arrow-left me-1"></i> Previous
+      </button>
+    </li>
+    @for (page of getPageNumbers(); track page) {
+      <li class="page-item" [class.active]="page === currentPage">
+        <button class="page-link" type="button" (click)="goToPage(page)">
+          {{ page }}
+        </button>
+      </li>
+    }
+    <li class="page-item" [class.disabled]="currentPage === totalPages()">
+      <button class="page-link" type="button" (click)="goToPage(currentPage + 1)"
+        [disabled]="currentPage === totalPages()">
+        Next <i class="cil-arrow-right ms-1"></i>
+      </button>
+    </li>
+  </ul>
+</nav>
+
+<!-- Card Footer -->
+<div class="card-footer d-flex justify-content-between align-items-center">
+  <div class="footer-info small">
+    Showing <strong>{{ paginatedCharges.length }}</strong> of <strong>{{ filteredCharges.length }}</strong> charges
+    @if(filteredCharges.length > 0) {
+      <span class="ms-3 text-primary">
+        Total Amount: <strong>{{ calculateTotalAmount() }}</strong>
+      </span>
+    }
+  </div>
+</div>
+
+</div>

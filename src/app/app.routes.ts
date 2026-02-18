@@ -206,6 +206,15 @@ export const routes: Routes = [
               roles: ['admin', 'treasurer','cashier']
             },
           },
+          {
+            path: 'pettycash-released',
+            canActivate: [AuthGuard],
+            loadComponent: () => import('./views/report/pettycash-released/pettycash-released.component').then(m => m.PettycashReleasedComponent),
+            data: {
+              title: 'Released Petty Cash',
+              roles: ['admin', 'treasurer','cashier']
+            },
+          }
         ]
       },
       {

@@ -87,7 +87,7 @@ export const navItems = [
     children: [
       {
         name: 'Released Petty Cash',
-        url: '/report/liquidations',
+        url: '/report/pettycash-released',
         iconComponent: { name: 'cil-paper-plane' },
         roles: ['admin','treasurer','cashier']
       },

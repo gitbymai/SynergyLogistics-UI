@@ -83,6 +83,10 @@ export interface ChargeTransaction {
 
   processorOwner?: number;
   processorOwnerName?: string | null;
+  masterAirwayBill?: string | null;
+  houseAirwayBill?: string | null;
+  masterBillLading?: string | null;
+  houseBillLading?: string | null;
 }
 
 export interface ChargeTransactionAuditLog {
