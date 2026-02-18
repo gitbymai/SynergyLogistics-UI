@@ -10,20 +10,28 @@ import { ChargeTransaction } from '../../models/chargetransaction';
 @Injectable({
   providedIn: 'root',
 })
-export class ReportService extends ApiService{
-  
-   private apiUrl = `${this.baseUrl}`;
+export class ReportService extends ApiService {
 
-     constructor(http: HttpClient) {
+  private apiUrl = `${this.baseUrl}`;
+
+  constructor(http: HttpClient) {
     super(http);  // Call parent constructor
   }
 
-    getallRefunds(): Observable<ApiResponse<Refund[]>> {
-    return this.http.get<ApiResponse<Refund[]>>(`${this.apiUrl}/report/refund-list`);
+  getallRefunds(dateFrom?: string, dateTo?: string): Observable<ApiResponse<Refund[]>> {
+    let params = new HttpParams();
+    if (dateFrom) params = params.set('dateFrom', dateFrom);
+    if (dateTo) params = params.set('dateTo', dateTo);
+
+    return this.http.get<ApiResponse<Refund[]>>(`${this.apiUrl}/report/refund-list`, { params });
   }
 
-    getallActualReleasedPettyCash(): Observable<ApiResponse<ChargeTransaction[]>> {
-    return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/report/pettycash-released-list`);
+  getallActualReleasedPettyCash(dateFrom?: string, dateTo?: string): Observable<ApiResponse<ChargeTransaction[]>> {
+    let params = new HttpParams();
+    if (dateFrom) params = params.set('dateFrom', dateFrom);
+    if (dateTo) params = params.set('dateTo', dateTo);
+
+    return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/report/pettycash-released-list`, { params });
   }
-  
+
 }

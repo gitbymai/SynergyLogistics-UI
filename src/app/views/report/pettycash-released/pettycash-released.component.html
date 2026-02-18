@@ -1,175 +1,237 @@
-<div class="card my-4 shadow-sm">
-  <div class="card-header bg-primary text-white">
-    <div class="d-flex justify-content-between align-items-center">
-      <h4 class="mb-0">
-        <i class="cil-money me-2"></i> Actual Released Petty Cash Report
-      </h4>
-      <div class="d-flex gap-2 align-items-center">
-        <div class="search-wrapper" style="width: 250px;">
-          <i class="cil-search search-icon"></i>
-          <input type="text" class="form-control form-control-custom search-input" placeholder="Search charges..."
-            [value]="searchTerm" (input)="onSearchInput($event)" />
-        </div>
-        <button class="btn btn-light btn-sm filter-btn-compact" (click)="toggleFilters()">
-          <i class="cil-filter" style="font-size: 11px;"></i>
-          <span class="d-none d-md-inline filter-text">{{ showFilters ? 'Hide' : 'Show' }}</span>
-          @if (hasActiveFilters()) {
-          <span class="badge bg-danger ms-1 badge-xs">{{ activeFilterCount() }}</span>
+<div class="report-wrapper">
+
+  <!-- ── Report Header ── -->
+  <header class="report-header">
+    <div class="report-header-left">
+      <div class="report-label">Financial Operations · Petty Cash Management</div>
+      <h1 class="report-title">Released Petty Cash Report</h1>
+      <p class="report-subtitle">Actual released petty cash charges by job code and charge category</p>
+    </div>
+    <div class="report-header-right">
+      <div class="report-meta">
+        Generated: {{ today | date:'MMMM d, yyyy' }}<br />
+        Period: {{ filters.dateFrom || 'All time' }} — {{ filters.dateTo || 'Present' }}<br />
+        Records: {{ filteredCharges.length }}
+      </div>
+    </div>
+  </header>
+
+  <!-- ── KPI Summary Cards ── -->
+  <div class="kpi-row">
+    <div class="kpi-card accent">
+      <div class="kpi-label">Total Amount</div>
+      <div class="kpi-value">{{ calculateTotalAmount() | number:'1.2-2' }}</div>
+      <div class="kpi-note">Across all currencies</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total Records</div>
+      <div class="kpi-value">{{ filteredCharges.length }}</div>
+      <div class="kpi-note">{{ filteredCharges.length !== charges.length ? 'Filtered from ' + charges.length : 'All
+        records' }}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Avg. Charge Amount</div>
+      <div class="kpi-value">{{ calculateAverageAmount() | number:'1.2-2' }}</div>
+      <div class="kpi-note">Per transaction</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">With Processor</div>
+      <div class="kpi-value">{{ countWithProcessor() }}</div>
+      <div class="kpi-note">Assigned charges</div>
+    </div>
+  </div>
+
+  <!-- ── Toolbar ── -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
+        <input type="text" placeholder="Search by job code, charge code, processor…" [value]="searchTerm"
+          (input)="onSearchInput($event)" />
+      </div>
+    </div>
+    <div class="toolbar-right">
+      <button class="btn btn-ghost" (click)="toggleFilters()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M7 10h10M11 16h2" />
+        </svg>
+        {{ showFilters ? 'Hide Filters' : 'Filters' }}
+        @if (hasActiveFilters()) {
+        <span class="badge">{{ activeFilterCount() }}</span>
+        }
+      </button>
+      <button class="btn btn-ghost" (click)="exportReport()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+        </svg>
+        Export
+      </button>
+    </div>
+  </div>
+
+  @if (showFilters) {
+  <div class="filter-panel">
+    <div class="filter-panel-header">
+      <span>Filter Options</span>
+      <button class="btn btn-ghost" style="padding: 5px 12px; font-size: 11.5px;" (click)="clearFilters()">Clear
+        All</button>
+    </div>
+    <div class="filter-panel-body">
+
+      <div class="filter-group">
+        <label class="filter-label">Date From</label>
+        <input type="date" class="filter-input" [(ngModel)]="filters.dateFrom" (change)="onDateFromChange()" />
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Date To</label>
+        <input type="date" class="filter-input" [(ngModel)]="filters.dateTo" [min]="filters.dateFrom" [max]="maxDateTo"
+          (change)="onDateToChange()" />
+        @if (dateRangeError) {
+        <span style="font-size: 11px; color: var(--red); margin-top: 4px;">
+          Date range cannot exceed 1 month.
+        </span>
+        }
+      </div>
+      <div class="filter-group" style="justify-content: flex-end;">
+        <label class="filter-label">&nbsp;</label>
+        <button class="btn btn-primary" (click)="generateReport()" [disabled]="isLoading">
+          @if (isLoading) {
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2" class="spin">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 3v3m0 12v3m9-9h-3M6 12H3m15.364-6.364-2.121 2.121M8.757 15.243l-2.121 2.121M18.364 18.364l-2.121-2.121M8.757 8.757 6.636 6.636" />
+          </svg>
+          Generating...
+          } @else {
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2" />
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+          </svg>
+          Generate Report
           }
         </button>
       </div>
     </div>
   </div>
-
-  <!-- Filter Panel -->
-  @if (showFilters) {
-  <div class="filter-panel">
-    <div class="filter-header">
-      <h6 class="mb-0">
-        <i class="cil-filter me-2"></i> Filter Options
-      </h6>
-      <button class="btn btn-sm btn-primary" (click)="clearFilters()">
-        <i class="cil-x me-1"></i> Clear All
-      </button>
-    </div>
-    <div class="filter-body">
-      <div class="row g-3">
-        <div class="col-md-3">
-          <label class="form-label">
-            <i class="cil-calendar me-1"></i> Date From
-          </label>
-          <input type="date" class="form-control form-control-custom" [value]="filters.dateFrom"
-            (change)="onDateFromChange($event)" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">
-            <i class="cil-calendar me-1"></i> Date To
-          </label>
-          <input type="date" class="form-control form-control-custom" [value]="filters.dateTo"
-            (change)="onDateToChange($event)" />
-        </div>
-      </div>
-    </div>
-  </div>
   }
+  <!-- ── Data Table ── -->
+  <div class="table-card">
+    <div style="overflow-x: auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Job Code</th>
+            <th>Airwaybill / Bill of Lading</th>
+            <th>Charge Code</th>
+            <th class="right">Amount</th>
+            <th class="right">Created Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (paginatedCharges.length > 0) {
+          @for (charge of paginatedCharges; track charge.chargeId) {
+          <tr>
+            <td>
+              <span class="cell-primary cell-mono">{{ charge.jobCode }}</span>
+            </td>
+            <td>
+              @if (charge.houseBillLading && charge.masterBillLading) {
+              <div class="waybill-pair">
+                {{ charge.houseBillLading }}
+                <span>{{ charge.masterBillLading }}</span>
+              </div>
+              } @else if (charge.houseAirwayBill && charge.masterAirwayBill) {
+              <div class="waybill-pair">
+                {{ charge.houseAirwayBill }}
+                <span>{{ charge.masterAirwayBill }}</span>
+              </div>
+              } @else {
+              <span class="empty-dash">—</span>
+              }
+            </td>
+            <td>
+              <span class="cell-primary">{{ charge.chargeCode }}</span>
+              @if (charge.chargeSubCategoryName) {
+              <div class="cell-sub">{{ charge.chargeSubCategoryName }}</div>
+              }
+            </td>
+            <td class="right">
+              <span class="amount-positive">{{ charge.amount | currency:charge.currencyCode }}</span>
+              @if (charge.conversionRate && charge.conversionRate !== 1) {
+              <div class="cell-sub" style="text-align: right;">Rate: {{ charge.conversionRate }}</div>
+              }
+            </td>
+            <td class="right">
+              @if (charge.createdDate) {
+              <span class="cell-mono" style="font-size: 12px;">
+                {{ charge.createdDate | date:'MM/dd/yy' }}<br />
+                <span style="color: var(--ink-muted); font-size: 11px;">{{ charge.createdDate | date:'h:mm a' }}</span>
+              </span>
+              @if (charge.processorOwnerName) {
+              <div class="cell-sub" style="text-align: right;">by {{ charge.processorOwnerName }}</div>
+              }
+              } @else {
+              <span class="empty-dash">—</span>
+              }
+            </td>
+          </tr>
+          }
+          } @else {
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <div class="empty-icon">◻</div>
+                <p>No charges match your current filters</p>
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
 
-<!-- Charges Table -->
-<div class="table-responsive">
-  <table class="table table-hover table-custom">
-    <thead>
-      <tr>
-        <th class="text-center">
-          <i class="cil-code me-2"></i> Job Code
-        </th>
-        <th class="text-center">
-          <i class="cil-file me-2"></i> Airwaybill/Bill of Lading
-        </th>
-        <th class="text-center">
-          <i class="cil-notes me-2"></i> Charge Code
-        </th>
-        <th class="text-center">
-          <i class="cil-dollar me-2"></i> Amount
-        </th>
-        <th class="text-center">
-          <i class="cil-calendar me-2"></i> Created Date
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      @if(paginatedCharges.length > 0) {
-        @for (charge of paginatedCharges; track charge.chargeId) {
-        <tr>
-          <!-- Job Code -->
-          <td class="text-center">
-            <strong>{{ charge.jobCode }}</strong>
-          </td>
-
-          <!-- Airwaybill / Bill of Lading -->
-          <td class="text-center">
-            @if(charge.houseBillLading !== '' && charge.masterBillLading !== '') {
-              {{ charge.houseBillLading }} | {{ charge.masterBillLading }}
-            } @else if(charge.houseAirwayBill !== '' && charge.masterAirwayBill !== '') {
-              {{ charge.houseAirwayBill }} | {{ charge.masterAirwayBill }}
-            } @else {
-              <span class="text-muted">-</span>
-            }
-          </td>
-
-          <!-- Charge Code -->
-          <td class="text-center">
-            <strong>{{ charge.chargeCode }}</strong>
-            @if(charge.chargeSubCategoryName) {
-              <div class="small text-muted">{{ charge.chargeSubCategoryName }}</div>
-            }
-          </td>
-
-          <!-- Amount -->
-          <td class="text-center">
-            <strong class="text-primary">{{ charge.amount | currency:charge.currencyCode }}</strong>
-            @if(charge.conversionRate && charge.conversionRate !== 1) {
-              <div class="small text-muted">Rate: {{ charge.conversionRate }}</div>
-            }
-          </td>
-
-          <!-- Created Date -->
-          <td class="text-center">
-            @if(charge.createdDate) {
-              {{ charge.createdDate | date:'MM/dd/yy h:mm a' }}
-            } @else {
-              <span class="text-muted">-</span>
-            }
-            @if(charge.processorOwnerName) {
-              <div class="small text-muted">by {{ charge.processorOwnerName }}</div>
-            }
-          </td>
-        </tr>
-        }
-      } @else {
-      <tr>
-        <td colspan="8" class="text-center text-muted py-4">
-          <i class="cil-inbox me-2" style="font-size: 2rem;"></i>
-          <div class="mt-2">No charges found</div>
-        </td>
-      </tr>
+    <!-- Footer row -->
+    <div class="report-footer">
+      <div class="footer-count">
+        Showing <strong>{{ paginatedCharges.length }}</strong> of <strong>{{ filteredCharges.length }}</strong> charges
+      </div>
+      @if (filteredCharges.length > 0) {
+      <div>
+        <span class="footer-total-label">Total Amount</span>
+        <span class="footer-total">{{ calculateTotalAmount() | number:'1.2-2' }}</span>
+      </div>
       }
-    </tbody>
-  </table>
-</div>
+    </div>
 
-<!-- Pagination -->
-<nav aria-label="Page navigation" class="mt-4">
-  <ul class="pagination justify-content-center">
-    <li class="page-item" [class.disabled]="currentPage === 1">
-      <button class="page-link" type="button" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
-        <i class="cil-arrow-left me-1"></i> Previous
+    <!-- Pagination -->
+    <div class="pagination">
+      <button class="page-btn" type="button" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+        ←
       </button>
-    </li>
-    @for (page of getPageNumbers(); track page) {
-      <li class="page-item" [class.active]="page === currentPage">
-        <button class="page-link" type="button" (click)="goToPage(page)">
-          {{ page }}
+
+      @for (page of getPageNumbers(); track page) {
+      @if (page === 1 || page === totalPages() || (page >= currentPage - 1 && page <= currentPage + 1)) { <button
+        class="page-btn" type="button" [class.active]="page === currentPage" (click)="goToPage(page)">
+        {{ page }}
         </button>
-      </li>
-    }
-    <li class="page-item" [class.disabled]="currentPage === totalPages()">
-      <button class="page-link" type="button" (click)="goToPage(currentPage + 1)"
-        [disabled]="currentPage === totalPages()">
-        Next <i class="cil-arrow-right ms-1"></i>
-      </button>
-    </li>
-  </ul>
-</nav>
+        } @else if (page === currentPage - 2 || page === currentPage + 2) {
+        <span class="page-sep">…</span>
+        }
+        }
 
-<!-- Card Footer -->
-<div class="card-footer d-flex justify-content-between align-items-center">
-  <div class="footer-info small">
-    Showing <strong>{{ paginatedCharges.length }}</strong> of <strong>{{ filteredCharges.length }}</strong> charges
-    @if(filteredCharges.length > 0) {
-      <span class="ms-3 text-primary">
-        Total Amount: <strong>{{ calculateTotalAmount() }}</strong>
-      </span>
-    }
+        <button class="page-btn" type="button" (click)="goToPage(currentPage + 1)"
+          [disabled]="currentPage === totalPages()">
+          →
+        </button>
+    </div>
   </div>
-</div>
 
 </div>

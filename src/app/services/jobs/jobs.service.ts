@@ -39,7 +39,7 @@ export class JobsService extends ApiService {
   }
 
   getAllJobs(): Observable<ApiResponse<Job[]>> {
-    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job`);
+    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/job-list`);
   }
 
   getAllJobsByCashierWithRequest(): Observable<ApiResponse<Job[]>> {

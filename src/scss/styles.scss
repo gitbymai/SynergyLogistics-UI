@@ -11,16 +11,11 @@
 // Custom styles for this theme
 @use "theme";
 
-// Some temp fixes
-//@use "fixes";
 
-// If you want to add custom CSS you can put it here.
-@use "custom";
-
-// Examples
-// We use those styles to show code examples, you should remove them in your application.
-@use "examples";
-
+@import 'base';
 
 @import "bootstrap/dist/css/bootstrap.min.css";
 @import "@coreui/coreui/dist/css/coreui.min.css";
+
+// styles.scss
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap');

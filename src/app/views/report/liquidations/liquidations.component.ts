@@ -18,6 +18,9 @@ export class LiquidationsComponent {
   sortColumn = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
+  // Used in the report header: {{ today | date:'MMMM d, yyyy' }}
+  today: Date = new Date();
+
   refunds: any[] = [];
   filteredRefunds: any[] = [];
   filterTransactionTypes: string[] = [];
@@ -30,12 +33,13 @@ export class LiquidationsComponent {
     dateTo: ''
   };
 
-  constructor(private router: Router,private reportService: ReportService) {
+  isLoading = false;
+  maxDateTo: string = '';
+  dateRangeError: boolean = false;
 
-  }
+  constructor(private router: Router, private reportService: ReportService) { }
 
   ngOnInit(): void {
-
     this.loadRefundList();
   }
 
@@ -44,13 +48,13 @@ export class LiquidationsComponent {
       next: (response) => {
         if (response.success && response.data?.length) {
           this.refunds = response.data
-            .filter(r => r.isActive)
-            .sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
+            .filter((r: any) => r.isActive)
+            .sort((a: any, b: any) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
 
           this.filteredRefunds = [...this.refunds];
         }
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('API returned error:', error.message);
       }
     });
@@ -102,46 +106,6 @@ export class LiquidationsComponent {
     this.showFilters = !this.showFilters;
   }
 
-  applyFilters(): void {
-    this.filteredRefunds = this.refunds.filter(refund => {
-      // Transaction Type filter
-      if (this.filters.transactionType && refund.transactionTypeName !== this.filters.transactionType) {
-        return false;
-      }
-
-      // Payment Type filter
-      if (this.filters.paymentType && refund.paymentTypeName !== this.filters.paymentType) {
-        return false;
-      }
-
-      // Date range filter
-      if (this.filters.dateFrom) {
-        const refundDate = new Date(refund.createdDate);
-        const fromDate = new Date(this.filters.dateFrom);
-        if (refundDate < fromDate) {
-          return false;
-        }
-      }
-
-      if (this.filters.dateTo) {
-        const refundDate = new Date(refund.createdDate);
-        const toDate = new Date(this.filters.dateTo);
-        if (refundDate > toDate) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-
-    // Apply search term if exists
-    if (this.searchTerm) {
-      this.onSearchChange();
-    }
-
-    this.currentPage = 1;
-  }
-
   clearFilters(): void {
     this.filters = {
       transactionType: '',
@@ -173,5 +137,125 @@ export class LiquidationsComponent {
     return this.filteredRefunds.reduce((total, refund) => total + (refund.refundAmount || 0), 0);
   }
 
+  /** KPI: average refund amount across filtered records */
+  calculateAverageRefundAmount(): number {
+    if (!this.filteredRefunds.length) return 0;
+    return this.calculateTotalRefundAmount() / this.filteredRefunds.length;
+  }
+
+  /** KPI: count of refunds that have a non-empty referenceNumber */
+  countWithReference(): number {
+    return this.filteredRefunds.filter(r => r.referenceNumber?.trim()).length;
+  }
+
+  /** Export the current filtered data as a CSV download */
+  exportReport(): void {
+    if (!this.filteredRefunds.length) return;
+
+    const headers = [
+      'Job Code',
+      'House AWB/BL',
+      'Master AWB/BL',
+      'Charge Code',
+      'Description',
+      'Currency',
+      'Requested Amount',
+      'Refund Amount',
+      'Reference #',
+      'Refund Date'
+    ];
+
+    const rows = this.filteredRefunds.map(r => [
+      r.jobCode ?? '',
+      r.houseBillLading || r.houseAirWaybill || '',
+      r.masterBillLading || r.masterAirWaybill || '',
+      r.chargeCode ?? '',
+      r.description ?? '',
+      r.currencyCode ?? '',
+      r.amount ?? 0,
+      r.refundAmount ?? 0,
+      r.referenceNumber ?? '',
+      r.createdDate ? new Date(r.createdDate).toLocaleString() : ''
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `refunds-report-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  generateReport(): void {
+    if (!this.filters.dateFrom || !this.filters.dateTo) {
+      // both dates required — you can swap this for a toast/alert
+      alert('Please select both a Date From and Date To before generating.');
+      return;
+    }
+
+    this.isLoading = true;
+    this.refunds = [];
+    this.filteredRefunds = [];
+
+    this.reportService.getallRefunds(this.filters.dateFrom, this.filters.dateTo).subscribe({
+      next: (response) => {
+        if (response.success && response.data?.length) {
+          this.refunds = response.data
+            .filter((r: any) => r.isActive)
+            .sort((a: any, b: any) =>
+              new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()
+            );
+        }
+        this.filteredRefunds = [...this.refunds];
+        this.currentPage = 1;
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        console.error('API returned error:', error.message);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  onDateFromChange(): void {
+    this.dateRangeError = false;
+
+    if (this.filters.dateFrom) {
+      const from = new Date(this.filters.dateFrom);
+      const max = new Date(from);
+      max.setMonth(max.getMonth() + 1);
+
+      // Clamp to same day one month later
+      this.maxDateTo = max.toISOString().split('T')[0];
+
+      // If existing dateTo exceeds the new max, reset it
+      if (this.filters.dateTo && new Date(this.filters.dateTo) > max) {
+        this.filters.dateTo = '';
+        this.dateRangeError = false;
+      }
+    } else {
+      this.maxDateTo = '';
+    }
+  }
+
+  onDateToChange(): void {
+    if (!this.filters.dateFrom || !this.filters.dateTo) return;
+
+    const from = new Date(this.filters.dateFrom);
+    const to = new Date(this.filters.dateTo);
+    const max = new Date(from);
+    max.setMonth(max.getMonth() + 1);
+
+    this.dateRangeError = to > max;
+
+    if (this.dateRangeError) {
+      this.filters.dateTo = '';
+    }
+  }
 
 }
