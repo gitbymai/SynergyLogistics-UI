@@ -47,8 +47,7 @@
             <th class="text-right">Calc. Charge</th>
             <th class="text-right">Selling Amt</th>
             <th class="text-right">Calc. Selling</th>
-            <th>Created By</th>
-            <th>Last Update</th>
+            <th>Assigned Processor</th>
             <th class="text-center">Actions</th>
           </tr>
         </thead>
@@ -85,13 +84,7 @@
               <span class="amount-positive">PHP {{ charge.calculatedSellingAmount | number:'1.2-2' }}</span>
             </td>
             <td>
-              <span class="cell-sub" style="font-size: 12px;">{{ charge.createdByName }}</span>
-            </td>
-            <td>
-              <span class="cell-mono" style="font-size: 11px; color: var(--ink-muted);">
-                {{ (charge.modifiedDate || charge.createdDate) | date:'MM/dd/yy' }}<br />
-                {{ (charge.modifiedDate || charge.createdDate) | date:'h:mm a' }}
-              </span>
+              <span class="cell-sub" style="font-size: 12px;">{{ charge.processorOwnerName ?? 'UNASSIGNED' }}</span>
             </td>
             <td class="text-center">
               <div style="display: inline-flex; gap: 4px; align-items: center;">
