@@ -365,7 +365,10 @@ export class TransactionlistComponent implements OnInit, OnChanges {
           job.customerName,
           job.transactionTypeName,
           job.jobStatusName,
-          job.origin
+          job.hbl,
+          job.mbl,
+          job.hawb,
+          job.mawb
         ];
         return searchableFields.some(field =>
           field?.toLowerCase().includes(term)

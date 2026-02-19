@@ -166,14 +166,10 @@ calculateAgingDays(createdDate: string | Date | null | undefined): number {
           job.jobCode,
           job.customerName,
           job.transactionTypeName,
-          job.jobStatusName,
-          job.origin,
-          job.destination,
-          job.carrier,
-          job.vessel,
-          job.mbl,
           job.hbl,
-          job.jobId.toString()
+          job.mbl,
+          job.hawb,
+          job.mawb
         ];
         return searchableFields.some(field =>
           field?.toLowerCase().includes(term)
@@ -364,11 +360,6 @@ calculateAgingDays(createdDate: string | Date | null | undefined): number {
 
   
   generateReport(): void {
-    if (!this.filters.dateFrom || !this.filters.dateTo) {
-      // both dates required — you can swap this for a toast/alert
-      alert('Please select both a Date From and Date To before generating.');
-      return;
-    }
 
     this.isLoading = true;
     this.jobs = [];

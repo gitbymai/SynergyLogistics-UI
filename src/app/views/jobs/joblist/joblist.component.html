@@ -9,224 +9,252 @@
     <div class="list-header-right">
       <div class="search-box">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
         </svg>
-        <input type="text" placeholder="Search jobs…"
-          [(ngModel)]="searchTerm" (input)="onSearchChange()" />
+        <input type="text" placeholder="Search jobs…" [(ngModel)]="searchTerm" (input)="onSearchChange()" />
       </div>
       <button class="btn btn-ghost" (click)="toggleFilters()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M7 10h10M11 16h2"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M7 10h10M11 16h2" />
         </svg>
         {{ showFilters ? 'Hide Filters' : 'Filters' }}
         @if (hasActiveFilters()) {
-          <span class="badge">{{ activeFilterCount() }}</span>
+        <span class="badge">{{ activeFilterCount() }}</span>
         }
       </button>
     </div>
   </header>
 
   <!-- ── Filter Panel ── -->
-@if (showFilters) {
-<div class="filter-panel">
-  <div class="filter-panel-header">
-    <span>Filter Options</span>
-    <button class="btn btn-ghost" style="padding: 5px 12px; font-size: 11.5px;" (click)="clearFilters()">Clear All</button>
-  </div>
-  <div class="filter-panel-body">
+  @if (showFilters) {
+  <div class="filter-panel">
+    <div class="filter-panel-header">
+      <span>Filter Options</span>
+      <button class="btn btn-ghost" style="padding: 5px 12px; font-size: 11.5px;" (click)="clearFilters()">Clear
+        All</button>
+    </div>
+    <div class="filter-panel-body">
 
-    <!-- ── Date Range: Generate Data ── -->
-    <div class="filter-section">
-      <div class="filter-section-label">
-        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
-        </svg>
-        Date Range — Generate Report
-      </div>
-      <div class="filter-section-body">
-        <div class="filter-group">
-          <label class="filter-label">Date From</label>
-          <input type="date" class="filter-input" [(ngModel)]="filters.dateFrom"
-            (change)="onDateFromChange()" />
+      <!-- ── Date Range: Generate Data ── -->
+      <div class="filter-section">
+        <div class="filter-section-label">
+          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <path d="M16 2v4M8 2v4M3 10h18" />
+          </svg>
+          Date Range — Generate Report
         </div>
-        <div class="filter-group">
-          <label class="filter-label">Date To</label>
-          <input type="date" class="filter-input" [(ngModel)]="filters.dateTo"
-            [min]="filters.dateFrom" [max]="maxDateTo"
-            (change)="onDateToChange()" />
-          @if (dateRangeError) {
+        <div class="filter-section-body">
+          <div class="filter-group">
+            <label class="filter-label">Date From</label>
+            <input type="date" class="filter-input" [(ngModel)]="filters.dateFrom" (change)="onDateFromChange()" />
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Date To</label>
+            <input type="date" class="filter-input" [(ngModel)]="filters.dateTo" [min]="filters.dateFrom"
+              [max]="maxDateTo" (change)="onDateToChange()" />
+            @if (dateRangeError) {
             <span class="filter-error">Date range cannot exceed 1 month.</span>
-          }
-        </div>
-        <div class="filter-group" style="justify-content: flex-end;">
-          <label class="filter-label">&nbsp;</label>
-          <button class="btn btn-primary" (click)="generateReport()" [disabled]="isLoading">
-            @if (isLoading) {
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="spin">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v3m0 12v3m9-9h-3M6 12H3m15.364-6.364-2.121 2.121M8.757 15.243l-2.121 2.121M18.364 18.364l-2.121-2.121M8.757 8.757 6.636 6.636"/>
+            }
+          </div>
+          <div class="filter-group" style="justify-content: flex-end;">
+            <label class="filter-label">&nbsp;</label>
+            <button class="btn btn-primary" (click)="generateReport()" [disabled]="isLoading">
+              @if (isLoading) {
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2" class="spin">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 3v3m0 12v3m9-9h-3M6 12H3m15.364-6.364-2.121 2.121M8.757 15.243l-2.121 2.121M18.364 18.364l-2.121-2.121M8.757 8.757 6.636 6.636" />
               </svg>
               Generating...
-            } @else {
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/>
-                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+              } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2" />
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
               </svg>
               Generate
-            }
-          </button>
+              }
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- ── Separator ── -->
-    <div class="filter-separator">
-      <span>Filter Results</span>
-    </div>
-
-    <!-- ── Data Filters ── -->
-    <div class="filter-section">
-      <div class="filter-section-label">
-        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M7 10h10M11 16h2"/>
-        </svg>
-        Narrow Current Results
+      <!-- ── Separator ── -->
+      <div class="filter-separator">
+        <span>Filter Results</span>
       </div>
-      <div class="filter-section-body">
-        <div class="filter-group">
-          <label class="filter-label">Status</label>
-          <select class="filter-input" [(ngModel)]="filters.status" (change)="applyFilters()">
-            <option value="">All Statuses</option>
-            @for (status of filterJobStatus; track status.optionId) {
+
+      <!-- ── Data Filters ── -->
+      <div class="filter-section">
+        <div class="filter-section-label">
+          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M7 10h10M11 16h2" />
+          </svg>
+          Narrow Current Results
+        </div>
+        <div class="filter-section-body">
+          <div class="filter-group">
+            <label class="filter-label">Status</label>
+            <select class="filter-input" [(ngModel)]="filters.status" (change)="applyFilters()">
+              <option value="">All Statuses</option>
+              @for (status of filterJobStatus; track status.optionId) {
               <option [value]="status.value">{{ status.value }}</option>
-            }
-          </select>
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">Transaction Type</label>
-          <select class="filter-input" [(ngModel)]="filters.transactionType" (change)="applyFilters()">
-            <option value="">All Types</option>
-            @for (type of filterJobTransactionTypeList; track type.jobTransactionTypeId) {
+              }
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Transaction Type</label>
+            <select class="filter-input" [(ngModel)]="filters.transactionType" (change)="applyFilters()">
+              <option value="">All Types</option>
+              @for (type of filterJobTransactionTypeList; track type.jobTransactionTypeId) {
               <option [value]="type.jobTransactionType" [attr.data-freight-type]="type.jobTransactionTypePrefix">
                 {{ type.jobTransactionType }}
               </option>
-            }
-          </select>
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">Payment Type</label>
-          <select class="filter-input" [(ngModel)]="filters.paymentType" (change)="applyFilters()">
-            <option value="">All Payment Types</option>
-            @for (payment of filterPaymenTypeList; track payment.optionId) {
+              }
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Payment Type</label>
+            <select class="filter-input" [(ngModel)]="filters.paymentType" (change)="applyFilters()">
+              <option value="">All Payment Types</option>
+              @for (payment of filterPaymenTypeList; track payment.optionId) {
               <option [value]="payment.value">{{ payment.value }}</option>
-            }
-          </select>
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">Incoterms</label>
-          <select class="filter-input" [(ngModel)]="filters.incoterms" (change)="applyFilters()">
-            <option value="">All Incoterms</option>
-            @for (term of filterIncotermsList; track term.optionId) {
+              }
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Incoterms</label>
+            <select class="filter-input" [(ngModel)]="filters.incoterms" (change)="applyFilters()">
+              <option value="">All Incoterms</option>
+              @for (term of filterIncotermsList; track term.optionId) {
               <option [value]="term.value">{{ term.value }}</option>
-            }
-          </select>
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">Customer</label>
-          <input type="text" class="filter-input" placeholder="Enter customer name"
-            [(ngModel)]="filters.customer" (input)="applyFilters()" />
+              }
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Customer</label>
+            <input type="text" class="filter-input" placeholder="Enter customer name" [(ngModel)]="filters.customer"
+              (input)="applyFilters()" />
+          </div>
         </div>
       </div>
-    </div>
 
+    </div>
   </div>
-</div>
-}
+  }
 
   <!-- ── Table Card ── -->
   <div class="table-card">
-    <div style="overflow-x: auto;">
-      <table>
-        <thead>
+
+  <div style="overflow-x: auto;">
+  <table class="table-custom">
+    <thead>
+      <tr>
+        <th>Job Code</th>
+        <th>Customer</th>
+        <th>Transaction</th>
+        <th>Reference</th>
+        <th class="center">Status</th>
+        <th class="right">Created Date</th>
+        <th class="center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (paginatedJobs.length > 0) {
+        @for (job of paginatedJobs; track job) {
           <tr>
-            <th>Job Code</th>
-            <th>Customer</th>
-            <th>Transaction</th>
-            <th>Reference</th>
-            <th class="center">Status</th>
-            <th class="right">Created Date</th>
-            <th class="center">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @if (paginatedJobs.length > 0) {
-            @for (job of paginatedJobs; track job) {
-            <tr>
-              <td>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span class="cell-primary cell-mono">{{ job.jobCode }}</span>
-                  <span class="aging-chip" [class.aging-ok]="(job.agingDays ?? 0) < 7"
-                    [class.aging-warn]="(job.agingDays ?? 0) >= 7 && (job.agingDays ?? 0) < 30"
-                    [class.aging-danger]="(job.agingDays ?? 0) >= 30">
-                    {{ job.agingDays }}d
-                  </span>
-                </div>
-              </td>
-              <td>
-                <span class="cell-primary">{{ job.customerName }}</span>
-              </td>
-              <td>
-                <span class="tx-chip">{{ job.transactionTypeName }}</span>
-              </td>
-              <td>
-                <span class="cell-mono" style="font-size: 12px;">
-                  @if (job.hbl && job.mbl) {
-                    {{ job.hbl }}<br/>
-                    <span style="color: var(--ink-muted); font-size: 11px;">{{ job.mbl }}</span>
-                  } @else {
-                    {{ job.hawb }}<br/>
-                    <span style="color: var(--ink-muted); font-size: 11px;">{{ job.mawb }}</span>
-                  }
+
+            <!-- Job Code -->
+            <td>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="cell-mono" style="color: var(--accent); font-weight: 600; font-size: 12px;">
+                  {{ job.jobCode }}
                 </span>
-              </td>
-              <td class="center">
-                <span class="status-chip" [ngClass]="getStatusBadgeClass(job.jobStatusName)">
-                  {{ job.jobStatusName }}
+                <span class="aging-chip"
+                  [class.aging-ok]="(job.agingDays ?? 0) < 7"
+                  [class.aging-warn]="(job.agingDays ?? 0) >= 7 && (job.agingDays ?? 0) < 30"
+                  [class.aging-danger]="(job.agingDays ?? 0) >= 30">
+                  {{ job.agingDays }}d
                 </span>
-              </td>
-              <td class="right">
-                @if (job.createdDate) {
-                  <span class="cell-mono" style="font-size: 12px;">
-                    {{ job.createdDate | date:'MM/dd/yy' }}<br/>
-                    <span style="color: var(--ink-muted); font-size: 11px;">{{ job.createdDate | date:'h:mm a' }}</span>
-                  </span>
+              </div>
+            </td>
+
+            <!-- Customer -->
+            <td>
+              <span class="cell-primary" style="font-size: 13px;">{{ job.customerName }}</span>
+            </td>
+
+            <!-- Transaction -->
+            <td>
+              <span class="tx-chip">{{ job.transactionTypeName }}</span>
+            </td>
+
+            <!-- Reference -->
+            <td>
+              <span style="font-size: 11px; ">
+                @if (job.hbl && job.mbl) {
+                  {{ job.hbl }}<br/>
+                  {{ job.mbl }}
                 } @else {
-                  <span class="empty-dash">—</span>
+                  {{ job.hawb || '—' }}<br/>
+                  {{ job.mawb || '—' }}
                 }
-              </td>
-              <td class="center">
+              </span>
+            </td>
+
+            <!-- Status -->
+            <td class="center">
+              <span class="status-chip" [ngClass]="getStatusBadgeClass(job.jobStatusName)">
+                {{ job.jobStatusName }}
+              </span>
+            </td>
+
+            <!-- Created Date -->
+            <td class="right">
+              @if (job.createdDate) {
+                <span class="cell-mono" style="font-size: 11px; color: var(--ink-muted);">
+                  {{ job.createdDate | date:'MM/dd/yy' }}<br/>
+                  {{ job.createdDate | date:'h:mm a' }}
+                </span>
+              } @else {
+                <span class="cell-sub">—</span>
+              }
+            </td>
+
+            <!-- Actions -->
+            <td class="center">
+              <div style="display: inline-flex; gap: 4px; flex-wrap: wrap; justify-content: center;">
                 <button class="action-btn" (click)="viewJob(job)" title="View Job Details">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                     <circle cx="12" cy="12" r="3"/>
                   </svg>
                   View
                 </button>
-              </td>
-            </tr>
-            }
-          } @else {
-            <tr>
-              <td colspan="7">
-                <div class="empty-state">
-                  <div class="empty-icon">◻</div>
-                  <p>No jobs found</p>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+              </div>
+            </td>
+
+          </tr>
+        }
+      } @else {
+        <tr>
+          <td colspan="7">
+            <div class="empty-state">
+              <div class="empty-icon">◻</div>
+              <p>No jobs found</p>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
 
     <!-- Footer -->
     <div class="list-footer">
@@ -236,23 +264,20 @@
 
       <!-- Pagination -->
       <div class="pagination">
-        <button class="page-btn" type="button"
-          (click)="goToPage(currentPage - 1)"
+        <button class="page-btn" type="button" (click)="goToPage(currentPage - 1)"
           [disabled]="currentPage === 1">←</button>
 
         @for (page of [].constructor(totalPages()); track page; let i = $index) {
-          @if (i + 1 === 1 || i + 1 === totalPages() || (i + 1 >= currentPage - 1 && i + 1 <= currentPage + 1)) {
-            <button class="page-btn" type="button"
-              [class.active]="i + 1 === currentPage"
-              (click)="goToPage(i + 1)">{{ i + 1 }}</button>
+        @if (i + 1 === 1 || i + 1 === totalPages() || (i + 1 >= currentPage - 1 && i + 1 <= currentPage + 1)) { <button
+          class="page-btn" type="button" [class.active]="i + 1 === currentPage" (click)="goToPage(i + 1)">{{ i + 1
+          }}</button>
           } @else if (i + 1 === currentPage - 2 || i + 1 === currentPage + 2) {
-            <span class="page-sep">…</span>
+          <span class="page-sep">…</span>
           }
-        }
+          }
 
-        <button class="page-btn" type="button"
-          (click)="goToPage(currentPage + 1)"
-          [disabled]="currentPage === totalPages()">→</button>
+          <button class="page-btn" type="button" (click)="goToPage(currentPage + 1)"
+            [disabled]="currentPage === totalPages()">→</button>
       </div>
     </div>
   </div>

@@ -437,6 +437,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
 
   openSubmitClearingConfirmation(charge: any) {
     this.selectedCharge = charge;
+    console.log('Selected Charge for Clearing:', this.selectedCharge);
     this.showSubmitClearingConfirmModal = true;
   }
 

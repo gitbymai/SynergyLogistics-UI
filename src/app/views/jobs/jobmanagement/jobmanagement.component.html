@@ -1,673 +1,737 @@
-<div class="card my-4 shadow-sm">
-  <div class="card-header bg-primary text-white">
-    <div class="d-flex justify-content-between align-items-center">
-      <div class="d-flex align-items-center gap-3">
-        <h4 class="mb-0">
-          <i class="bi bi-briefcase me-2"></i> Job Details
-        </h4>
-        <span class="badge badge-code">{{ job?.jobCode }}</span>
-      </div>
-      <div class="d-flex gap-2">
-        <button routerLink="/jobs/list" class="btn btn-light-custom btn-sm">
-          <i class="bi bi-arrow-left me-1"></i>
-          <span>Back to List</span>
-        </button>
-        <button class="btn btn-light-custom btn-sm" (click)="printJobDetails()">
-          <i class="bi bi-printer me-1"></i>
-          <span>Print</span>
-        </button>
-      </div>
+<!-- ── Job Details Card ── -->
+<div class="table-card" style="margin-bottom: 24px;">
+
+  <!-- ── Card Header ── -->
+  <div
+    style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--rule); background: var(--rule-light);">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span class="section-title" style="margin: 0; padding: 0; border: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z" />
+        </svg>
+        Job Details
+      </span>
+      <span class="ref-chip" style="font-size: 10px; font-family: 'DM Mono', monospace;">{{ job?.jobCode }}</span>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button routerLink="/jobs/list" class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to List
+      </button>
+      <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px;" (click)="printJobDetails()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+        </svg>
+        Print
+      </button>
     </div>
   </div>
 
-  <div class="card-body job-details-body">
-    <div class="accordion accordion-custom" id="jobDetailsAccordion">
+  <div style="padding: 20px; display: flex; flex-direction: column; gap: 20px;">
 
-      <!-- ======================= 1. JOB INFORMATION ======================== -->
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingJobInfo">
-          <button class="accordion-button" [class.collapsed]="!isSectionOpen('jobInfo')" type="button"
-            (click)="toggleSection('jobInfo')" [attr.aria-expanded]="isSectionOpen('jobInfo')">
-            <i class="bi bi-briefcase me-2"></i>
-            Job Information
+    <!-- ══════════════════════════════════════════
+         1. JOB INFORMATION
+    ══════════════════════════════════════════ -->
+    <div>
+      <!-- Section header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span class="section-title" style="margin: 0; padding: 0; border: none; font-size: 11px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z" />
+          </svg>
+          Job Information
+        </span>
+
+        <!-- Action buttons -->
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;">
+          @if ((userRole === 'SALES' || userRole === 'ADMIN') && job?.jobStatusName === 'FOR APPROVAL') {
+          <button class="action-btn" style="color: #15803d; background: #dcfce7; border-color: #dcfce7;"
+            (click)="openApproveConfirm(job)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            Approve
           </button>
-        </h2>
-        <div id="collapseJobInfo" class="accordion-collapse" [class.collapse]="!isSectionOpen('jobInfo')"
-          [class.show]="isSectionOpen('jobInfo')">
-          <div class="accordion-body">
-            <div class="detail-section">
-              <div class="row g-4">
-                <div class="col-md-8">
-                  <div class="detail-item">
-                    <label class="detail-label">
-                      <i class="bi bi-person"></i> Client
-                    </label>
-                    <div class="detail-value">{{ job?.customerName || '-' }}</div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="detail-item">
-                    <label class="detail-label">
-                      <i class="bi bi-info-circle"></i> Status
-                    </label>
-                    <div class="detail-value">
-                      <span [class]="'badge status-badge ' + getStatusBadgeClass(job?.jobStatusName || '')">
-                        <i class="bi me-1" [ngClass]="getStatusIcon(job?.jobStatusName || '')"></i>
-                        {{ job?.jobStatusName || 'Pending' }}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="detail-section">
-              <div class="row g-4">
-                <div class="col-md-4">
-                  <div class="detail-item">
-                    <label class="detail-label">
-                      <i class="bi bi-arrow-left-right"></i> Transaction Type
-                    </label>
-                    <div class="detail-value">{{ job?.transactionTypeName || '-' }}</div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="detail-item">
-                    <label class="detail-label">
-                      <i class="bi bi-tags"></i> Incoterms
-                    </label>
-                    <div class="detail-value">{{ job?.incotermsName || '-' }}</div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="detail-item">
-                    <label class="detail-label">
-                      <i class="bi bi-credit-card"></i> Payment Type
-                    </label>
-                    <div class="detail-value">{{ job?.paymentTypeName || '-' }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="detail-section">
-              <div class="row g-4">
-                <div class="col-md-6">
-                  <div class="detail-item">
-                    <label class="detail-label">
-                      <i class="bi bi-calendar"></i> Created Date
-                    </label>
-                    <div class="detail-value">{{ job?.createdDate | date:'MM/dd/yy h:mm a' }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-
-            @if((userRole === 'SALES' || userRole === 'ADMIN') && job?.jobStatusName === 'FOR APPROVAL') {
-            <div class="detail-section">
-              <div class="row g-4">
-                <div class="col-md-8">
-
-                </div>
-                <div class="col-md-4">
-                  <div class="text-end">
-
-                    <button class="btn btn-approve me-2" (click)="openApproveConfirm(job)">
-                      <span>Approve</span>
-                    </button>
-                    <button class="btn btn-disapprove" (click)="openDisapproveConfirm(job)">
-                      <span>Disapprove</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            }
-
-            @if((userRole === 'SALES' || userRole === 'ADMIN' || userRole === 'OPS STAFF') && job?.jobStatusName !== 'FOR APPROVAL') {
-            <div class="detail-section">
-              <div class="row g-4">
-                <div class="col-md-8">
-
-                </div>
-                <div class="col-md-4">
-                  <div class="text-end">
-                    @if(job?.jobStatusName !== 'CLOSED' && job?.jobStatusName !== 'CANCELLED' && (userRole === 'OPS STAFF' || userRole === 'ADMIN')){
-                    <button class="btn btn-approve me-2" (click)="openCloseConfirm(job)">
-                      <span>Close Job</span>
-                    </button>
-                    }
-                    <button class="btn btn-replicate" (click)="openReplicateConfirm(job)">
-                      <span>Replicate Job</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            }
-
-          </div>
+          <button class="action-btn" style="color: var(--red); background: #fdecea; border-color: #fdecea;"
+            (click)="openDisapproveConfirm(job)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Disapprove
+          </button>
+          }
+          @if ((userRole === 'SALES' || userRole === 'ADMIN' || userRole === 'OPS STAFF') && job?.jobStatusName !== 'FOR
+          APPROVAL') {
+          @if (job?.jobStatusName !== 'CLOSED' && job?.jobStatusName !== 'CANCELLED' && (userRole === 'OPS STAFF' ||
+          userRole === 'ADMIN')) {
+          <button class="action-btn" style="color: #92520a; background: #fef3e2; border-color: #fef3e2;"
+            (click)="openCloseConfirm(job)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Close Job
+          </button>
+          }
+          <button class="action-btn"
+            style="color: var(--accent); background: var(--accent-light); border-color: var(--accent-light);"
+            (click)="openReplicateConfirm(job)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            Replicate Job
+          </button>
+          }
         </div>
       </div>
 
-      <!-- ======================= 2. CARGO & ROUTING DETAILS ======================== -->
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingCargo">
-          <button class="accordion-button" [class.collapsed]="!isSectionOpen('cargo')" type="button"
-            (click)="toggleSection('cargo')" [attr.aria-expanded]="isSectionOpen('cargo')">
-            <i class="bi bi-box-seam me-2"></i>
-            Cargo & Routing Details
-          </button>
-        </h2>
-        <div id="collapseCargo" class="accordion-collapse" [class.collapse]="!isSectionOpen('cargo')"
-          [class.show]="isSectionOpen('cargo')">
-          <div class="accordion-body">
-            <div class="detail-section">
-              <h6 class="section-subtitle">
-                <i class="bi bi-inbox"></i> Shipment Information
-              </h6>
-              <div class="row g-4">
-                <div class="col-md-4">
-                  <div class="detail-item">
-                    <label class="detail-label">Commodity</label>
-                    <div class="detail-value">{{ job?.commodity || '-' }}</div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="detail-item">
-                    <label class="detail-label">Carrier</label>
-                    <div class="detail-value">{{ job?.carrier || '-' }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <!-- Fields -->
+      <div class="summary-card" style="margin-bottom: 0;">
+        <div
+          style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
 
-            <div class="detail-section">
-              <h6 class="section-subtitle">
-                <i class="bi bi-geo-alt"></i> Routing Information
-              </h6>
-              <div class="row g-4">
-                <div class="col-md-4">
-                  <div class="detail-item">
-                    <label class="detail-label">Origin</label>
-                    <div class="detail-value">{{ job?.origin || '-' }}</div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="detail-item">
-                    <label class="detail-label">Destination</label>
-                    <div class="detail-value">{{ job?.destination || '-' }}</div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="detail-item">
-                    <label class="detail-label">Port / CFS</label>
-                    <div class="detail-value">{{ job?.portCfs || '-' }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <!-- Client — full width -->
+          <div
+            style="grid-column: 1 / -1; padding: 10px 14px; border-bottom: 1px solid var(--rule); background: var(--rule-light);">
+            <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Client</div>
+            <div class="cell-primary" style="font-size: 13px; font-weight: 600;">{{ job?.customerName || '—' }}</div>
+          </div>
 
-            <div class="detail-section">
-              <h6 class="section-subtitle">
-                <i class="bi bi-bar-chart"></i> Measurements
-              </h6>
-              <div class="row g-4">
-                <div class="col-md-4">
-                  <div class="detail-item">
-                    <label class="detail-label">Gross Weight</label>
-                    <div class="detail-value">{{ job?.grossWeight || '-' }} kg</div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="detail-item">
-                    <label class="detail-label">Volume (CBM)</label>
-                    <div class="detail-value">{{ job?.volume || '-' }} m³</div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="detail-item">
-                    <label class="detail-label">Number of Packages</label>
-                    <div class="detail-value">{{ job?.numberOfPackages || '-' }}</div>
-                  </div>
-                </div>
-              </div>
+          <!-- Transaction Type -->
+          <div style="padding: 10px 14px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule);">
+            <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Transaction Type</div>
+            <div class="cell-primary" style="font-size: 12px;">{{ job?.transactionTypeName || '—' }}</div>
+          </div>
+
+          <!-- Incoterms -->
+          <div style="padding: 10px 14px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule);">
+            <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Incoterms</div>
+            <div class="cell-primary" style="font-size: 12px;">{{ job?.incotermsName || '—' }}</div>
+          </div>
+
+          <!-- Payment Type -->
+          <div style="padding: 10px 14px; border-bottom: 1px solid var(--rule);">
+            <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Payment Type</div>
+            <div class="cell-primary" style="font-size: 12px;">{{ job?.paymentTypeName || '—' }}</div>
+          </div>
+
+          <!-- Created Date -->
+          <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+            <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Created Date</div>
+            <div class="cell-mono" style="font-size: 12px;">{{ job?.createdDate | date:'MM/dd/yy h:mm a' }}</div>
+          </div>
+
+          <!-- Status -->
+          <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+            <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Status</div>
+            <div>
+              <span class="badge" [ngClass]="getStatusBadgeClass(job?.jobStatusName || '')">
+                {{ job?.jobStatusName || 'Pending' }}
+              </span>
             </div>
           </div>
+
+          <!-- empty cell to complete the 3-col row -->
+          <div style="padding: 10px 14px;"></div>
+
         </div>
       </div>
-
-      <!-- ======================= 3. FREIGHT DETAILS ======================== -->
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingFreight">
-          <button class="accordion-button" [class.collapsed]="!isSectionOpen('freight')" type="button"
-            (click)="toggleSection('freight')" [attr.aria-expanded]="isSectionOpen('freight')">
-            <i class="bi bi-truck me-2"></i>
-            Freight Details
-          </button>
-        </h2>
-        <div id="collapseFreight" class="accordion-collapse" [class.collapse]="!isSectionOpen('freight')"
-          [class.show]="isSectionOpen('freight')">
-          <div class="accordion-body">
-            @if (isSeaFreight()) {
-            <div class="freight-section">
-              <div class="freight-type-badge sea">
-                <i class="bi bi-water"></i> Sea Freight
-              </div>
-              <div class="detail-section">
-                <h6 class="section-subtitle">Bill of Lading References</h6>
-                <div class="row g-4">
-                  <div class="col-md-6">
-                    <div class="detail-item">
-                      <label class="detail-label">MBL Reference</label>
-                      <div class="detail-value">{{ job?.mbl || '-' }}</div>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="detail-item">
-                      <label class="detail-label">HBL Reference</label>
-                      <div class="detail-value">{{ job?.hbl || '-' }}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="detail-section">
-                <h6 class="section-subtitle">Vessel & Container Information</h6>
-                <div class="row g-4">
-                  <div class="col-md-6">
-                    <div class="detail-item">
-                      <label class="detail-label">Vessel</label>
-                      <div class="detail-value">{{ job?.vessel || '-' }}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            }
-
-            @if (isAirFreight()) {
-            <div class="freight-section">
-              <div class="freight-type-badge air">
-                <i class="bi bi-airplane"></i> Air Freight
-              </div>
-              <div class="detail-section">
-                <h6 class="section-subtitle">Air Waybill References</h6>
-                <div class="row g-4">
-                  <div class="col-md-6">
-                    <div class="detail-item">
-                      <label class="detail-label">MAWB Reference</label>
-                      <div class="detail-value">{{ job?.mawb || '-' }}</div>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="detail-item">
-                      <label class="detail-label">HAWB Reference</label>
-                      <div class="detail-value">{{ job?.hawb || '-' }}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="detail-section">
-                <h6 class="section-subtitle">Flight Information</h6>
-                <div class="row g-4">
-                  <div class="col-md-6">
-                    <div class="detail-item">
-                      <label class="detail-label">Flight No.</label>
-                      <div class="detail-value">{{ job?.flightNo || '-' }}</div>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="detail-item">
-                      <label class="detail-label">Chargeable Weight</label>
-                      <div class="detail-value">{{ job?.chargeableWeight || '-' }} kg</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            }
-
-            @if (!isSeaFreight() && !isAirFreight()) {
-            <div class="empty-freight">
-              <i class="bi bi-question-circle"></i>
-              <p>No freight type specified</p>
-            </div>
-            }
-          </div>
-        </div>
-      </div>
-
-      <!-- ======================= 4. ADDITIONAL DETAILS ======================== -->
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingAdditional">
-          <button class="accordion-button" [class.collapsed]="!isSectionOpen('additional')" type="button"
-            (click)="toggleSection('additional')" [attr.aria-expanded]="isSectionOpen('additional')">
-            <i class="bi bi-journal-text me-2"></i>
-            Additional Details
-          </button>
-        </h2>
-        <div id="collapseAdditional" class="accordion-collapse" [class.collapse]="!isSectionOpen('additional')"
-          [class.show]="isSectionOpen('additional')">
-          <div class="accordion-body">
-            <div class="detail-section">
-              <div class="row g-4">
-                <div class="col-md-6">
-                  <div class="detail-item">
-                    <label class="detail-label">
-                      <i class="bi bi-people"></i> Agent
-                    </label>
-                    <div class="detail-value">{{ job?.agent || '-' }}</div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="detail-item">
-                    <label class="detail-label">Booking No.</label>
-                    <div class="detail-value">{{ job?.bookingNo || '-' }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="detail-section">
-              <div class="detail-item">
-                <label class="detail-label">
-                  <i class="bi bi-chat-left-text"></i> Remarks
-                </label>
-                <div class="detail-value remarks-box">
-                  <div class="remarks-content">
-                    {{ job?.remarks || 'No remarks' }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ======================= 5. CHARGES & DISBURSEMENTS ======================== -->
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingCharges">
-          <button class="accordion-button" [class.collapsed]="!isSectionOpen('charges')" type="button"
-            (click)="toggleSection('charges')" [attr.aria-expanded]="isSectionOpen('charges')">
-            <i class="bi bi-cash-coin me-2"></i>
-            Charges | Expenses | Disbursements
-          </button>
-        </h2>
-        <div id="collapseCharges" class="accordion-collapse" [class.collapse]="!isSectionOpen('charges')"
-          [class.show]="isSectionOpen('charges')">
-          <div class="accordion-body p-0">
-            <app-job-charges [charges]="charges" [jobGuid]="jobGuid" [userRole]="userRole"
-              [jobStatus]="job?.jobStatusName || ''" [viewSummary]="true"></app-job-charges>
-          </div>
-        </div>
-      </div>
-
     </div>
+
+    <!-- ══════════════════════════════════════════
+         2. CARGO & ROUTING DETAILS
+    ══════════════════════════════════════════ -->
+    <div>
+      <span class="section-title"
+        style="margin: 0 0 12px; padding: 0; border: none; font-size: 11px; display: flex; align-items: center; gap: 6px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
+        </svg>
+        Cargo &amp; Routing Details
+      </span>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+
+        <!-- Shipment Information -->
+        <div>
+          <div
+            style="font-size: 10px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; padding-left: 2px;">
+            &#9632; Shipment Information
+          </div>
+          <div
+            style="display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+            <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Commodity</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ job?.commodity || '—' }}</div>
+            </div>
+            <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Carrier</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ job?.carrier || '—' }}</div>
+            </div>
+            <div style="padding: 10px 14px;">
+              <!-- intentionally empty -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Routing Information -->
+        <div>
+          <div
+            style="font-size: 10px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; padding-left: 2px;">
+            &#9632; Routing Information
+          </div>
+          <div
+            style="display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+            <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Origin</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ job?.origin || '—' }}</div>
+            </div>
+            <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Destination</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ job?.destination || '—' }}</div>
+            </div>
+            <div style="padding: 10px 14px;">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Port / CFS</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ job?.portCfs || '—' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Measurements -->
+        <div>
+          <div
+            style="font-size: 10px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; padding-left: 2px;">
+            &#9632; Measurements
+          </div>
+          <div
+            style="display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+            <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Gross Weight</div>
+              <div class="cell-primary" style="font-size: 12px;">
+                {{ job?.grossWeight || '—' }}<span *ngIf="job?.grossWeight"
+                  style="color: var(--ink-muted); font-size: 11px;"> kg</span>
+              </div>
+            </div>
+            <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Volume (CBM)</div>
+              <div class="cell-primary" style="font-size: 12px;">
+                {{ job?.volume || '—' }}<span *ngIf="job?.volume" style="color: var(--ink-muted); font-size: 11px;">
+                  m³</span>
+              </div>
+            </div>
+            <div style="padding: 10px 14px;">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">No. of Packages</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ job?.numberOfPackages || '—' }}</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         3. FREIGHT DETAILS
+    ══════════════════════════════════════════ -->
+    <div>
+      <span class="section-title"
+        style="margin: 0 0 12px; padding: 0; border: none; font-size: 11px; display: flex; align-items: center; gap: 6px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V8l-4-4H8z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 4v4h4M9 12h6M9 16h6" />
+        </svg>
+        Freight Details
+      </span>
+
+      @if (isSeaFreight()) {
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+
+        <!-- Badge -->
+        <div>
+          <span class="badge"
+            style="background: #dbeafe; color: #1d4ed8; font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 600;">
+            🚢 Sea Freight
+          </span>
+        </div>
+
+        <!-- Bill of Lading References -->
+        <div>
+          <div
+            style="font-size: 10px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; padding-left: 2px;">
+            &#9632; Bill of Lading References
+          </div>
+          <div
+            style="display: grid; grid-template-columns: repeat(2, 1fr); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+            <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">MBL Reference</div>
+              <div class="cell-mono" style="font-size: 12px; color: var(--accent);">{{ job?.mbl || '—' }}</div>
+            </div>
+            <div style="padding: 10px 14px;">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">HBL Reference</div>
+              <div class="cell-mono" style="font-size: 12px; color: var(--accent);">{{ job?.hbl || '—' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vessel & Container -->
+        <div>
+          <div
+            style="font-size: 10px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; padding-left: 2px;">
+            &#9632; Vessel &amp; Container Information
+          </div>
+          <div
+            style="display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+            <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Vessel</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ job?.vessel || '—' }}</div>
+            </div>
+            <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Container Type</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ job?.containerType || '—' }}</div>
+            </div>
+            <div style="padding: 10px 14px;">
+              <!-- spacer -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipper / Consignee -->
+        <div>
+          <div
+            style="font-size: 10px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; padding-left: 2px;">
+            &#9632; Parties
+          </div>
+          <div
+            style="display: grid; grid-template-columns: repeat(2, 1fr); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+            <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Shipper</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ job?.shipper || '—' }}</div>
+            </div>
+            <div style="padding: 10px 14px;">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Consignee</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ job?.consignee || '—' }}</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      }
+
+      @if (isAirFreight()) {
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+
+        <!-- Badge -->
+        <div>
+          <span class="badge"
+            style="background: #fee2e2; color: #b91c1c; font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 600;">
+            ✈️ Air Freight
+          </span>
+        </div>
+
+        <!-- Air Waybill References -->
+        <div>
+          <div
+            style="font-size: 10px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; padding-left: 2px;">
+            &#9632; Air Waybill References
+          </div>
+          <div
+            style="display: grid; grid-template-columns: repeat(2, 1fr); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+            <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">MAWB Reference</div>
+              <div class="cell-mono" style="font-size: 12px; color: var(--accent);">{{ job?.mawb || '—' }}</div>
+            </div>
+            <div style="padding: 10px 14px;">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">HAWB Reference</div>
+              <div class="cell-mono" style="font-size: 12px; color: var(--accent);">{{ job?.hawb || '—' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flight Information -->
+        <div>
+          <div
+            style="font-size: 10px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; padding-left: 2px;">
+            &#9632; Flight Information
+          </div>
+          <div
+            style="display: grid; grid-template-columns: repeat(2, 1fr); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+            <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Flight No.</div>
+              <div class="cell-mono" style="font-size: 12px;">{{ job?.flightNo || '—' }}</div>
+            </div>
+            <div style="padding: 10px 14px;">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Chargeable Weight</div>
+              <div class="cell-primary" style="font-size: 12px;">
+                {{ job?.chargeableWeight || '—' }}<span *ngIf="job?.chargeableWeight"
+                  style="color: var(--ink-muted); font-size: 11px;"> kg</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipper / Consignee -->
+        <div>
+          <div
+            style="font-size: 10px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; padding-left: 2px;">
+            &#9632; Parties
+          </div>
+          <div
+            style="display: grid; grid-template-columns: repeat(2, 1fr); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+            <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Shipper</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ job?.shipper || '—' }}</div>
+            </div>
+            <div style="padding: 10px 14px;">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Consignee</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ job?.consignee || '—' }}</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      }
+
+      @if (!isSeaFreight() && !isAirFreight()) {
+      <div class="empty-state" style="padding: 24px;">
+        <div class="empty-icon">◻</div>
+        <p>No freight type specified</p>
+      </div>
+      }
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         4. ADDITIONAL DETAILS
+    ══════════════════════════════════════════ -->
+    <div>
+      <span class="section-title"
+        style="margin: 0 0 12px; padding: 0; border: none; font-size: 11px; display: flex; align-items: center; gap: 6px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        Additional Details
+      </span>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div
+          style="display: grid; grid-template-columns: repeat(2, 1fr); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+          <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+            <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Agent</div>
+            <div class="cell-primary" style="font-size: 12px;">{{ job?.agentName || '—' }}</div>
+          </div>
+          <div style="padding: 10px 14px;">
+            <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Booking No.</div>
+            <div class="cell-mono" style="font-size: 12px; color: var(--accent);">{{ job?.bookingNo || '—' }}</div>
+          </div>
+        </div>
+
+        <!-- Remarks -->
+        <div style="border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+          <div style="padding: 8px 14px; background: var(--rule-light); border-bottom: 1px solid var(--rule);">
+            <span class="cell-sub" style="font-size: 10px;">Remarks</span>
+          </div>
+          <textarea readonly style="
+      display: block;
+      width: 100%;
+      min-height: 200px;
+      padding: 12px 14px;
+      font-size: 12px;
+      font-family: inherit;
+      color: var(--ink-soft);
+      line-height: 1.6;
+      border: none;
+      border-left: 3px solid #fbbf24;
+      background: #fffbeb;
+      resize: vertical;
+      outline: none;
+      box-sizing: border-box;
+      white-space: pre-wrap;
+      word-break: break-word;
+    ">{{ job?.remarks || 'No remarks.' }}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         5. CHARGES & DISBURSEMENTS
+    ══════════════════════════════════════════ -->
+    <div>
+      <span class="section-title"
+        style="margin: 0 0 12px; padding: 0; border: none; font-size: 11px; display: flex; align-items: center; gap: 6px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Charges | Expenses | Disbursements
+        <span class="ref-chip" style="font-size: 10px;">{{ charges?.length || 0 }}</span>
+      </span>
+
+      <div style="border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+        <app-job-charges [charges]="charges" [jobGuid]="jobGuid" [userRole]="userRole"
+          [jobStatus]="job?.jobStatusName || ''" [viewSummary]="true">
+        </app-job-charges>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<!-- Active Transactions Warning Modal -->
-@if (showActiveTransactionsModal) {
-<div class="modal-backdrop" (click)="closeActiveTransactionsModal()"></div>
-}
+
+<!-- ── Active Transactions Warning Modal ── -->
+@if (showActiveTransactionsModal) { <div class="modal-backdrop" (click)="closeActiveTransactionsModal()"></div> }
 <div class="modal custom-modal" [class.show]="showActiveTransactionsModal" [class.d-block]="showActiveTransactionsModal"
   tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
-      <div class="modal-header bg-warning text-dark">
-        <h5 class="modal-title">
-          <i class="cil-warning me-2"></i> Cannot Close Job
+      <div class="modal-header" style="background: #92520a; color: #fff;">
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px;">Cannot Close Job
         </h5>
-        <button type="button" class="btn-close" (click)="closeActiveTransactionsModal()"
+        <button type="button" class="btn-close btn-close-white" (click)="closeActiveTransactionsModal()"
           aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <div class="alert alert-warning" role="alert">
-          <i class="cil-ban me-2"></i>
-          This job has active transactions and cannot be closed
+      <div class="modal-body" style="padding: 24px;">
+        <div class="confirm-notice" style="background: #fef3e2; color: #92520a; margin-bottom: 16px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          This job has active transactions and cannot be closed.
         </div>
-        <p class="mb-2">
-          The job <strong>{{ selectedJob?.jobCode }}</strong> cannot be closed at this time.
-        </p>
-        <p class="text-muted small mb-0">
-          <i class="cil-info me-1"></i> Please complete or cancel all ongoing charge transactions before closing this job.
+        <div class="summary-card">
+          <div class="summary-row">
+            <span class="summary-key">Job Code</span>
+            <span class="summary-val cell-mono" style="color: var(--accent);">{{ selectedJob?.jobCode }}</span>
+          </div>
+        </div>
+        <p style="font-size: 12px; color: var(--ink-muted); margin: 12px 0 0; text-align: center;">
+          Please complete or cancel all ongoing charge transactions before closing this job.
         </p>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" (click)="closeActiveTransactionsModal()">
-          <i class="cil-check me-2"></i> Understood
-        </button>
+      <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 14px 24px;">
+        <button type="button" class="btn btn-primary" (click)="closeActiveTransactionsModal()">Understood</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Close Job Confirmation Modal -->
-@if (showCloseConfirmModal) {
-<div class="modal-backdrop" (click)="closeClosingConfirmation()"></div>
-}
+
+<!-- ── Close Job Confirmation Modal ── -->
+@if (showCloseConfirmModal) { <div class="modal-backdrop" (click)="closeClosingConfirmation()"></div> }
 <div class="modal custom-modal" [class.show]="showCloseConfirmModal" [class.d-block]="showCloseConfirmModal"
   tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title">
-          <i class="cil-lock-locked me-2"></i> Close Job
-        </h5>
+      <div class="modal-header" style="background: var(--red, #dc2626); color: #fff;">
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px;">Close Job</h5>
         <button type="button" class="btn-close btn-close-white" (click)="closeClosingConfirmation()"
           aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <div class="alert alert-danger" role="alert">
-          <i class="cil-warning me-2"></i>
-          Please confirm you want to close this job
+      <div class="modal-body" style="padding: 24px;">
+        <div class="confirm-notice" style="background: #fdecea; color: var(--red, #dc2626); margin-bottom: 16px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          This action will permanently close the job.
         </div>
-        <p class="mb-2">
-          Are you sure you want to close the job <strong>{{ selectedJob?.jobCode }}</strong>?
-        </p>
-        <p class="text-muted small mb-0">
-          <i class="cil-info me-1"></i> This action will mark the job as closed.
+        <div class="summary-card" style="margin-bottom: 16px;">
+          <div class="summary-row">
+            <span class="summary-key">Job Code</span>
+            <span class="summary-val cell-mono" style="color: var(--accent);">{{ selectedJob?.jobCode }}</span>
+          </div>
+        </div>
+        <p style="text-align: center; font-size: 13px; color: var(--ink-soft); margin: 0;">
+          Are you sure you want to close this job? This action cannot be undone.
         </p>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeClosingConfirmation()">
-          <i class="cil-x me-2"></i> Cancel
-        </button>
-        <button type="button" class="btn btn-danger" (click)="confirmCloseJob()" [disabled]="isSubmitting">
-          @if (!isSubmitting) {
-          <span>
-            <i class="cil-lock-locked me-2"></i> Close Job
-          </span>
-          }
-          @if (isSubmitting) {
-          <span>
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            Closing...
-          </span>
-          }
+      <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 14px 24px; gap: 10px;">
+        <button type="button" class="btn btn-ghost" (click)="closeClosingConfirmation()">Cancel</button>
+        <button type="button" class="btn btn-primary" style="background: var(--red, #dc2626);"
+          (click)="confirmCloseJob()" [disabled]="isSubmitting">
+          @if (!isSubmitting) { Close Job }
+          @else { <span class="spinner-border spinner-border-sm me-2"></span> Closing... }
         </button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Replicate Job Confirmation Modal -->
-@if (showReplicateConfirmModal) {
-<div class="modal-backdrop" (click)="closeReplicateConfirm()"></div>
-}
+
+<!-- ── Replicate Job Confirmation Modal ── -->
+@if (showReplicateConfirmModal) { <div class="modal-backdrop" (click)="closeReplicateConfirm()"></div> }
 <div class="modal custom-modal" [class.show]="showReplicateConfirmModal" [class.d-block]="showReplicateConfirmModal"
   tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">
-          <i class="cil-copy me-2"></i> Replicate Job
-        </h5>
+      <div class="modal-header" style="background: #1a3a6b;">
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px; color:#fff;">
+          Replicate Job</h5>
         <button type="button" class="btn-close btn-close-white" (click)="closeReplicateConfirm()"
           aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <div class="alert alert-primary" role="alert">
-          <i class="cil-info me-2"></i>
-          Please confirm you want to replicate this job
+      <div class="modal-body" style="padding: 24px;">
+        <div class="confirm-notice" style="margin-bottom: 16px;">
+          A new job will be created with the same details as this one.
         </div>
-        <p class="mb-2">
-          Are you sure you want to replicate the job <strong>{{ selectedJob?.jobCode }}</strong>?
-        </p>
-        <p class="text-muted small mb-0">
-          <i class="cil-info me-1"></i> This will create a new job with the same details.
+        <div class="summary-card" style="margin-bottom: 16px;">
+          <div class="summary-row">
+            <span class="summary-key">Job Code</span>
+            <span class="summary-val cell-mono" style="color: var(--accent);">{{ selectedJob?.jobCode }}</span>
+          </div>
+        </div>
+        <p style="text-align: center; font-size: 13px; color: var(--ink-soft); margin: 0;">
+          Are you sure you want to replicate this job?
         </p>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeReplicateConfirm()">
-          <i class="cil-x me-2"></i> Cancel
-        </button>
+      <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 14px 24px; gap: 10px;">
+        <button type="button" class="btn btn-ghost" (click)="closeReplicateConfirm()">Cancel</button>
         <button type="button" class="btn btn-primary" (click)="confirmReplicateJob()" [disabled]="isSubmitting">
-          @if (!isSubmitting) {
-          <span>
-            <i class="cil-copy me-2"></i> Replicate Job
-          </span>
-          }
-          @if (isSubmitting) {
-          <span>
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            Replicating...
-          </span>
-          }
+          @if (!isSubmitting) { Replicate Job }
+          @else { <span class="spinner-border spinner-border-sm me-2"></span> Replicating... }
         </button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Approve Confirmation Modal -->
-@if (showApproveConfirmModal) {
-<div class="modal-backdrop" (click)="closeApproveConfirm()"></div>
-}
+
+<!-- ── Approve Confirmation Modal ── -->
+@if (showApproveConfirmModal) { <div class="modal-backdrop" (click)="closeApproveConfirm()"></div> }
 <div class="modal custom-modal" [class.show]="showApproveConfirmModal" [class.d-block]="showApproveConfirmModal"
   tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
-      <div class="modal-header bg-success text-white">
-        <h5 class="modal-title">
-          <i class="cil-check-circle me-2"></i> Approve Charge
-        </h5>
+      <div class="modal-header" style="background: #15803d; color: #fff;">
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px;">Approve Job</h5>
         <button type="button" class="btn-close btn-close-white" (click)="closeApproveConfirm()"
           aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <div class="alert alert-success" role="alert">
-          <i class="cil-info me-2"></i>
-          Please confirm your approval
+      <div class="modal-body" style="padding: 24px;">
+        <div class="confirm-notice" style="background: #dcfce7; color: #15803d; margin-bottom: 16px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          This job will be marked as approved.
         </div>
-        <p class="mb-2">
-          Are you sure you want to approve the job <strong>{{ selectedJob?.jobCode }}</strong>?
+        <div class="summary-card" style="margin-bottom: 16px;">
+          <div class="summary-row">
+            <span class="summary-key">Job Code</span>
+            <span class="summary-val cell-mono" style="color: var(--accent);">{{ selectedJob?.jobCode }}</span>
+          </div>
+        </div>
+        <p style="text-align: center; font-size: 13px; color: var(--ink-soft); margin: 0;">
+          Are you sure you want to approve this job?
         </p>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeApproveConfirm()">
-          <i class="cil-x me-2"></i> Cancel
-        </button>
-        <button type="button" class="btn btn-success" (click)="confirmApprove()" [disabled]="isSubmitting">
-          @if (!isSubmitting) {
-          <span>
-            <i class="cil-check-circle me-2"></i> Approve Job
-          </span>
-          }
-          @if (isSubmitting) {
-          <span>
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            Approving...
-          </span>
-          }
+      <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 14px 24px; gap: 10px;">
+        <button type="button" class="btn btn-ghost" (click)="closeApproveConfirm()">Cancel</button>
+        <button type="button" class="btn btn-primary" style="background: #15803d;" (click)="confirmApprove()"
+          [disabled]="isSubmitting">
+          @if (!isSubmitting) { Approve Job }
+          @else { <span class="spinner-border spinner-border-sm me-2"></span> Approving... }
         </button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Disapprove Confirmation Modal -->
-@if (showDisapproveConfirmModal) {
-<div class="modal-backdrop" (click)="closeDisapproveConfirm()"></div>
-}
+
+<!-- ── Disapprove Confirmation Modal ── -->
+@if (showDisapproveConfirmModal) { <div class="modal-backdrop" (click)="closeDisapproveConfirm()"></div> }
 <div class="modal custom-modal" [class.show]="showDisapproveConfirmModal" [class.d-block]="showDisapproveConfirmModal"
   tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title">
-          <i class="cil-x-circle me-2"></i> Disapprove Job
+      <div class="modal-header" style="background: var(--red, #dc2626); color: #fff;">
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px;">Disapprove Job
         </h5>
         <button type="button" class="btn-close btn-close-white" (click)="closeDisapproveConfirm()"
           aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <div class="alert alert-danger" role="alert">
-          <i class="cil-warning me-2"></i>
-          Please confirm your disapproval
+      <div class="modal-body" style="padding: 24px;">
+        <div class="confirm-notice" style="background: #fdecea; color: var(--red, #dc2626); margin-bottom: 16px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="m15 9-6 6M9 9l6 6" />
+          </svg>
+          This job will be marked as disapproved.
         </div>
-        <p class="mb-2">
-          Are you sure you want to disapprove the job <strong>{{ selectedJob?.jobCode }}</strong>?
+        <div class="summary-card" style="margin-bottom: 16px;">
+          <div class="summary-row">
+            <span class="summary-key">Job Code</span>
+            <span class="summary-val cell-mono" style="color: var(--accent);">{{ selectedJob?.jobCode }}</span>
+          </div>
+        </div>
+        <p style="text-align: center; font-size: 13px; color: var(--ink-soft); margin: 0;">
+          Are you sure you want to disapprove this job?
         </p>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeDisapproveConfirm()">
-          <i class="cil-x me-2"></i> Cancel
-        </button>
-        <button type="button" class="btn btn-danger" (click)="confirmDisapprove()" [disabled]="isSubmitting">
-          @if (!isSubmitting) {
-          <span>
-            <i class="cil-x-circle me-2"></i> Disapprove Job
-          </span>
-          }
-          @if (isSubmitting) {
-          <span>
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            Disapproving...
-          </span>
-          }
+      <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 14px 24px; gap: 10px;">
+        <button type="button" class="btn btn-ghost" (click)="closeDisapproveConfirm()">Cancel</button>
+        <button type="button" class="btn btn-primary" style="background: var(--red, #dc2626);"
+          (click)="confirmDisapprove()" [disabled]="isSubmitting">
+          @if (!isSubmitting) { Disapprove Job }
+          @else { <span class="spinner-border spinner-border-sm me-2"></span> Disapproving... }
         </button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Toast Notifications -->
+
+<!-- ── Toast Notifications ── -->
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
-  <!-- Success Toast -->
-  <div class="toast align-items-center border-0" [class.show]="showSuccessToast" role="alert" aria-live="assertive"
-    aria-atomic="true">
+  <div class="toast align-items-center border-0" [class.show]="showSuccessToast" role="alert">
     <div class="d-flex">
-      <div class="toast-body bg-success text-white rounded">
-        <div class="d-flex align-items-center">
-          <i class="bi bi-check-circle me-2" style="font-size: 1.5rem;"></i>
-          <div>
-            <strong class="d-block">Success!</strong>
-            <span>{{ successMessage }}</span>
-          </div>
-        </div>
+      <div class="toast-body rounded"
+        style="background: var(--green-light); color: var(--green); display:flex; align-items:center; gap:10px; font-size:13px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+        <div><strong style="display:block;">Success!</strong>{{ successMessage }}</div>
       </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showSuccessToast = false"
+      <button type="button" class="btn-close me-2 m-auto" (click)="showSuccessToast = false"
         aria-label="Close"></button>
     </div>
   </div>
-
-  <!-- Error Toast -->
-  <div class="toast align-items-center border-0" [class.show]="showErrorToast" role="alert" aria-live="assertive"
-    aria-atomic="true">
+  <div class="toast align-items-center border-0" [class.show]="showErrorToast" role="alert">
     <div class="d-flex">
-      <div class="toast-body bg-danger text-white rounded">
-        <div class="d-flex align-items-center">
-          <i class="bi bi-x-circle me-2" style="font-size: 1.5rem;"></i>
-          <div>
-            <strong class="d-block">Error</strong>
-            <span>{{ errorMessage }}</span>
-          </div>
-        </div>
+      <div class="toast-body rounded"
+        style="background: #fdecea; color: var(--red); display:flex; align-items:center; gap:10px; font-size:13px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <path d="m15 9-6 6M9 9l6 6" />
+        </svg>
+        <div><strong style="display:block;">Error</strong>{{ errorMessage }}</div>
       </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="showErrorToast = false"
-        aria-label="Close"></button>
+      <button type="button" class="btn-close me-2 m-auto" (click)="showErrorToast = false" aria-label="Close"></button>
     </div>
   </div>
 </div>

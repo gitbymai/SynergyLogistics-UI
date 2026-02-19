@@ -185,153 +185,191 @@
 
 
 <!-- ── Add / Edit Modal ── -->
+<!-- ── Add / Edit Modal ── -->
 @if (showModal) {
-<div class="modal-backdrop" (click)="closeModal()"></div>
+  <div class="modal-backdrop" (click)="closeModal()"></div>
 }
 <div class="modal custom-modal" [class.show]="showModal" [class.d-block]="showModal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
-      <div class="modal-header" style="background: #1a3a6b; color: #fff;">
-        <h5 class="modal-title" style="font-family: 'Sora', sans-serif; font-weight: 600; font-size: 16px;">
-          @if (isEditMode) { Edit Charge } @else { Add New Charge }
-        </h5>
+
+      <!-- Header -->
+      <div class="modal-header" style="background: #1a3a6b;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <h5 class="modal-title" style="font-family: 'Sora', sans-serif; font-weight: 600; font-size: 15px; color: #fff; margin: 0;">
+            @if (isEditMode) { Edit Charge } @else { Add New Charge }
+          </h5>
+          @if (isEditMode) {
+            <span class="ref-chip" style="font-size: 10px; background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.2);">
+              Edit Mode
+            </span>
+          }
+        </div>
         <button type="button" class="btn-close btn-close-white" (click)="closeModal()" aria-label="Close"></button>
       </div>
 
-      <div class="modal-body" style="padding: 28px;">
+      <!-- Body -->
+      <div class="modal-body" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
         <form [formGroup]="chargeFormGroup">
-          <div class="row">
 
-            <!-- LEFT: Category & Description -->
-            <div class="col-md-6">
-              <div class="mb-3">
-                <div class="position-relative category-dropdown">
-                  <label class="filter-label" style="margin-bottom: 6px; display: block;">
-                    Category <span style="color: var(--red);">*</span>
-                  </label>
-                  <input type="text" class="filter-input" style="width: 100%;" placeholder="Search or select category"
-                    [value]="categorySearch" (input)="onCategorySearchChange($any($event.target).value)"
-                    (focus)="categoryDropdownOpen = true" [disabled]="isEditMode"
-                    [style.opacity]="isEditMode ? '0.5' : '1'" [style.cursor]="isEditMode ? 'not-allowed' : 'text'" />
-                  @if (categoryDropdownOpen && filteredCategories.length > 0 && !isEditMode) {
+          <!-- ── Section: Charge Info ── -->
+          <div style="border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+            <div style="padding: 8px 14px; background: var(--rule-light); border-bottom: 1px solid var(--rule);">
+              <span class="cell-sub" style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Charge Info</span>
+            </div>
+            <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 12px;">
+
+              <!-- Category -->
+              <div class="position-relative category-dropdown">
+                <label class="filter-label" style="margin-bottom: 6px; display: block;">
+                  Category <span style="color: var(--red);">*</span>
+                </label>
+                <input type="text" class="filter-input" style="width: 100%;"
+                  placeholder="Search or select category"
+                  [value]="categorySearch"
+                  (input)="onCategorySearchChange($any($event.target).value)"
+                  (focus)="categoryDropdownOpen = true"
+                  [disabled]="isEditMode"
+                  [style.opacity]="isEditMode ? '0.5' : '1'"
+                  [style.cursor]="isEditMode ? 'not-allowed' : 'text'" />
+                @if (categoryDropdownOpen && filteredCategories.length > 0 && !isEditMode) {
                   <ul class="dropdown-list">
                     @for (category of filteredCategories; track category.chargeSubCategoryId) {
-                    <li class="dropdown-item-custom" (click)="selectCategory(category)">
-                      {{ category.chargeSubCategoryName }}
-                    </li>
+                      <li class="dropdown-item-custom" (click)="selectCategory(category)">
+                        {{ category.chargeSubCategoryName }}
+                      </li>
                     }
                   </ul>
-                  }
-                  @if (categoryDropdownOpen && filteredCategories.length === 0 && categorySearch && !isEditMode) {
+                }
+                @if (categoryDropdownOpen && filteredCategories.length === 0 && categorySearch && !isEditMode) {
                   <ul class="dropdown-list">
                     <li class="dropdown-item-custom" style="color: var(--ink-muted);">No categories found</li>
                   </ul>
-                  }
-                  <input type="hidden" formControlName="chargeSubCategoryId" />
-                  @if (chargeFormGroup.get('chargeSubCategoryId')?.invalid &&
-                  chargeFormGroup.get('chargeSubCategoryId')?.touched) {
+                }
+                <input type="hidden" formControlName="chargeSubCategoryId" />
+                @if (chargeFormGroup.get('chargeSubCategoryId')?.invalid && chargeFormGroup.get('chargeSubCategoryId')?.touched) {
                   <div style="font-size: 11px; color: var(--red); margin-top: 4px;">Category is required</div>
+                }
+              </div>
+
+              <!-- Description -->
+              <div>
+                <label class="filter-label" style="margin-bottom: 6px; display: block;">Description</label>
+                <textarea class="filter-input"
+                  style="width: 100%; resize: vertical; min-height: 80px; box-sizing: border-box;"
+                  rows="3"
+                  formControlName="description"
+                  placeholder="Enter charge description..."
+                  [style.opacity]="isEditMode ? '0.5' : '1'"
+                  [style.pointer-events]="isEditMode ? 'none' : 'auto'"></textarea>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ── Section: Financial Details ── -->
+          <div style="border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+            <div style="padding: 8px 14px; background: var(--rule-light); border-bottom: 1px solid var(--rule);">
+              <span class="cell-sub" style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Financial Details</span>
+            </div>
+            <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 12px;">
+
+              <!-- Currency + Rate -->
+              <div style="display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start;">
+                <div>
+                  <label class="filter-label" style="margin-bottom: 6px; display: block;">
+                    Currency <span style="color: var(--red);">*</span>
+                  </label>
+                  <select class="filter-input" style="width: 100%;"
+                    formControlName="currency"
+                    [style.opacity]="isEditMode ? '0.5' : '1'"
+                    [style.pointer-events]="isEditMode ? 'none' : 'auto'">
+                    <option value="">Select currency...</option>
+                    <option value="PHP">PHP — Philippine Peso</option>
+                    <option value="USD">USD — US Dollar</option>
+                    <option value="SGD">SGD — Singapore Dollar</option>
+                    <option value="GBP">GBP — British Pound</option>
+                    <option value="EUR">EUR — Euro</option>
+                  </select>
+                  @if (chargeFormGroup.get('currency')?.invalid && chargeFormGroup.get('currency')?.touched) {
+                    <div style="font-size: 11px; color: var(--red); margin-top: 4px;">Currency is required</div>
+                  }
+                </div>
+                <div style="width: 120px;">
+                  <label class="filter-label" style="margin-bottom: 6px; display: block;">Rate to PHP</label>
+                  <input type="number" class="filter-input" style="width: 100%; min-width: 0;"
+                    formControlName="conversionRate" step="0.0001" placeholder="56.50" />
+                  @if (chargeFormGroup.get('currency')?.value === 'PHP') {
+                    <div style="font-size: 11px; color: var(--ink-muted); margin-top: 4px;">Default rate</div>
                   }
                 </div>
               </div>
 
-              <div class="mb-3">
-                <label class="filter-label" style="margin-bottom: 6px; display: block;">Description</label>
-                <textarea class="filter-input" style="width: 100%; resize: vertical; min-height: 160px;" rows="8"
-                  formControlName="description" placeholder="Enter charge description..."
-                  [style.opacity]="isEditMode ? '0.5' : '1'"
-                  [style.pointer-events]="isEditMode ? 'none' : 'auto'"></textarea>
-              </div>
-            </div>
-
-            <!-- RIGHT: Financial -->
-            <div class="col-md-6">
-              <!-- Currency + Rate row — flex instead of Bootstrap grid -->
-<!-- Currency + Rate row -->
-<div style="display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; overflow: hidden;">
-  <div style="flex: 2; min-width: 0;">
-    <label class="filter-label" style="margin-bottom: 6px; display: block;">
-      Currency <span style="color: var(--red);">*</span>
-    </label>
-    <select class="filter-input" style="width: 100%; min-width: 0;" formControlName="currency"
-      [style.opacity]="isEditMode ? '0.5' : '1'" [style.pointer-events]="isEditMode ? 'none' : 'auto'">
-      <option value="">Select currency...</option>
-      <option value="PHP">PHP - Philippine Peso</option>
-      <option value="USD">USD - US Dollar</option>
-      <option value="SGD">SGD - Singapore Dollar</option>
-      <option value="GBP">GBP - British Pound</option>
-      <option value="EUR">EUR - Euro</option>
-    </select>
-    @if (chargeFormGroup.get('currency')?.invalid && chargeFormGroup.get('currency')?.touched) {
-      <div style="font-size: 11px; color: var(--red); margin-top: 4px;">Currency is required</div>
-    }
-  </div>
-  <div style="flex: 1; min-width: 0; max-width: 120px;">
-    <label class="filter-label" style="margin-bottom: 6px; display: block;">Rate to PHP</label>
-    <input type="number" class="filter-input" style="width: 100%; min-width: 0;"
-      formControlName="conversionRate" step="0.0001" placeholder="56.50" />
-    @if (chargeFormGroup.get('currency')?.value === 'PHP') {
-      <div style="font-size: 11px; color: var(--ink-muted); margin-top: 4px;">Default rate</div>
-    }
-  </div>
-</div>
-              <div class="mb-3">
-                <label class="filter-label" style="margin-bottom: 6px; display: block;">
-                  Charge Amount <span style="color: var(--red);">*</span>
-                </label>
-                <input type="number" class="filter-input" style="width: 100%;" formControlName="amount" step="0.01"
-                  placeholder="0.00" />
-                @if (chargeFormGroup.get('amount')?.invalid && chargeFormGroup.get('amount')?.touched) {
-                <div style="font-size: 11px; color: var(--red); margin-top: 4px;">Valid charge amount is required</div>
-                }
+              <!-- Charge Amount + Selling Amount (side by side) -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                  <label class="filter-label" style="margin-bottom: 6px; display: block;">
+                    Charge Amount <span style="color: var(--red);">*</span>
+                  </label>
+                  <input type="number" class="filter-input" style="width: 100%;"
+                    formControlName="amount" step="0.01" placeholder="0.00" />
+                  @if (chargeFormGroup.get('amount')?.invalid && chargeFormGroup.get('amount')?.touched) {
+                    <div style="font-size: 11px; color: var(--red); margin-top: 4px;">Valid charge amount is required</div>
+                  }
+                </div>
+                <div>
+                  <label class="filter-label" style="margin-bottom: 6px; display: block;">
+                    Selling Amount <span style="color: var(--red);">*</span>
+                  </label>
+                  <input type="number" class="filter-input" style="width: 100%;"
+                    formControlName="amountSelling" step="0.01" placeholder="0.00" />
+                  @if (chargeFormGroup.get('amountSelling')?.invalid && chargeFormGroup.get('amountSelling')?.touched) {
+                    <div style="font-size: 11px; color: var(--red); margin-top: 4px;">Valid selling amount is required</div>
+                  }
+                </div>
               </div>
 
-              <div class="mb-3">
-                <label class="filter-label" style="margin-bottom: 6px; display: block;">
-                  Amount Selling <span style="color: var(--red);">*</span>
-                </label>
-                <input type="number" class="filter-input" style="width: 100%;" formControlName="amountSelling"
-                  step="0.01" placeholder="0.00" />
-                @if (chargeFormGroup.get('amountSelling')?.invalid && chargeFormGroup.get('amountSelling')?.touched) {
-                <div style="font-size: 11px; color: var(--red); margin-top: 4px;">Valid selling amount is required</div>
-                }
-              </div>
-
-              <!-- Is For Processing -->
-              <div
-                style="background: var(--accent-light); border: 1px solid var(--rule); border-radius: 8px; padding: 16px; margin-top: 8px;">
-                <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer;"
-                  [style.cursor]="isEditMode ? 'not-allowed' : 'pointer'">
-                  <input type="checkbox" formControlName="isForProcessing" id="isForProcessingCheck"
-                    style="width: 16px; height: 16px; margin-top: 2px; accent-color: var(--accent);"
-                    [style.cursor]="isEditMode ? 'not-allowed' : 'pointer'" />
-                  <div>
-                    <div
-                      style="font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--ink);">
-                      Is for processing
-                    </div>
-                    <div style="font-size: 11.5px; color: var(--ink-muted); margin-top: 3px;">
-                      Check this to make this charge available for processors to process.
-                    </div>
-                  </div>
-                </label>
-              </div>
             </div>
           </div>
+
+          <!-- ── Section: Processing Flag ── -->
+          <div style="border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;"
+            [style.opacity]="isEditMode ? '0.5' : '1'"
+            [style.pointer-events]="isEditMode ? 'none' : 'auto'">
+            <label style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; cursor: pointer; margin: 0;">
+              <input type="checkbox" formControlName="isForProcessing"
+                style="width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0;" />
+              <div>
+                <div style="font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--ink);">
+                  Is for processing
+                </div>
+                <div style="font-size: 11.5px; color: var(--ink-muted); margin-top: 2px; line-height: 1.4;">
+                  Makes this charge available for processors to pick up and process.
+                </div>
+              </div>
+            </label>
+          </div>
+
         </form>
       </div>
 
-      <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 16px 24px; gap: 10px;">
+      <!-- Footer -->
+      <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 14px 20px; gap: 10px;">
         <button type="button" class="btn btn-ghost" (click)="closeModal()">Cancel</button>
         <button type="button" class="btn btn-primary" (click)="onSubmit()"
           [disabled]="!chargeFormGroup.valid || isSubmitting">
-          @if (!isSubmitting) { {{ isEditMode ? 'Update Charge' : 'Create Charge' }} }
-          @else {
-          <span class="spinner-border spinner-border-sm me-2"></span>
-          Submitting...
+          @if (!isSubmitting) {
+            {{ isEditMode ? 'Update Charge' : 'Create Charge' }}
+          } @else {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Submitting...
           }
         </button>
       </div>
+
     </div>
   </div>
 </div>
@@ -640,8 +678,7 @@
                 <div class="summary-row">
                   <span class="summary-key">Is Active</span>
                   <span class="summary-val">
-                    <span class="status-chip" [class.bg-success]="selectedCharge?.isActive"
-                      [class.bg-secondary]="!selectedCharge?.isActive">
+                    <span class="status-chip" >
                       {{ selectedCharge?.isActive ? 'Yes' : 'No' }}
                     </span>
                   </span>
@@ -649,8 +686,7 @@
                 <div class="summary-row">
                   <span class="summary-key">For Processing</span>
                   <span class="summary-val">
-                    <span class="status-chip" [class.bg-success]="selectedCharge?.isForProcessing"
-                      [class.bg-secondary]="!selectedCharge?.isForProcessing">
+                    <span class="status-chip" >
                       {{ selectedCharge?.isForProcessing ? 'Yes' : 'No' }}
                     </span>
                   </span>
@@ -658,8 +694,7 @@
                 <div class="summary-row">
                   <span class="summary-key">For Disbursement</span>
                   <span class="summary-val">
-                    <span class="status-chip" [class.bg-success]="selectedCharge?.isForDisbursement"
-                      [class.bg-secondary]="!selectedCharge?.isForDisbursement">
+                    <span class="status-chip" >
                       {{ selectedCharge?.isForDisbursement ? 'Yes' : 'No' }}
                     </span>
                   </span>

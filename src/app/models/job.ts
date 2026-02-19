@@ -30,6 +30,7 @@ export interface CreateJobRequest {
   consignee?: string | null;
   agent?: string | null;
   remarks?: string | null;
+  agentName?: string | null;
 }
 
 export interface Job extends CreateJobRequest {

@@ -1,120 +1,165 @@
-<div class="card my-4 shadow-sm">
-    <div class="card-header bg-primary text-white">
-        <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-3">
-                <h4 class="mb-0">
-                    <i class="bi bi-briefcase me-2"></i> Job Details
-                </h4>
-                <span class="badge badge-code">{{ job?.jobCode }}</span>
+<div class="table-card" style="margin-bottom: 24px;">
+
+  <!-- Header -->
+  <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--rule); background: var(--rule-light);">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span class="section-title" style="margin: 0; padding: 0; border: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z"/>
+        </svg>
+        Job Details
+      </span>
+      <span class="ref-chip" style="font-size: 10px; font-family: 'DM Mono', monospace;">{{ job?.jobCode }}</span>
+    </div>
+    <button routerLink="/jobs/financials" class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      Back to List
+    </button>
+  </div>
+
+  <div style="padding: 20px; display: flex; flex-direction: column; gap: 20px;">
+
+    <!-- ══════════════════════════════════════════
+         CLIENT INFORMATION + REMARKS  (2-col)
+    ══════════════════════════════════════════ -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+
+      <!-- Client Information -->
+      <div>
+        <span class="section-title" style="margin: 0 0 10px; padding: 0; border: none; font-size: 11px; display: flex; align-items: center; gap: 6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          Client Information
+        </span>
+
+        <div style="border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+
+          <!-- Customer — full width highlight row -->
+          <div style="padding: 10px 14px; background: var(--rule-light); border-bottom: 1px solid var(--rule);">
+            <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Client</div>
+            <div class="cell-primary" style="font-size: 13px; font-weight: 600;">{{ job?.customerName || '—' }}</div>
+          </div>
+
+          <!-- 2-col grid fields -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr;">
+
+            <div style="padding: 10px 14px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Status</div>
+              <span class="status-chip" [ngClass]="getStatusBadgeClass(job?.jobStatusName || '')">
+                {{ job?.jobStatusName || 'Pending' }}
+              </span>
             </div>
-            <div class="d-flex gap-2">
-                <button routerLink="/jobs/financials" class="btn btn-light-custom btn-sm">
-                    <i class="bi bi-arrow-left me-1"></i>
-                    <span>Back to List</span>
-                </button>
+
+            <div style="padding: 10px 14px; border-bottom: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Transaction Type</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ job?.transactionTypeName || '—' }}</div>
             </div>
+
+            <div style="padding: 10px 14px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Incoterms</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ job?.incotermsName || '—' }}</div>
+            </div>
+
+            <div style="padding: 10px 14px; border-bottom: 1px solid var(--rule);">
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">Created Date</div>
+              <div class="cell-mono" style="font-size: 12px;">{{ job?.createdDate | date:'MM/dd/yy' }}</div>
+              <div class="cell-mono" style="font-size: 11px; color: var(--ink-muted);">{{ job?.createdDate | date:'h:mm a' }}</div>
+            </div>
+
+            <!-- Sea Freight refs -->
+            @if (job?.hbl !== null || job?.mbl !== null) {
+              <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+                <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">HBL</div>
+                <div class="cell-mono" style="font-size: 12px; color: var(--accent);">{{ job?.hbl || '—' }}</div>
+              </div>
+              <div style="padding: 10px 14px;">
+                <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">MBL</div>
+                <div class="cell-mono" style="font-size: 12px; color: var(--accent);">{{ job?.mbl || '—' }}</div>
+              </div>
+            }
+
+            <!-- Air Freight refs -->
+            @if (job?.hawb !== null || job?.mawb !== null) {
+              <div style="padding: 10px 14px; border-right: 1px solid var(--rule);">
+                <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">HAWB</div>
+                <div class="cell-mono" style="font-size: 12px; color: var(--accent);">{{ job?.hawb || '—' }}</div>
+              </div>
+              <div style="padding: 10px 14px;">
+                <div class="cell-sub" style="font-size: 10px; margin-bottom: 3px;">MAWB</div>
+                <div class="cell-mono" style="font-size: 12px; color: var(--accent);">{{ job?.mawb || '—' }}</div>
+              </div>
+            }
+
+          </div>
         </div>
+      </div>
+
+      <!-- Remarks -->
+      <div>
+        <span class="section-title" style="margin: 0 0 10px; padding: 0; border: none; font-size: 11px; display: flex; align-items: center; gap: 6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+          </svg>
+          Remarks
+        </span>
+
+        <div style="border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; height: calc(100% - 30px);">
+          <div style="padding: 8px 14px; background: var(--rule-light); border-bottom: 1px solid var(--rule);">
+            <span class="cell-sub" style="font-size: 10px;">Job Remarks</span>
+          </div>
+          <textarea
+            readonly
+            style="
+              display: block;
+              width: 100%;
+              height: calc(100% - 37px);
+              min-height: 120px;
+              padding: 12px 14px;
+              font-size: 12px;
+              font-family: inherit;
+              color: var(--ink-soft);
+              line-height: 1.6;
+              border: none;
+              border-left: 3px solid #fbbf24;
+              background: #fffbeb;
+              resize: vertical;
+              outline: none;
+              box-sizing: border-box;
+              white-space: pre-wrap;
+              word-break: break-word;
+            ">{{ job?.remarks || 'No remarks.' }}</textarea>
+        </div>
+      </div>
+
     </div>
 
-    <div class="card-body job-details-body">
+    <!-- ══════════════════════════════════════════
+         CHARGES (full width)
+    ══════════════════════════════════════════ -->
+    <div>
+      <span class="section-title" style="margin: 0 0 10px; padding: 0; border: none; font-size: 11px; display: flex; align-items: center; gap: 6px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Charges | Expenses | Disbursements
+        <span class="ref-chip" style="font-size: 10px;">{{ charges?.length || 0 }}</span>
+      </span>
 
-        <!-- Two Column Layout -->
-        <div class="row g-4">
-
-            <!-- LEFT COLUMN -->
-            <div class="col-lg-6">
-
-                <!-- Client & Status -->
-                <div class="info-card mb-3">
-                    <div class="info-card-header">
-                        <i class="bi bi-person-circle"></i>
-                        <span>Client Information</span>
-                    </div>
-                    <div class="info-card-body">
-                        <div class="info-row">
-                            <label>Client</label>
-                            <span>{{ job?.customerName || '-' }}</span>
-                        </div>
-                        <div class="info-row">
-                            <label>Status</label>
-                            <span [class]="'badge status-badge ' + getStatusBadgeClass(job?.jobStatusName || '')">
-                                {{ job?.jobStatusName || 'Pending' }}
-                            </span>
-                        </div>
-                        <div class="info-row">
-                            <label>Transaction Type</label>
-                            <span>{{ job?.transactionTypeName || '-' }}</span>
-                        </div>
-                        <div class="info-row">
-                            <label>Incoterms</label>
-                            <span>{{ job?.incotermsName || '-' }}</span>
-                        </div>
-                        @if(job && job.hbl !== null) {
-                        <div class="info-row">
-                            <label>HBL</label>
-                            <span>{{ job.hbl || '-' }}</span>
-                        </div>
-                        } @if(job && job.mbl !== null) {
-                        <div class="info-row">
-                            <label>MBL</label>
-                            <span>{{ job.mbl || '-' }}</span>
-                        </div>
-                        }
-                        @if(job && job.hawb !== null) {
-                        <div class="info-row">
-                            <label>HAWB</label>
-                            <span>{{ job.hawb || '-' }}</span>
-                        </div>
-                        } @if(job && job.mawb !== null) {
-                        <div class="info-row">
-                            <label>MAWB</label>
-                            <span>{{ job.mawb || '-' }}</span>
-                        </div>
-                        }
-                    </div>
-                </div>
-
-
-            </div>
-
-            <!-- RIGHT COLUMN -->
-            <div class="col-lg-6">
-                <!-- Remarks -->
-                <div class="info-card mb-3">
-                    <div class="info-card-header">
-                        <i class="bi bi-chat-left-text"></i>
-                        <span>Remarks</span>
-                    </div>
-                    <div class="info-card-body">
-                        <div class="remarks-content">
-                            {{ job?.remarks || 'No remarks' }}
-                        </div>
-                        <div class="info-row">
-                            <label>Created Date</label>
-                            <span>{{ job?.createdDate | date:'MM/dd/yy h:mm a' }}</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- Full Width Charges Section -->
-        <div class="row">
-            <div class="col-12">
-                <div class="info-card">
-                    <div class="info-card-header">
-                        <i class="bi bi-cash-coin"></i>
-                        <span>Charges</span>
-                    </div>
-                    <div class="info-card-body p-0">
-                        <app-job-charges [charges]="charges" [jobGuid]="jobGuid" [userRole]="userRole" [job]="job"
-                            [jobStatus]="job?.jobStatusName || ''" [viewSummary]="false"></app-job-charges>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+      <div style="border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+        <app-job-charges
+          [charges]="charges"
+          [jobGuid]="jobGuid"
+          [userRole]="userRole"
+          [job]="job"
+          [jobStatus]="job?.jobStatusName || ''"
+          [viewSummary]="false">
+        </app-job-charges>
+      </div>
     </div>
+
+  </div>
 </div>

@@ -161,15 +161,16 @@
                 <span class="tx-chip">{{ job.transactionTypeName }}</span>
               </td>
               <td>
-                <span class="cell-mono" style="font-size: 12px;">
-                  @if (job.hbl && job.mbl) {
-                    {{ job.hbl }}<br/>
-                    <span style="color: #8a8fa3; font-size: 11px;">{{ job.mbl }}</span>
-                  } @else {
-                    {{ job.hawb }}<br/>
-                    <span style="color: #8a8fa3; font-size: 11px;">{{ job.mawb }}</span>
-                  }
-                </span>
+                
+              <span style="font-size: 11px; ">
+                @if (job.hbl && job.mbl) {
+                  {{ job.hbl }}<br/>
+                  {{ job.mbl }}
+                } @else {
+                  {{ job.hawb || '—' }}<br/>
+                  {{ job.mawb || '—' }}
+                }
+              </span>
               </td>
               <td class="text-center">
                 <span class="status-chip" [ngClass]="getStatusBadgeClass(job.jobStatusName)">

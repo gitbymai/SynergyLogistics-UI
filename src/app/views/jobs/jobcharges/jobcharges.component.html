@@ -50,6 +50,8 @@
           <th>In-Charge</th>
           @if (!viewSummary) {
             <th class="center">Actions</th>
+          } @else{
+            <th></th>
           }
         </tr>
       </thead>
@@ -167,6 +169,8 @@
 
                 </div>
               </td>
+            } @else{
+              <td></td>
             }
           </tr>
         }
@@ -213,13 +217,14 @@
               </td>
               <td class="right"></td>
               <td></td><td></td><td></td>
-              @if (!viewSummary) { <td></td> }
+              @if (!viewSummary) { <td></td> } @else{ <td></td> }
             </tr>
           }
         </tfoot>
       }
     </table>
   </div>
+
 </div>
 
 
@@ -366,7 +371,7 @@
           </div>
           <div class="summary-row">
             <span class="summary-key">Processor</span>
-            <span class="summary-val">{{ selectedCharge?.processorName || 'N/A' }}</span>
+            <span class="summary-val">{{ selectedCharge?.processorOwnerName || 'N/A' }}</span>
           </div>
           <div class="summary-row">
             <span class="summary-key">Category</span>
@@ -412,69 +417,96 @@
           Processor is complying with liquidation requirements. This will be submitted to cashier for clearing and tagged as <strong>FOR CLEARING</strong>.
         </div>
 
-        <!-- Charge summary -->
-        <div class="summary-card" style="margin-bottom: 16px;">
-          <div class="summary-card-title">Liquidation Details</div>
-          <div class="summary-row">
-            <span class="summary-key">Charge Code</span>
-            <span class="summary-val cell-mono" style="color: var(--accent);">{{ selectedCharge?.chargeCode }}</span>
-          </div>
-          <div class="summary-row">
-            <span class="summary-key">Processor</span>
-            <span class="summary-val">{{ selectedCharge?.processorName || 'N/A' }}</span>
-          </div>
-          <div class="summary-row">
-            <span class="summary-key">Category</span>
-            <span class="summary-val">{{ selectedCharge?.chargeSubCategoryName }}</span>
-          </div>
-          <div class="summary-row">
-            <span class="summary-key">Amount</span>
-            <span class="summary-val" style="color: var(--green); font-size: 15px;">{{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}</span>
-          </div>
-          <div class="summary-row">
-            <span class="summary-key">Next Status</span>
-            <span class="summary-val"><span class="badge-cleared badge" style="font-size: 10px;">FOR CLEARING</span></span>
-          </div>
+     <!-- Charge Summary -->
+<div class="summary-card" style="margin-bottom: 16px;">
+  <div class="summary-card-title">Liquidation Details</div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 16px; margin-top: 8px;">
+    <div>
+      <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Charge Code</div>
+      <div class="cell-mono" style="font-size: 12px; color: var(--accent); font-weight: 600;">{{ selectedCharge?.chargeCode }}</div>
+    </div>
+    <div>
+      <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Category</div>
+      <div class="cell-primary" style="font-size: 12px;">{{ selectedCharge?.chargeSubCategoryName }}</div>
+    </div>
+    <div>
+      <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Processor</div>
+      <div class="cell-primary" style="font-size: 12px;">{{ selectedCharge?.processorOwnerName || '—' }}</div>
+    </div>
+    <div>
+      <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Amount</div>
+      <div class="cell-mono" style="font-size: 13px; color: var(--green); font-weight: 600;">
+        {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
+      </div>
+    </div>
+    <div>
+      <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Next Status</div>
+      <span class="badge badge-cleared" style="font-size: 10px;">FOR CLEARING</span>
+    </div>
+  </div>
+</div>
+
+<!-- Refund Details -->
+<div style="border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin-bottom: 16px;">
+
+  <!-- Section header -->
+  <div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--rule-light); border-bottom: 1px solid var(--rule);">
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+    </svg>
+    <span class="cell-sub" style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Refund Details</span>
+  </div>
+
+  <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 12px;">
+
+    <!-- Refund Amount -->
+    <div>
+      <label class="filter-label" style="margin-bottom: 6px; display: block;">Refund Amount</label>
+      <div style="display: flex; align-items: center;">
+        <span style="padding: 8px 12px; background: var(--rule-light); border: 1px solid var(--rule); border-right: none; border-radius: 6px 0 0 6px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink-muted); white-space: nowrap;">
+          {{ selectedCharge?.currencyCode }}
+        </span>
+        <input type="number" class="filter-input"
+          style="border-radius: 0 6px 6px 0; flex: 1; min-width: 0;"
+          [value]="refundAmount"
+          (input)="onRefundAmountChange($event)"
+          [max]="selectedCharge?.amount"
+          min="0" step="0.01"
+          placeholder="0.00"
+          [disabled]="isSubmitting" />
+      </div>
+      @if (refundAmount && refundAmount > (selectedCharge?.amount || 0)) {
+        <div style="font-size: 11px; color: var(--red); margin-top: 4px;">
+          Cannot exceed {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
         </div>
+      }
+    </div>
 
-        <!-- Refund Details -->
-        <div style="background: #fef3e2; border: 1px solid #fde68a; border-radius: 8px; padding: 16px 20px; margin-bottom: 16px;">
-          <div class="section-title" style="color: #92520a; border-color: #fde68a; margin-bottom: 16px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2"/></svg>
-            Refund Details
-          </div>
+    <!-- Reference Number -->
+    <div>
+      <label class="filter-label" style="margin-bottom: 6px; display: block;">Reference Number</label>
+      <input type="text" class="filter-input" style="width: 100%;"
+        [value]="referenceNumber"
+        (input)="onReferenceNumberChange($event)"
+        placeholder="Enter reference number"
+        [disabled]="isSubmitting" />
+    </div>
 
-          <div style="margin-bottom: 14px;">
-            <label class="filter-label" style="margin-bottom: 6px; display: block; color: #92520a;">Refund Amount</label>
-            <div style="display: flex; align-items: center; gap: 0;">
-              <span style="padding: 8px 12px; background: var(--rule-light); border: 1px solid var(--rule); border-right: none; border-radius: 6px 0 0 6px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink-muted);">
-                {{ selectedCharge?.currencyCode }}
-              </span>
-              <input type="number" class="filter-input" style="border-radius: 0 6px 6px 0; flex: 1; min-width: 0;"
-                [value]="refundAmount" (input)="onRefundAmountChange($event)"
-                [max]="selectedCharge?.amount" min="0" step="0.01" placeholder="0.00" [disabled]="isSubmitting" />
-            </div>
-            @if (refundAmount && refundAmount > (selectedCharge?.amount || 0)) {
-              <div style="font-size: 11px; color: var(--red); margin-top: 4px;">
-                Refund amount cannot exceed {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
-              </div>
-            }
-          </div>
+    <!-- Notes -->
+    <div>
+      <label class="filter-label" style="margin-bottom: 6px; display: block;">Notes</label>
+      <textarea class="filter-input"
+        style="width: 100%; resize: vertical; min-height: 68px; box-sizing: border-box;"
+        rows="3"
+        [value]="refundNotes"
+        (input)="onRefundNotesChange($event)"
+        placeholder="Add any additional notes..."
+        [disabled]="isSubmitting"></textarea>
+    </div>
 
-          <div style="margin-bottom: 14px;">
-            <label class="filter-label" style="margin-bottom: 6px; display: block; color: #92520a;">Reference Number</label>
-            <input type="text" class="filter-input" style="width: 100%;"
-              [value]="referenceNumber" (input)="onReferenceNumberChange($event)"
-              placeholder="Enter reference number" [disabled]="isSubmitting" />
-          </div>
-
-          <div>
-            <label class="filter-label" style="margin-bottom: 6px; display: block; color: #92520a;">Notes</label>
-            <textarea class="filter-input" style="width: 100%; resize: vertical; min-height: 72px;"
-              rows="3" [value]="refundNotes" (input)="onRefundNotesChange($event)"
-              placeholder="Add any additional notes..." [disabled]="isSubmitting"></textarea>
-          </div>
-        </div>
+  </div>
+</div>
 
         <div class="confirm-notice" style="background: #fef3e2; color: #92520a;">
           Are you sure you want to submit this transaction for clearing?
@@ -515,7 +547,7 @@
           </div>
           <div class="summary-row">
             <span class="summary-key">Processor</span>
-            <span class="summary-val">{{ selectedCharge?.processorName || 'N/A' }}</span>
+            <span class="summary-val">{{ selectedCharge?.processorOwnerName || 'N/A' }}</span>
           </div>
           <div class="summary-row">
             <span class="summary-key">Category</span>
@@ -567,7 +599,7 @@
           </div>
           <div class="summary-row">
             <span class="summary-key">Current Processor</span>
-            <span class="summary-val">{{ selectedCharge?.processorName || 'Unassigned' }}</span>
+            <span class="summary-val">{{ selectedCharge?.processorOwnerName || 'Unassigned' }}</span>
           </div>
           <div class="summary-row">
             <span class="summary-key">Category</span>
