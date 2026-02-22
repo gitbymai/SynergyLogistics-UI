@@ -8,6 +8,8 @@ import { Job } from '../../../models/job';
 import { ChargeTransactionService } from '../../../services/chargetransaction/chargetransaction.service';
 import { finalize } from 'rxjs';
 import { ChargeSubcategory } from '../../../models/chargesubcategory';
+import { Account } from '../../../models/user';
+import { UsermanagementService } from '../../../services/admin/usermanagement.service';
 
 @Component({
   selector: 'app-job-charges',
@@ -38,6 +40,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
 
   // Reactive Form
   chargeFormGroup!: FormGroup;
+  refundFormGroup!: FormGroup;
 
   // Toast Notifications
   showSuccessToast: boolean = false;
@@ -56,6 +59,8 @@ export class JobChargesComponent implements OnInit, OnChanges {
 
   filteredCharges: ChargeTransaction[] = [];
 
+  processorList: Account[] = [];
+
   showAuditLogModal = false;
   isLoadingAuditLog = false;
   auditLogs: ChargeTransactionAuditLog[] = [];
@@ -66,7 +71,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
 
   constructor(private fb: FormBuilder,
 
-    private chargeService: ChargeTransactionService,
+    private chargeService: ChargeTransactionService, private userService: UsermanagementService
   ) {
     this.initializeForm();
   }
@@ -81,6 +86,10 @@ export class JobChargesComponent implements OnInit, OnChanges {
   ngOnInit() {
 
     this.loadChargeSubCategories();
+    if (this.userRole === 'CASHIER') {
+
+      this.loadProcessorList();
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -180,7 +189,12 @@ export class JobChargesComponent implements OnInit, OnChanges {
             .filter((item) => item.isActive === true && item.chargeCategoryId === 1)
             .sort((a, b) => a.chargeSubCategoryName.localeCompare(b.chargeSubCategoryName));
 
-          this.filteredCategories = [...this.chargeSubCategories];
+          if (this.userRole === 'CASHIER') {
+            this.filteredCategories = this.chargeSubCategories.filter(sub => sub.chargeSubCategoryName.toLowerCase().includes('refund to processor'));
+          } else {
+
+            this.filteredCategories = [...this.chargeSubCategories];
+          }
         }
       },
       error: (error) => {
@@ -188,6 +202,19 @@ export class JobChargesComponent implements OnInit, OnChanges {
       }
     });
 
+  }
+
+  loadProcessorList(): void {
+    this.userService.getAllProcessor().subscribe({
+      next: (response) => {
+        if (response.data && response.data.length > 0) {
+          this.processorList = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading processor list:', error);
+      }
+    });
   }
 
   initializeForm(): void {
@@ -201,6 +228,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
       currency: ['PHP', Validators.required],
       conversionRate: [{ value: 1, disabled: false }, [Validators.required, Validators.min(0.0001)]],
     });
+
   }
 
   loadCharges(): void {
@@ -231,7 +259,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
       });
   }
 
-  openAddModal(): void {
+  openAddChargeModal(): void {
     this.chargeFormGroup.reset({
       description: '',
       amount: 0,
@@ -245,12 +273,11 @@ export class JobChargesComponent implements OnInit, OnChanges {
 
     this.categorySearch = '';
     this.selectedSubCategory = null;
-    this.filteredCategories = [...this.chargeSubCategories];
     this.categoryDropdownOpen = false;
     this.showModal = true;
   }
 
-  closeModal(): void {
+  closeCreateChargeModal(): void {
     this.showModal = false;
     this.chargeFormGroup.reset();
   }
@@ -280,7 +307,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
           if (response.data) {
             this.loadCharges();
             this.showSuccess(`New charge has been created!`);
-            this.closeModal();
+            this.closeCreateChargeModal();
           } else {
             this.showError(response.message || 'Failed to create charge');
           }
@@ -292,14 +319,13 @@ export class JobChargesComponent implements OnInit, OnChanges {
       });
   }
 
-
   markFormGroupTouched(): void {
     Object.keys(this.chargeFormGroup.controls).forEach(key => {
       this.chargeFormGroup.get(key)?.markAsTouched();
     });
   }
 
-  onSubmit(): void {
+  submitCreateCharge(): void {
     if (!this.chargeFormGroup.valid) {
       this.showError('Please fill in all required fields correctly');
       this.markFormGroupTouched();
@@ -535,7 +561,6 @@ export class JobChargesComponent implements OnInit, OnChanges {
     });
 
   }
-
 
   openFinalClosingConfirmation(charge: any) {
     this.selectedCharge = charge;

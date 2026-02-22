@@ -21,6 +21,10 @@ export class UsermanagementService extends ApiService {
   getAllUsers(): Observable<ApiResponse<Account[]>> {
     return this.http.get<ApiResponse<Account[]>>(`${this.apiUrl}/getall`);
   }
+  
+  getAllProcessor(): Observable<ApiResponse<Account[]>> {
+    return this.http.get<ApiResponse<Account[]>>(`${this.apiUrl}/getall-processor`);
+  }
 
   getUserById(accountId: number): Observable<ApiResponse<Account>> {
     return this.http.get<ApiResponse<Account>>(`${this.apiUrl}/${accountId}`);
