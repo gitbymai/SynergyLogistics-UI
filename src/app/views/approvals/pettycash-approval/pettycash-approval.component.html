@@ -1,38 +1,61 @@
-<div class="card my-4 shadow-sm">
-    <div class="card-header bg-primary text-white">
-        <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-3">
-                <h4 class="mb-0">
-                    <i class="bi bi-briefcase me-2"></i> Job
-                </h4>
-                <span class="badge badge-code">{{ job?.jobCode }}</span>
-            </div>
-            <div class="d-flex gap-2">
-                <button routerLink="/approvals/pettycash" class="btn btn-light-custom btn-sm">
-                    <i class="bi bi-arrow-left me-1"></i>
-                    <span>Back to List</span>
-                </button>
-            </div>
-        </div>
+<!-- ── Job Charges Card ── -->
+<div class="table-card" style="margin-bottom: 24px;">
+
+  <!-- ── Card Header ── -->
+  <div
+    style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--rule); background: var(--rule-light);">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span class="section-title" style="margin: 0; padding: 0; border: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z" />
+        </svg>
+        Job
+      </span>
+      <span class="ref-chip" style="font-size: 10px; font-family: 'DM Mono', monospace;">{{ job?.jobCode }}</span>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button routerLink="/approvals/pettycash" class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to List
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Card Body ── -->
+  <div style="padding: 20px; display: flex; flex-direction: column; gap: 20px;">
+
+    <!-- ══════════════════════════════════════════
+         CHARGES & DISBURSEMENTS
+    ══════════════════════════════════════════ -->
+    <div>
+      <span class="section-title"
+        style="margin: 0 0 12px; padding: 0; border: none; font-size: 11px; display: flex; align-items: center; gap: 6px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Charges
+        <span class="ref-chip" style="font-size: 10px;">{{ charges?.length || 0 }}</span>
+      </span>
+
+      <div style="border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;">
+        <app-job-charges
+          [charges]="charges"
+          [jobGuid]="jobGuid"
+          [userRole]="userRole"
+          [job]="job"
+          [jobStatus]="job?.jobStatusName || ''"
+          [viewSummary]="false">
+        </app-job-charges>
+      </div>
     </div>
 
-    <div class="card-body job-details-body">
-
-        <!-- Full Width Charges Section -->
-        <div class="row">
-            <div class="col-12">
-                <div class="info-card">
-                    <div class="info-card-header">
-                        <i class="bi bi-cash-coin"></i>
-                        <span>Charges</span>
-                    </div>
-                    <div class="info-card-body p-0">
-                        <app-job-charges [charges]="charges" [jobGuid]="jobGuid" [userRole]="userRole" [job]="job"
-                            [jobStatus]="job?.jobStatusName || ''" [viewSummary]="false"></app-job-charges>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
+  </div>
 </div>

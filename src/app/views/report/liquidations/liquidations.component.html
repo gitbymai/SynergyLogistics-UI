@@ -19,9 +19,9 @@
   <!-- ── KPI Summary Cards ── -->
   <!-- NOTE: Wire up these values to your component properties -->
   <div class="kpi-row">
-    <div class="kpi-card accent">
+    <div class="kpi-card">
       <div class="kpi-label">Total Refund Value</div>
-      <div class="kpi-value">{{ calculateTotalRefundAmount() }}</div>
+      <div class="kpi-value">{{ calculateTotalRefundAmount() | number:'1.2-2' }}</div>
       <div class="kpi-note">Across all currencies</div>
     </div>
     <div class="kpi-card">
@@ -32,7 +32,7 @@
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Avg. Refund Amount</div>
-      <div class="kpi-value">{{ calculateAverageRefundAmount() }}</div>
+      <div class="kpi-value">{{ calculateAverageRefundAmount() | number:'1.2-2' }}</div>
       <div class="kpi-note">Per transaction</div>
     </div>
     <div class="kpi-card">
@@ -216,7 +216,7 @@
       @if (filteredRefunds.length > 0) {
       <div>
         <span class="footer-total-label">Total Refund Amount</span>
-        <span class="footer-total">{{ calculateTotalRefundAmount() }}</span>
+        <span class="footer-total">{{ calculateTotalRefundAmount() | number:'1.2-2' }}</span>
       </div>
       }
     </div>

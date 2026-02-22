@@ -26,12 +26,15 @@ export class JobChargesComponent implements OnInit, OnChanges {
   showModal: boolean = false;
   selectedCategory: string = '';
 
+  showApproveConfirmModal = false;
+  showRejectConfirmModal = false;
   showSubmitClearingConfirmModal = false;
   showCashReleasingConfirmModal = false;
   showCashReleaseConfirmModal = false;
   showFinalClosingConfirmModal = false;
   showOwnLineChargeConfirmModal = false;
   selectedCharge: any = null;
+  rejectionReason: string = '';
 
   // Reactive Form
   chargeFormGroup!: FormGroup;
@@ -210,7 +213,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
             this.charges = response.data;
             if (response.data.length) {
               this.jobCode = response.data[0].jobCode;
-              
+
               this.filteredCharges = this.charges.filter(charge => {
                 return charge.isForProcessing === true
                   && charge.isActive === true
@@ -247,35 +250,9 @@ export class JobChargesComponent implements OnInit, OnChanges {
     this.showModal = true;
   }
 
-  markFormGroupTouched(): void {
-    Object.keys(this.chargeFormGroup.controls).forEach(key => {
-      this.chargeFormGroup.get(key)?.markAsTouched();
-    });
-  }
-
-  onSubmit(): void {
-    if (!this.chargeFormGroup.valid) {
-      this.showError('Please fill in all required fields correctly');
-      this.markFormGroupTouched();
-      return;
-    }
-
-    this.isSubmitting = true;
-
-    this.createCharge();
-  }
-
-  onRefundAmountChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.refundAmount = parseFloat(input.value) || 0;
-  }
-
-  onReferenceNumberChange(event: Event): void {
-    this.referenceNumber = (event.target as HTMLInputElement).value;
-  }
-
-  onRefundNotesChange(event: Event): void {
-    this.refundNotes = (event.target as HTMLTextAreaElement).value;
+  closeModal(): void {
+    this.showModal = false;
+    this.chargeFormGroup.reset();
   }
 
   createCharge(): void {
@@ -315,9 +292,40 @@ export class JobChargesComponent implements OnInit, OnChanges {
       });
   }
 
-  closeModal(): void {
-    this.showModal = false;
-    this.chargeFormGroup.reset();
+
+  markFormGroupTouched(): void {
+    Object.keys(this.chargeFormGroup.controls).forEach(key => {
+      this.chargeFormGroup.get(key)?.markAsTouched();
+    });
+  }
+
+  onSubmit(): void {
+    if (!this.chargeFormGroup.valid) {
+      this.showError('Please fill in all required fields correctly');
+      this.markFormGroupTouched();
+      return;
+    }
+
+    this.isSubmitting = true;
+
+    this.createCharge();
+  }
+
+  onRefundAmountChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.refundAmount = parseFloat(input.value) || 0;
+  }
+
+  onReferenceNumberChange(event: Event): void {
+    this.referenceNumber = (event.target as HTMLInputElement).value;
+  }
+
+  onRefundNotesChange(event: Event): void {
+    this.refundNotes = (event.target as HTMLTextAreaElement).value;
+  }
+
+  onRejectionReasonChange(event: Event): void {
+    this.rejectionReason = (event.target as HTMLTextAreaElement).value;
   }
 
   openCashReleasingConfirmation(charge: any) {
@@ -421,7 +429,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
 
         if (response.data) {
           this.loadCharges();
-          this.showSuccess('Trannsaction completed!');
+          this.showSuccess('Transaction completed!');
           this.closeOwnLineChargeConfirmModal();
         }
         else {
@@ -437,7 +445,6 @@ export class JobChargesComponent implements OnInit, OnChanges {
 
   openSubmitClearingConfirmation(charge: any) {
     this.selectedCharge = charge;
-    console.log('Selected Charge for Clearing:', this.selectedCharge);
     this.showSubmitClearingConfirmModal = true;
   }
 
@@ -448,6 +455,87 @@ export class JobChargesComponent implements OnInit, OnChanges {
       this.refundAmount = 0;
     }
   }
+
+  openApprovalConfirmModal(charge: any) {
+    this.selectedCharge = charge;
+    this.showApproveConfirmModal = true;
+  }
+
+  closeApproveConfirmModal() {
+    if (!this.isSubmitting) {
+      this.showApproveConfirmModal = false;
+      this.selectedCharge = null;
+    }
+  }
+
+  confirmApproveCharge() {
+
+    this.isSubmitting = true;
+
+    this.chargeService.approveCharge(this.selectedCharge.chargeGuid, 'APPROVED').subscribe({
+      next: (response) => {
+        this.isSubmitting = false;
+        this.showApproveConfirmModal = false;
+
+        if (response.data) {
+          this.loadCharges();
+          this.showSuccess('Transaction completed!');
+          this.closeApproveConfirmModal();
+        }
+        else {
+          this.showError(response.message || 'Failed to complete transaction');
+        }
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+        this.showError(error?.error?.Message || 'Failed to complete transaction');
+      }
+    });
+
+  }
+
+  openRejectConfirmModal(charge: any) {
+    this.selectedCharge = charge;
+    this.rejectionReason = '';
+    this.showRejectConfirmModal = true;
+  }
+
+  closeRejectConfirmModal() {
+    if (!this.isSubmitting) {
+      this.showRejectConfirmModal = false;
+      this.selectedCharge = null;
+      this.rejectionReason = '';
+    }
+  }
+
+  confirmRejectCharge() {
+
+    if (!this.rejectionReason?.trim() || this.isSubmitting) return;
+
+    this.isSubmitting = true;
+
+    this.chargeService.rejectCharge(this.selectedCharge.chargeGuid, this.rejectionReason).subscribe({
+      next: (response) => {
+        this.isSubmitting = false;
+        this.showRejectConfirmModal = false;
+
+        if (response.data) {
+          this.loadCharges();
+          this.showSuccess('Transaction completed!');
+          this.closeRejectConfirmModal();
+        }
+        else {
+          this.showError(response.message || 'Failed to complete transaction');
+        }
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+        this.showError(error?.error?.Message || 'Failed to complete transaction');
+      }
+    });
+
+  }
+
 
   openFinalClosingConfirmation(charge: any) {
     this.selectedCharge = charge;
@@ -471,7 +559,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
 
         if (response.data) {
           this.loadCharges();
-          this.showSuccess('Trannsaction completed!');
+          this.showSuccess('Transaction completed!');
           this.closeFinalClosingConfirmModal();
         }
         else {

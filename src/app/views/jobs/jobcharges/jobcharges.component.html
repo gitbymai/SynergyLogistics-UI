@@ -2,32 +2,43 @@
 <div class="table-card" style="margin-bottom: 24px;">
 
   <!-- Header -->
-  <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--rule); background: var(--rule-light);">
+  <div
+    style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--rule); background: var(--rule-light);">
     <div style="display: flex; align-items: center; gap: 10px;">
       <span class="section-title" style="margin: 0; padding: 0; border: none;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         Financial Transactions
       </span>
       <span class="ref-chip" style="font-size: 10px;">{{ charges.length || 0 }}</span>
     </div>
     <div style="display: flex; gap: 8px;">
-      @if ((userRole === 'ADMIN' || userRole === 'FINANCE' || userRole === 'SALES') && jobStatus !== 'COMPLETED' && jobStatus !== 'CANCELLED' && jobStatus !== 'CLOSED' && jobStatus !== 'FOR APPROVAL') {
-        <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px;" [routerLink]="['/jobs/jobmanagement', jobGuid, 'charges']">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/>
-          </svg>
-          Manage
-        </button>
+      @if ((userRole === 'ADMIN' || userRole === 'FINANCE' || userRole === 'SALES') && jobStatus !== 'COMPLETED' &&
+      jobStatus !== 'CANCELLED' && jobStatus !== 'CLOSED' && jobStatus !== 'FOR APPROVAL') {
+      <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px;"
+        [routerLink]="['/jobs/jobmanagement', jobGuid, 'charges']">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+        Manage
+      </button>
       }
-      @if ((userRole === 'ADMIN' || userRole === 'OPSMGR' || userRole === 'PROCESSOR') && jobStatus !== 'COMPLETED' && jobStatus !== 'CANCELLED' && jobStatus !== 'CLOSED' && jobStatus !== 'FOR APPROVAL') {
-        <button class="btn btn-primary" style="font-size: 12px; padding: 6px 12px;" type="button" (click)="openAddModal()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-          </svg>
-          Request
-        </button>
+      @if ((userRole === 'ADMIN' || userRole === 'PROCESSOR') && jobStatus !== 'COMPLETED' && jobStatus !== 'CANCELLED'
+      && jobStatus !== 'CLOSED' && jobStatus !== 'FOR APPROVAL') {
+      <button class="btn btn-primary" style="font-size: 12px; padding: 6px 12px;" type="button"
+        (click)="openAddModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        Request
+      </button>
       }
     </div>
   </div>
@@ -43,34 +54,34 @@
           <th class="center">Status</th>
           <th class="right">Charge Amount</th>
           @if (userRole === 'SALES' || userRole === 'FINANCE' || userRole === 'TREASURER' || userRole === 'ADMIN') {
-            <th class="right">Selling Amount</th>
+          <th class="right">Selling Amount</th>
           }
           <th>Last Update</th>
           <th>Updated By</th>
           <th>In-Charge</th>
           @if (!viewSummary) {
-            <th class="center">Actions</th>
+          <th class="center">Actions</th>
           } @else{
-            <th></th>
+          <th></th>
           }
         </tr>
       </thead>
       <tbody>
         @for (charge of filteredCharges; track charge) {
-          <tr>
-            <td>
-              <span class="cell-mono" style="color: var(--accent); font-weight: 600; font-size: 12px;">
-                {{ charge.chargeCode }}
-              </span>
-            </td>
-            <td>
-              <span class="cell-primary" style="font-size: 13px;">{{ charge.chargeSubCategoryName }}</span>
-            </td>
-            <td class="description-cell">
-              <span class="cell-sub">{{ charge.description || '—' }}</span>
-            </td>
-            <td class="center">
-              <span class="badge" [ngClass]="{
+        <tr>
+          <td>
+            <span class="cell-mono" style="color: var(--accent); font-weight: 600; font-size: 12px;">
+              {{ charge.chargeCode }}
+            </span>
+          </td>
+          <td>
+            <span class="cell-primary" style="font-size: 13px;">{{ charge.chargeSubCategoryName }}</span>
+          </td>
+          <td class="description-cell">
+            <span class="cell-sub">{{ charge.description || '—' }}</span>
+          </td>
+          <td class="center">
+            <span class="badge" [ngClass]="{
                 'badge-for-approval':   charge.chargeTransactionStatus === 'FOR APPROVAL',
                 'badge-released':       charge.chargeTransactionStatus === 'FOR CLEARING',
                 'badge-cleared':        charge.chargeTransactionStatus === 'CLEARED',
@@ -81,152 +92,359 @@
                 'badge-cancelled':      charge.chargeTransactionStatus === 'CANCELLED',
                 'badge-approved':       charge.chargeTransactionStatus === 'APPROVED'
               }">{{ charge.chargeTransactionStatus }}</span>
-            </td>
-            <td class="right">
-              <span class="amount-positive">PHP {{ charge.calculatedAmount | number:'1.2-2' }}</span>
-            </td>
-            @if (canViewSellingAmount()) {
-              <td class="right">
-                <span class="amount-positive">PHP {{ charge.calculatedSellingAmount | number:'1.2-2' }}</span>
-              </td>
+          </td>
+          <td class="right">
+            <span class="amount-positive">{{charge.currencyCode }} {{ charge.amount | number:'1.2-2' }}</span>
+          </td>
+          @if (canViewSellingAmount()) {
+          <td class="right">
+            <span class="amount-positive">{{charge.currencyCode }} {{ charge.amountSelling | number:'1.2-2' }}</span>
+          </td>
+          }
+          <td>
+            <span class="cell-mono" style="font-size: 11px; color: var(--ink-muted);">
+              {{ (charge.modifiedDate || charge.createdDate) | date:'MM/dd/yy' }}<br />
+              {{ (charge.modifiedDate || charge.createdDate) | date:'h:mm a' }}
+            </span>
+          </td>
+          <td>
+            <span class="cell-sub" style="font-size: 12px;">{{ charge.modifiedByName || charge.createdByName }}</span>
+          </td>
+          <td>
+            @if (!charge.processorOwnerName) {
+            <span class="status-chip bg-warning">UNASSIGNED</span>
+            } @else {
+            <span class="cell-sub" style="font-size: 12px;">{{ charge.processorOwnerName }}</span>
             }
-            <td>
-              <span class="cell-mono" style="font-size: 11px; color: var(--ink-muted);">
-                {{ (charge.modifiedDate || charge.createdDate) | date:'MM/dd/yy' }}<br/>
-                {{ (charge.modifiedDate || charge.createdDate) | date:'h:mm a' }}
-              </span>
-            </td>
-            <td>
-              <span class="cell-sub" style="font-size: 12px;">{{ charge.modifiedByName || charge.createdByName }}</span>
-            </td>
-            <td>
-              @if (!charge.processorOwnerName) {
-                <span class="status-chip bg-warning">UNASSIGNED</span>
-              } @else {
-                <span class="cell-sub" style="font-size: 12px;">{{ charge.processorOwnerName }}</span>
+          </td>
+          @if (!viewSummary) {
+          <td class="center">
+            <div style="display: inline-flex; gap: 4px; flex-wrap: wrap; justify-content: center;">
+
+              @if (canProcessCharges()) {
+
+              @if (charge.chargeTransactionStatus === 'FOR APPROVAL' && (['OPSMGR','SALES'].includes(userRole)) &&
+              charge.processorOwner ) {
+              <button class="action-btn"
+                style="color: var(--green); background: var(--green-light); border-color: var(--green-light);"
+                (click)="openApprovalConfirmModal(charge)" title="Approve Charge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Approve
+              </button>
               }
-            </td>
-            @if (!viewSummary) {
-              <td class="center">
-                <div style="display: inline-flex; gap: 4px; flex-wrap: wrap; justify-content: center;">
 
-                  @if (canProcessCharges()) {
-                    @if (charge.chargeTransactionStatus === 'APPROVED' && userRole === 'PROCESSOR' && (!charge.processorOwnerName || charge.processorOwnerName === '')) {
-                      <button class="action-btn" style="color: var(--accent); background: var(--accent-light); border-color: var(--accent-light);"
-                        (click)="openOwnChargeConfirmation(charge)" title="Take In-Charge">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                        Own
-                      </button>
-                    }
-                    @if (charge.chargeTransactionStatus === 'CASH RECEIVED - FOR LIQUIDATION' && (userRole === 'PROCESSOR' || userRole === 'OPSMGR' || userRole === 'ADMIN')) {
-                      <button class="action-btn" style="color: var(--green); background: var(--green-light); border-color: var(--green-light);"
-                        (click)="openSubmitClearingConfirmation(charge)" title="Submit for Clearing">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        Liquidate
-                      </button>
-                    }
-                    @if (charge.chargeTransactionStatus === 'APPROVED' && charge.processorOwner && (userRole === 'ADMIN' || userRole === 'TREASURER')) {
-                      <button class="action-btn" style="color: #0369a1; background: #e0f2fe; border-color: #e0f2fe;"
-                        (click)="openCashReleasingConfirmation(charge)" title="Approval to Release Cash">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                        </svg>
-                        Cash Release
-                      </button>
-                    }
-                    @if (charge.chargeTransactionStatus === 'FOR RELEASING' && (userRole === 'ADMIN' || userRole === 'CASHIER')) {
-                      <button class="action-btn" style="color: var(--accent); background: var(--accent-light); border-color: var(--accent-light);"
-                        (click)="openCashReleaseConfirmation(charge)" title="Release Cash">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1"/>
-                        </svg>
-                        Release
-                      </button>
-                    }
-                    @if (charge.chargeTransactionStatus === 'FOR CLEARING' && (userRole === 'ADMIN' || userRole === 'CASHIER' || userRole === 'TREASURER')) {
-                      <button class="action-btn" style="color: var(--green); background: var(--green-light); border-color: var(--green-light);"
-                        (click)="openFinalClosingConfirmation(charge)" title="Close Transaction">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        Close
-                      </button>
-                    }
-                  }
 
-                  @if (['CASHIER','ADMIN','FINANCE','TREASURER','SALES'].includes(userRole)) {
-                    <button class="action-btn" (click)="openAuditLogModal(charge)" title="View Logs">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                      </svg>
-                      Logs
-                    </button>
-                  }
+              @if (charge.chargeTransactionStatus === 'FOR APPROVAL' && (['OPSMGR','SALES'].includes(userRole)) &&
+              charge.processorOwner ) {
+              <button class="action-btn" style="color: var(--red); background: #fdecea; border-color: #fdecea;"
+                (click)="openRejectConfirmModal(charge)" title="Reject Charge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Reject
+              </button>
+              }
 
-                </div>
-              </td>
-            } @else{
-              <td></td>
-            }
-          </tr>
+              @if (charge.chargeTransactionStatus === 'APPROVED' && userRole === 'PROCESSOR' &&
+              (!charge.processorOwnerName || charge.processorOwnerName === '')) {
+              <button class="action-btn"
+                style="color: var(--accent); background: var(--accent-light); border-color: var(--accent-light);"
+                (click)="openOwnChargeConfirmation(charge)" title="Take In-Charge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Own
+              </button>
+              }
+
+              @if (charge.chargeTransactionStatus === 'CASH RECEIVED - FOR LIQUIDATION' &&
+              (['PROCESSOR','ADMIN'].includes(userRole))) {
+              <button class="action-btn"
+                style="color: var(--green); background: var(--green-light); border-color: var(--green-light);"
+                (click)="openSubmitClearingConfirmation(charge)" title="Submit for Clearing">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Liquidate
+              </button>
+              }
+              @if (charge.chargeTransactionStatus === 'APPROVED' && charge.processorOwner &&
+              (['ADMIN','TREASURER'].includes(userRole))) {
+              <button class="action-btn" style="color: #0369a1; background: #e0f2fe; border-color: #e0f2fe;"
+                (click)="openCashReleasingConfirmation(charge)" title="Approval to Release Cash">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+                Cash Release
+              </button>
+              }
+              @if (charge.chargeTransactionStatus === 'FOR RELEASING' && (['CASHIER','ADMIN'].includes(userRole))) {
+              <button class="action-btn"
+                style="color: var(--accent); background: var(--accent-light); border-color: var(--accent-light);"
+                (click)="openCashReleaseConfirmation(charge)" title="Release Cash">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1" />
+                </svg>
+                Release
+              </button>
+              }
+              @if (charge.chargeTransactionStatus === 'FOR CLEARING' &&
+              (['CASHIER','ADMIN','TREASURER'].includes(userRole))) {
+              <button class="action-btn"
+                style="color: var(--green); background: var(--green-light); border-color: var(--green-light);"
+                (click)="openFinalClosingConfirmation(charge)" title="Close Transaction">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                Close
+              </button>
+              }
+              }
+
+              @if (['CASHIER','ADMIN','FINANCE','TREASURER','SALES', 'OPSMGR'].includes(userRole)) {
+              <button class="action-btn" (click)="openAuditLogModal(charge)" title="View Logs">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Logs
+              </button>
+              }
+
+            </div>
+          </td>
+          } @else{
+          <td></td>
+          }
+        </tr>
         }
         @if (!filteredCharges || filteredCharges.length === 0) {
-          <tr>
-            <td [attr.colspan]="getColspan()">
-              <div class="empty-state">
-                <div class="empty-icon">◻</div>
-                <p>No charges found</p>
-              </div>
-            </td>
-          </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td [attr.colspan]="getColspan()">
+            <div class="empty-state">
+              <div class="empty-icon">◻</div>
+              <p>No charges found</p>
+            </div>
+          </td>
+        </tr>
         }
       </tbody>
       @if (filteredCharges && filteredCharges.length > 0) {
-        <tfoot>
-          <tr>
-            <td [attr.colspan]="getFooterColspan()" class="right">
-              <span class="total-label">Total Charge Amount</span>
-            </td>
-            <td class="right">
-              <span class="total-amount">₱{{ totalChargeAmount | number:'1.2-2' }}</span>
-            </td>
-            @if (userRole === 'SALES' || userRole === 'FINANCE' || userRole === 'TREASURER' || userRole === 'ADMIN') {
-              <td class="right">
-                <span class="total-amount">₱{{ totalSellingAmount | number:'1.2-2' }}</span>
-              </td>
-              <td></td>
-            }
-            <td></td>
-            @if (userRole === 'CASHIER' || userRole === 'PROCESSOR' || userRole === 'OPSMGR') { <td></td> }
-            <td></td><td></td>
-          </tr>
-          @if (canViewSellingAmount()) {
-            <tr>
-              <td [attr.colspan]="getFooterColspan()" class="right">
-                <span class="total-label">Total Profit</span>
-              </td>
-              <td class="right">
-                <span class="total-amount"
-                  [style.color]="(totalSellingAmount - totalChargeAmount) >= 0 ? 'var(--green)' : 'var(--red)'">
-                  ₱{{ (totalSellingAmount - totalChargeAmount) | number:'1.2-2' }}
-                </span>
-              </td>
-              <td class="right"></td>
-              <td></td><td></td><td></td>
-              @if (!viewSummary) { <td></td> } @else{ <td></td> }
-            </tr>
+      <tfoot>
+        <tr>
+          <td [attr.colspan]="getFooterColspan()" class="right">
+            <span class="total-label">Total Charge Amount</span>
+          </td>
+          <td class="right">
+            <span class="total-amount">₱{{ totalChargeAmount | number:'1.2-2' }}</span>
+          </td>
+          @if (userRole === 'SALES' || userRole === 'FINANCE' || userRole === 'TREASURER' || userRole === 'ADMIN') {
+          <td class="right">
+            <span class="total-amount">₱{{ totalSellingAmount | number:'1.2-2' }}</span>
+          </td>
+          <td></td>
           }
-        </tfoot>
+          <td></td>
+          @if (userRole === 'CASHIER' || userRole === 'PROCESSOR' || userRole === 'OPSMGR') { <td></td> }
+          <td></td>
+          <td></td>
+        </tr>
+        @if (canViewSellingAmount()) {
+        <tr>
+          <td [attr.colspan]="getFooterColspan()" class="right">
+            <span class="total-label">Total Profit</span>
+          </td>
+          <td class="right">
+            <span class="total-amount"
+              [style.color]="(totalSellingAmount - totalChargeAmount) >= 0 ? 'var(--green)' : 'var(--red)'">
+              ₱{{ (totalSellingAmount - totalChargeAmount) | number:'1.2-2' }}
+            </span>
+          </td>
+          <td class="right"></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          @if (!viewSummary) { <td></td> } @else{ <td></td> }
+        </tr>
+        }
+      </tfoot>
       }
     </table>
   </div>
 
 </div>
 
+<!-- ── Approve Charge Modal ── -->
+@if (showApproveConfirmModal) { <div class="modal-backdrop" (click)="closeApproveConfirmModal()"></div> }
+<div class="modal custom-modal" [class.show]="showApproveConfirmModal" [class.d-block]="showApproveConfirmModal"
+  tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="background: var(--green);">
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px; color:#fff;">
+          Approve Charge</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeApproveConfirmModal()"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+
+        <div class="confirm-notice" style="margin-bottom: 16px;">
+          You are approving this charge request. It will be tagged as <strong>APPROVED</strong>
+        </div>
+
+        <!-- Charge Summary -->
+        <div class="summary-card" style="margin-bottom: 16px;">
+          <div class="summary-card-title">Charge Details</div>
+
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 16px; margin-top: 8px;">
+            <div>
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Charge Code</div>
+              <div class="cell-mono" style="font-size: 12px; color: var(--accent); font-weight: 600;">{{
+                selectedCharge?.chargeCode }}</div>
+            </div>
+            <div>
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Category</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ selectedCharge?.chargeSubCategoryName }}</div>
+            </div>
+            <div>
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Requested By</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ selectedCharge?.processorOwnerName || '—' }}</div>
+            </div>
+            <div>
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Amount</div>
+              <div class="cell-mono" style="font-size: 13px; color: var(--green); font-weight: 600;">
+                {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
+              </div>
+            </div>
+            <div>
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Next Status</div>
+              <span class="badge badge-approved" style="font-size: 10px;">APPROVED</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="confirm-notice" style="background: #dcfce7; color: #15803d;">
+          This charge will be forward to treasurer for cash releasing process.
+          Are you sure you want to approve this charge?
+        </div>
+
+      </div>
+      <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 14px 24px; gap: 10px;">
+        <button type="button" class="btn btn-ghost" (click)="closeApproveConfirmModal()"
+          [disabled]="isSubmitting">Cancel</button>
+        <button type="button" class="btn btn-primary" style="background: var(--green);" (click)="confirmApproveCharge()"
+          [disabled]="isSubmitting">
+          @if (!isSubmitting) { Approve }
+          @else { <span class="spinner-border spinner-border-sm me-2"></span> Approving... }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Reject Charge Modal ── -->
+@if (showRejectConfirmModal) { <div class="modal-backdrop" (click)="closeRejectConfirmModal()"></div> }
+<div class="modal custom-modal" [class.show]="showRejectConfirmModal" [class.d-block]="showRejectConfirmModal"
+  tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="background: var(--red);">
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px; color:#fff;">
+          Reject Charge</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeRejectConfirmModal()"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+
+        <div class="confirm-notice" style="margin-bottom: 16px;">
+          You are rejecting this charge request. It will be tagged as <strong>REJECTED</strong>
+        </div>
+
+        <!-- Charge Summary -->
+        <div class="summary-card" style="margin-bottom: 16px;">
+          <div class="summary-card-title">Charge Details</div>
+
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 16px; margin-top: 8px;">
+            <div>
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Charge Code</div>
+              <div class="cell-mono" style="font-size: 12px; color: var(--accent); font-weight: 600;">{{
+                selectedCharge?.chargeCode }}</div>
+            </div>
+            <div>
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Category</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ selectedCharge?.chargeSubCategoryName }}</div>
+            </div>
+            <div>
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Requested By</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ selectedCharge?.processorOwnerName || '—' }}</div>
+            </div>
+            <div>
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Amount</div>
+              <div class="cell-mono" style="font-size: 13px; color: var(--red); font-weight: 600;">
+                {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
+              </div>
+            </div>
+            <div>
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Next Status</div>
+              <span class="badge badge-cancelled" style="font-size: 10px;">REJECTED</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rejection Reason -->
+        <div style="border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin-bottom: 16px;">
+          <div
+            style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--rule-light); border-bottom: 1px solid var(--rule);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <span class="cell-sub"
+              style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Rejection
+              Reason</span>
+          </div>
+          <div style="padding: 14px 16px;">
+            <textarea class="filter-input"
+              style="width: 100%; resize: vertical; min-height: 80px; box-sizing: border-box;" rows="3"
+              [value]="rejectionReason" (input)="onRejectionReasonChange($event)"
+              placeholder="State the reason for rejection..." [disabled]="isSubmitting"></textarea>
+          </div>
+        </div>
+
+        <div class="confirm-notice" style="background: #fdecea; color: var(--red);">
+          Are you sure you want to reject this charge? This action cannot be undone.
+        </div>
+
+      </div>
+      <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 14px 24px; gap: 10px;">
+        <button type="button" class="btn btn-ghost" (click)="closeRejectConfirmModal()"
+          [disabled]="isSubmitting">Cancel</button>
+        <button type="button" class="btn btn-primary" style="background: var(--red);" (click)="confirmRejectCharge()"
+          [disabled]="isSubmitting || !rejectionReason?.trim()">
+          @if (!isSubmitting) { Reject }
+          @else { <span class="spinner-border spinner-border-sm me-2"></span> Rejecting... }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ── Add Charge Modal ── -->
 @if (showModal) { <div class="modal-backdrop" (click)="closeModal()"></div> }
@@ -234,7 +452,8 @@
   <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
       <div class="modal-header" style="background: #1a3a6b;">
-        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px; color:#fff;">Add New Charge</h5>
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px; color:#fff;">Add
+          New Charge</h5>
         <button type="button" class="btn-close btn-close-white" (click)="closeModal()" aria-label="Close"></button>
       </div>
       <div class="modal-body" style="padding: 24px;">
@@ -246,26 +465,26 @@
                 Category <span style="color: var(--red);">*</span>
               </label>
               <div class="position-relative category-dropdown">
-                <input type="text" class="filter-input" style="width: 100%;"
-                  placeholder="Search or select category"
-                  [value]="categorySearch"
-                  (input)="onCategorySearchChange($any($event.target).value)"
+                <input type="text" class="filter-input" style="width: 100%;" placeholder="Search or select category"
+                  [value]="categorySearch" (input)="onCategorySearchChange($any($event.target).value)"
                   (focus)="categoryDropdownOpen = true" />
                 @if (categoryDropdownOpen && filteredCategories.length > 0) {
-                  <ul class="dropdown-list">
-                    @for (category of filteredCategories; track category.chargeSubCategoryId) {
-                      <li class="dropdown-item-custom" (click)="selectCategory(category)">{{ category.chargeSubCategoryName }}</li>
-                    }
-                  </ul>
+                <ul class="dropdown-list">
+                  @for (category of filteredCategories; track category.chargeSubCategoryId) {
+                  <li class="dropdown-item-custom" (click)="selectCategory(category)">{{ category.chargeSubCategoryName
+                    }}</li>
+                  }
+                </ul>
                 }
                 @if (categoryDropdownOpen && filteredCategories.length === 0 && categorySearch) {
-                  <ul class="dropdown-list">
-                    <li class="dropdown-item-custom" style="color: var(--ink-muted);">No categories found</li>
-                  </ul>
+                <ul class="dropdown-list">
+                  <li class="dropdown-item-custom" style="color: var(--ink-muted);">No categories found</li>
+                </ul>
                 }
                 <input type="hidden" formControlName="chargeSubCategoryId" />
-                @if (chargeFormGroup.get('chargeSubCategoryId')?.invalid && chargeFormGroup.get('chargeSubCategoryId')?.touched) {
-                  <div style="font-size: 11px; color: var(--red); margin-top: 4px;">Category is required</div>
+                @if (chargeFormGroup.get('chargeSubCategoryId')?.invalid &&
+                chargeFormGroup.get('chargeSubCategoryId')?.touched) {
+                <div style="font-size: 11px; color: var(--red); margin-top: 4px;">Category is required</div>
                 }
               </div>
             </div>
@@ -274,18 +493,18 @@
               <label class="filter-label" style="margin-bottom: 6px; display: block;">
                 Amount <span style="color: var(--red);">*</span>
               </label>
-              <input type="number" class="filter-input" style="width: 100%;"
-                formControlName="amount" step="0.01" placeholder="0.00" />
+              <input type="number" class="filter-input" style="width: 100%;" formControlName="amount" step="0.01"
+                placeholder="0.00" />
               @if (chargeFormGroup.get('amount')?.invalid && chargeFormGroup.get('amount')?.touched) {
-                <div style="font-size: 11px; color: var(--red); margin-top: 4px;">Valid charge amount is required</div>
+              <div style="font-size: 11px; color: var(--red); margin-top: 4px;">Valid charge amount is required</div>
               }
             </div>
           </div>
           <!-- Description -->
           <div style="margin-top: 16px;">
             <label class="filter-label" style="margin-bottom: 6px; display: block;">Description</label>
-            <textarea class="filter-input" style="width: 100%; resize: vertical; min-height: 80px;"
-              rows="3" formControlName="description" placeholder="Enter charge description..."></textarea>
+            <textarea class="filter-input" style="width: 100%; resize: vertical; min-height: 80px;" rows="3"
+              formControlName="description" placeholder="Enter charge description..."></textarea>
           </div>
         </form>
       </div>
@@ -301,19 +520,24 @@
   </div>
 </div>
 
-
 <!-- ── Cash Releasing Confirmation Modal ── -->
 @if (showCashReleasingConfirmModal) { <div class="modal-backdrop" (click)="closeCashReleasingConfirmModal()"></div> }
-<div class="modal custom-modal" [class.show]="showCashReleasingConfirmModal" [class.d-block]="showCashReleasingConfirmModal" tabindex="-1" role="dialog">
+<div class="modal custom-modal" [class.show]="showCashReleasingConfirmModal"
+  [class.d-block]="showCashReleasingConfirmModal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
       <div class="modal-header" style="background: #92520a; color: #fff;">
-        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px;">Cash Releasing Confirmation</h5>
-        <button type="button" class="btn-close btn-close-white" (click)="closeCashReleasingConfirmModal()" aria-label="Close"></button>
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px;">Cash Releasing
+          Confirmation</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeCashReleasingConfirmModal()"
+          aria-label="Close"></button>
       </div>
       <div class="modal-body" style="padding: 24px;">
         <div class="confirm-notice" style="background: #fef3e2; color: #92520a; margin-bottom: 16px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2" />
+          </svg>
           This charge is for cash releasing.
         </div>
         <div class="summary-card" style="margin-bottom: 16px;">
@@ -328,7 +552,8 @@
           </div>
           <div class="summary-row">
             <span class="summary-key">Amount</span>
-            <span class="summary-val" style="color: var(--accent);">{{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}</span>
+            <span class="summary-val" style="color: var(--accent);">{{ selectedCharge?.currencyCode }} {{
+              selectedCharge?.amount | number:'1.2-2' }}</span>
           </div>
         </div>
         <p style="text-align: center; font-size: 13px; color: var(--ink-soft); margin: 0;">
@@ -345,22 +570,28 @@
   </div>
 </div>
 
-
 <!-- ── Release Cash to Processor Modal ── -->
 @if (showCashReleaseConfirmModal) { <div class="modal-backdrop" (click)="closeCashReleaseConfirmModal()"></div> }
-<div class="modal custom-modal" [class.show]="showCashReleaseConfirmModal" [class.d-block]="showCashReleaseConfirmModal" tabindex="-1" role="dialog">
+<div class="modal custom-modal" [class.show]="showCashReleaseConfirmModal" [class.d-block]="showCashReleaseConfirmModal"
+  tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
       <div class="modal-header" style="background: #1a3a6b;">
-        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px; color:#fff;">Release Cash to Processor</h5>
-        <button type="button" class="btn-close btn-close-white" (click)="closeCashReleaseConfirmModal()" aria-label="Close"></button>
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px; color:#fff;">
+          Release Cash to Processor</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeCashReleaseConfirmModal()"
+          aria-label="Close"></button>
       </div>
       <div class="modal-body" style="padding: 24px;">
         <div class="confirm-notice" style="margin-bottom: 12px;">
           Ready to release cash to the processor.
         </div>
         <div class="confirm-notice" style="background: #fef3e2; color: #92520a; margin-bottom: 16px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
           Transaction will be tagged as <strong>FOR LIQUIDATION</strong> after release.
         </div>
         <div class="summary-card" style="margin-bottom: 16px;">
@@ -379,21 +610,26 @@
           </div>
           <div class="summary-row">
             <span class="summary-key">Amount to Release</span>
-            <span class="summary-val" style="color: var(--green); font-size: 15px;">{{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}</span>
+            <span class="summary-val" style="color: var(--green); font-size: 15px;">{{ selectedCharge?.currencyCode }}
+              {{ selectedCharge?.amount | number:'1.2-2' }}</span>
           </div>
           <div class="summary-row">
             <span class="summary-key">Next Status</span>
-            <span class="summary-val"><span class="badge-for-liquidation badge" style="font-size: 10px;">FOR LIQUIDATION</span></span>
+            <span class="summary-val"><span class="badge-for-liquidation badge" style="font-size: 10px;">FOR
+                LIQUIDATION</span></span>
           </div>
         </div>
-        <div style="text-align: center; padding: 12px; background: var(--rule-light); border-radius: 8px; font-size: 13px; color: var(--ink-soft);">
-          Are you sure you want to release this cash to the processor? <br/>
+        <div
+          style="text-align: center; padding: 12px; background: var(--rule-light); border-radius: 8px; font-size: 13px; color: var(--ink-soft);">
+          Are you sure you want to release this cash to the processor? <br />
           <span style="font-size: 11px; color: var(--ink-muted);">This action cannot be undone.</span>
         </div>
       </div>
       <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 14px 24px; gap: 10px;">
-        <button type="button" class="btn btn-ghost" (click)="closeCashReleaseConfirmModal()" [disabled]="isSubmitting">Cancel</button>
-        <button type="button" class="btn btn-primary" style="background: var(--green);" (click)="confirmCashRelease()" [disabled]="isSubmitting">
+        <button type="button" class="btn btn-ghost" (click)="closeCashReleaseConfirmModal()"
+          [disabled]="isSubmitting">Cancel</button>
+        <button type="button" class="btn btn-primary" style="background: var(--green);" (click)="confirmCashRelease()"
+          [disabled]="isSubmitting">
           @if (!isSubmitting) { Confirm Release }
           @else { <span class="spinner-border spinner-border-sm me-2"></span> Releasing... }
         </button>
@@ -402,118 +638,118 @@
   </div>
 </div>
 
-
 <!-- ── Submit for Clearing Modal ── -->
 @if (showSubmitClearingConfirmModal) { <div class="modal-backdrop" (click)="closeSubmitClearingConfirmModal()"></div> }
-<div class="modal custom-modal" [class.show]="showSubmitClearingConfirmModal" [class.d-block]="showSubmitClearingConfirmModal" tabindex="-1" role="dialog">
+<div class="modal custom-modal" [class.show]="showSubmitClearingConfirmModal"
+  [class.d-block]="showSubmitClearingConfirmModal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
       <div class="modal-header" style="background: var(--green);">
-        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px; color:#fff;">Liquidate — Submit for Clearing</h5>
-        <button type="button" class="btn-close btn-close-white" (click)="closeSubmitClearingConfirmModal()" aria-label="Close"></button>
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px; color:#fff;">
+          Liquidate — Submit for Clearing</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeSubmitClearingConfirmModal()"
+          aria-label="Close"></button>
       </div>
       <div class="modal-body" style="padding: 24px;">
         <div class="confirm-notice" style="margin-bottom: 16px;">
-          Processor is complying with liquidation requirements. This will be submitted to cashier for clearing and tagged as <strong>FOR CLEARING</strong>.
+          Processor is complying with liquidation requirements. This will be submitted to cashier for clearing and
+          tagged as <strong>FOR CLEARING</strong>.
         </div>
 
-     <!-- Charge Summary -->
-<div class="summary-card" style="margin-bottom: 16px;">
-  <div class="summary-card-title">Liquidation Details</div>
+        <!-- Charge Summary -->
+        <div class="summary-card" style="margin-bottom: 16px;">
+          <div class="summary-card-title">Liquidation Details</div>
 
-  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 16px; margin-top: 8px;">
-    <div>
-      <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Charge Code</div>
-      <div class="cell-mono" style="font-size: 12px; color: var(--accent); font-weight: 600;">{{ selectedCharge?.chargeCode }}</div>
-    </div>
-    <div>
-      <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Category</div>
-      <div class="cell-primary" style="font-size: 12px;">{{ selectedCharge?.chargeSubCategoryName }}</div>
-    </div>
-    <div>
-      <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Processor</div>
-      <div class="cell-primary" style="font-size: 12px;">{{ selectedCharge?.processorOwnerName || '—' }}</div>
-    </div>
-    <div>
-      <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Amount</div>
-      <div class="cell-mono" style="font-size: 13px; color: var(--green); font-weight: 600;">
-        {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
-      </div>
-    </div>
-    <div>
-      <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Next Status</div>
-      <span class="badge badge-cleared" style="font-size: 10px;">FOR CLEARING</span>
-    </div>
-  </div>
-</div>
-
-<!-- Refund Details -->
-<div style="border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin-bottom: 16px;">
-
-  <!-- Section header -->
-  <div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--rule-light); border-bottom: 1px solid var(--rule);">
-    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
-    </svg>
-    <span class="cell-sub" style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Refund Details</span>
-  </div>
-
-  <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 12px;">
-
-    <!-- Refund Amount -->
-    <div>
-      <label class="filter-label" style="margin-bottom: 6px; display: block;">Refund Amount</label>
-      <div style="display: flex; align-items: center;">
-        <span style="padding: 8px 12px; background: var(--rule-light); border: 1px solid var(--rule); border-right: none; border-radius: 6px 0 0 6px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink-muted); white-space: nowrap;">
-          {{ selectedCharge?.currencyCode }}
-        </span>
-        <input type="number" class="filter-input"
-          style="border-radius: 0 6px 6px 0; flex: 1; min-width: 0;"
-          [value]="refundAmount"
-          (input)="onRefundAmountChange($event)"
-          [max]="selectedCharge?.amount"
-          min="0" step="0.01"
-          placeholder="0.00"
-          [disabled]="isSubmitting" />
-      </div>
-      @if (refundAmount && refundAmount > (selectedCharge?.amount || 0)) {
-        <div style="font-size: 11px; color: var(--red); margin-top: 4px;">
-          Cannot exceed {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 16px; margin-top: 8px;">
+            <div>
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Charge Code</div>
+              <div class="cell-mono" style="font-size: 12px; color: var(--accent); font-weight: 600;">{{
+                selectedCharge?.chargeCode }}</div>
+            </div>
+            <div>
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Category</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ selectedCharge?.chargeSubCategoryName }}</div>
+            </div>
+            <div>
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Processor</div>
+              <div class="cell-primary" style="font-size: 12px;">{{ selectedCharge?.processorOwnerName || '—' }}</div>
+            </div>
+            <div>
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Amount</div>
+              <div class="cell-mono" style="font-size: 13px; color: var(--green); font-weight: 600;">
+                {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
+              </div>
+            </div>
+            <div>
+              <div class="cell-sub" style="font-size: 10px; margin-bottom: 2px;">Next Status</div>
+              <span class="badge badge-cleared" style="font-size: 10px;">FOR CLEARING</span>
+            </div>
+          </div>
         </div>
-      }
-    </div>
 
-    <!-- Reference Number -->
-    <div>
-      <label class="filter-label" style="margin-bottom: 6px; display: block;">Reference Number</label>
-      <input type="text" class="filter-input" style="width: 100%;"
-        [value]="referenceNumber"
-        (input)="onReferenceNumberChange($event)"
-        placeholder="Enter reference number"
-        [disabled]="isSubmitting" />
-    </div>
+        <!-- Refund Details -->
+        <div style="border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin-bottom: 16px;">
 
-    <!-- Notes -->
-    <div>
-      <label class="filter-label" style="margin-bottom: 6px; display: block;">Notes</label>
-      <textarea class="filter-input"
-        style="width: 100%; resize: vertical; min-height: 68px; box-sizing: border-box;"
-        rows="3"
-        [value]="refundNotes"
-        (input)="onRefundNotesChange($event)"
-        placeholder="Add any additional notes..."
-        [disabled]="isSubmitting"></textarea>
-    </div>
+          <!-- Section header -->
+          <div
+            style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--rule-light); border-bottom: 1px solid var(--rule);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+            </svg>
+            <span class="cell-sub"
+              style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Refund
+              Details</span>
+          </div>
 
-  </div>
-</div>
+          <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 12px;">
+
+            <!-- Refund Amount -->
+            <div>
+              <label class="filter-label" style="margin-bottom: 6px; display: block;">Refund Amount</label>
+              <div style="display: flex; align-items: center;">
+                <span
+                  style="padding: 8px 12px; background: var(--rule-light); border: 1px solid var(--rule); border-right: none; border-radius: 6px 0 0 6px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink-muted); white-space: nowrap;">
+                  {{ selectedCharge?.currencyCode }}
+                </span>
+                <input type="number" class="filter-input" style="border-radius: 0 6px 6px 0; flex: 1; min-width: 0;"
+                  [value]="refundAmount" (input)="onRefundAmountChange($event)" [max]="selectedCharge?.amount" min="0"
+                  step="0.01" placeholder="0.00" [disabled]="isSubmitting" />
+              </div>
+              @if (refundAmount && refundAmount > (selectedCharge?.amount || 0)) {
+              <div style="font-size: 11px; color: var(--red); margin-top: 4px;">
+                Cannot exceed {{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}
+              </div>
+              }
+            </div>
+
+            <!-- Reference Number -->
+            <div>
+              <label class="filter-label" style="margin-bottom: 6px; display: block;">Reference Number</label>
+              <input type="text" class="filter-input" style="width: 100%;" [value]="referenceNumber"
+                (input)="onReferenceNumberChange($event)" placeholder="Enter reference number"
+                [disabled]="isSubmitting" />
+            </div>
+
+            <!-- Notes -->
+            <div>
+              <label class="filter-label" style="margin-bottom: 6px; display: block;">Notes</label>
+              <textarea class="filter-input"
+                style="width: 100%; resize: vertical; min-height: 68px; box-sizing: border-box;" rows="3"
+                [value]="refundNotes" (input)="onRefundNotesChange($event)" placeholder="Add any additional notes..."
+                [disabled]="isSubmitting"></textarea>
+            </div>
+
+          </div>
+        </div>
 
         <div class="confirm-notice" style="background: #fef3e2; color: #92520a;">
           Are you sure you want to submit this transaction for clearing?
         </div>
       </div>
       <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 14px 24px; gap: 10px;">
-        <button type="button" class="btn btn-ghost" (click)="closeSubmitClearingConfirmModal()" [disabled]="isSubmitting">Cancel</button>
+        <button type="button" class="btn btn-ghost" (click)="closeSubmitClearingConfirmModal()"
+          [disabled]="isSubmitting">Cancel</button>
         <button type="button" class="btn btn-primary" style="background: var(--green);"
           (click)="confirmSubmitClearing()"
           [disabled]="isSubmitting || (refundAmount && refundAmount > (selectedCharge?.amount || 0))">
@@ -525,15 +761,17 @@
   </div>
 </div>
 
-
 <!-- ── Final Closing Modal ── -->
 @if (showFinalClosingConfirmModal) { <div class="modal-backdrop" (click)="closeFinalClosingConfirmModal()"></div> }
-<div class="modal custom-modal" [class.show]="showFinalClosingConfirmModal" [class.d-block]="showFinalClosingConfirmModal" tabindex="-1" role="dialog">
+<div class="modal custom-modal" [class.show]="showFinalClosingConfirmModal"
+  [class.d-block]="showFinalClosingConfirmModal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
       <div class="modal-header" style="background: var(--ink);">
-        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px; color:#fff;">Final Closing</h5>
-        <button type="button" class="btn-close btn-close-white" (click)="closeFinalClosingConfirmModal()" aria-label="Close"></button>
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px; color:#fff;">
+          Final Closing</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeFinalClosingConfirmModal()"
+          aria-label="Close"></button>
       </div>
       <div class="modal-body" style="padding: 24px;">
         <div class="confirm-notice" style="background: var(--green-light); color: var(--green); margin-bottom: 16px;">
@@ -555,11 +793,13 @@
           </div>
           <div class="summary-row">
             <span class="summary-key">Amount</span>
-            <span class="summary-val" style="color: var(--green); font-size: 15px;">{{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}</span>
+            <span class="summary-val" style="color: var(--green); font-size: 15px;">{{ selectedCharge?.currencyCode }}
+              {{ selectedCharge?.amount | number:'1.2-2' }}</span>
           </div>
           <div class="summary-row">
             <span class="summary-key">Final Status</span>
-            <span class="summary-val"><span class="badge-completed badge" style="font-size: 10px;">COMPLETED</span></span>
+            <span class="summary-val"><span class="badge-completed badge"
+                style="font-size: 10px;">COMPLETED</span></span>
           </div>
         </div>
         <div class="confirm-notice" style="background: #fef3e2; color: #92520a;">
@@ -567,8 +807,10 @@
         </div>
       </div>
       <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 14px 24px; gap: 10px;">
-        <button type="button" class="btn btn-ghost" (click)="closeFinalClosingConfirmModal()" [disabled]="isSubmitting">Cancel</button>
-        <button type="button" class="btn btn-primary" style="background: var(--ink);" (click)="confirmFinalClosing()" [disabled]="isSubmitting">
+        <button type="button" class="btn btn-ghost" (click)="closeFinalClosingConfirmModal()"
+          [disabled]="isSubmitting">Cancel</button>
+        <button type="button" class="btn btn-primary" style="background: var(--ink);" (click)="confirmFinalClosing()"
+          [disabled]="isSubmitting">
           @if (!isSubmitting) { Complete Transaction }
           @else { <span class="spinner-border spinner-border-sm me-2"></span> Completing... }
         </button>
@@ -577,19 +819,22 @@
   </div>
 </div>
 
-
 <!-- ── Own Charge Confirmation Modal ── -->
 @if (showOwnLineChargeConfirmModal) { <div class="modal-backdrop" (click)="closeOwnLineChargeConfirmModal()"></div> }
-<div class="modal custom-modal" [class.show]="showOwnLineChargeConfirmModal" [class.d-block]="showOwnLineChargeConfirmModal" tabindex="-1" role="dialog">
+<div class="modal custom-modal" [class.show]="showOwnLineChargeConfirmModal"
+  [class.d-block]="showOwnLineChargeConfirmModal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
       <div class="modal-header" style="background: #1a3a6b;">
-        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px; color:#fff;">Own Line Charge</h5>
-        <button type="button" class="btn-close btn-close-white" (click)="closeOwnLineChargeConfirmModal()" aria-label="Close"></button>
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px; color:#fff;">Own
+          Line Charge</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeOwnLineChargeConfirmModal()"
+          aria-label="Close"></button>
       </div>
       <div class="modal-body" style="padding: 24px;">
         <div class="confirm-notice" style="margin-bottom: 16px;">
-          You are about to take ownership of this line charge. This will assign you as the processor and make it eligible for processing.
+          You are about to take ownership of this line charge. This will assign you as the processor and make it
+          eligible for processing.
         </div>
         <div class="summary-card" style="margin-bottom: 16px;">
           <div class="summary-card-title">Transaction Details</div>
@@ -607,7 +852,8 @@
           </div>
           <div class="summary-row">
             <span class="summary-key">Amount</span>
-            <span class="summary-val" style="color: var(--accent); font-size: 15px;">{{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}</span>
+            <span class="summary-val" style="color: var(--accent); font-size: 15px;">{{ selectedCharge?.currencyCode }}
+              {{ selectedCharge?.amount | number:'1.2-2' }}</span>
           </div>
         </div>
         <div class="confirm-notice" style="background: #fef3e2; color: #92520a;">
@@ -615,7 +861,8 @@
         </div>
       </div>
       <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 14px 24px; gap: 10px;">
-        <button type="button" class="btn btn-ghost" (click)="closeOwnLineChargeConfirmModal()" [disabled]="isSubmitting">Cancel</button>
+        <button type="button" class="btn btn-ghost" (click)="closeOwnLineChargeConfirmModal()"
+          [disabled]="isSubmitting">Cancel</button>
         <button type="button" class="btn btn-primary" (click)="confirmOwnLineCharge()" [disabled]="isSubmitting">
           @if (!isSubmitting) { Confirm Ownership }
           @else { <span class="spinner-border spinner-border-sm me-2"></span> Processing... }
@@ -625,15 +872,17 @@
   </div>
 </div>
 
-
 <!-- ── Audit Log Modal ── -->
 @if (showAuditLogModal) { <div class="modal-backdrop" (click)="closeAuditLogModal()"></div> }
-<div class="modal custom-modal" [class.show]="showAuditLogModal" [class.d-block]="showAuditLogModal" tabindex="-1" role="dialog">
+<div class="modal custom-modal" [class.show]="showAuditLogModal" [class.d-block]="showAuditLogModal" tabindex="-1"
+  role="dialog">
   <div class="modal-dialog modal-dialog-centered modal-lg" (click)="$event.stopPropagation()" role="document">
     <div class="modal-content">
       <div class="modal-header" style="background: #1a3a6b;">
-        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px; color:#fff;">Audit Log</h5>
-        <button type="button" class="btn-close btn-close-white" (click)="closeAuditLogModal()" aria-label="Close"></button>
+        <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px; color:#fff;">
+          Audit Log</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeAuditLogModal()"
+          aria-label="Close"></button>
       </div>
       <div class="modal-body" style="padding: 20px; max-height: 70vh; overflow-y: auto;">
 
@@ -642,15 +891,18 @@
           <div style="display: flex; gap: 24px; flex-wrap: wrap; font-size: 12px;">
             <div>
               <div class="cell-sub">Charge Code</div>
-              <div class="cell-mono" style="color: var(--accent); margin-top: 2px;">{{ selectedCharge?.chargeCode }}</div>
+              <div class="cell-mono" style="color: var(--accent); margin-top: 2px;">{{ selectedCharge?.chargeCode }}
+              </div>
             </div>
             <div>
               <div class="cell-sub">Category</div>
-              <div class="cell-primary" style="font-size: 12px; margin-top: 2px;">{{ selectedCharge?.chargeSubCategoryName }}</div>
+              <div class="cell-primary" style="font-size: 12px; margin-top: 2px;">{{
+                selectedCharge?.chargeSubCategoryName }}</div>
             </div>
             <div>
               <div class="cell-sub">Amount</div>
-              <div class="cell-mono" style="margin-top: 2px;">{{ selectedCharge?.currencyCode }} {{ selectedCharge?.amount | number:'1.2-2' }}</div>
+              <div class="cell-mono" style="margin-top: 2px;">{{ selectedCharge?.currencyCode }} {{
+                selectedCharge?.amount | number:'1.2-2' }}</div>
             </div>
             <div>
               <div class="cell-sub">Status</div>
@@ -668,69 +920,73 @@
 
         <!-- Loading -->
         @if (isLoadingAuditLog) {
-          <div style="text-align: center; padding: 32px; color: var(--ink-muted);">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="spin">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v3m0 12v3m9-9h-3M6 12H3"/>
-            </svg>
-            <p style="font-size: 13px; margin-top: 8px;">Loading audit log...</p>
-          </div>
+        <div style="text-align: center; padding: 32px; color: var(--ink-muted);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2" class="spin">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v3m0 12v3m9-9h-3M6 12H3" />
+          </svg>
+          <p style="font-size: 13px; margin-top: 8px;">Loading audit log...</p>
+        </div>
         }
 
         @if (!isLoadingAuditLog && auditLogs && auditLogs.length > 0) {
-          <div class="timeline">
-            @for (log of auditLogs; track log.id) {
-              <div class="timeline-item">
-                <div class="timeline-marker" [ngClass]="getActionTypeClass(log.actionType)"></div>
-                <div class="timeline-content">
-                  <div class="summary-card" style="margin-bottom: 10px;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                      <div>
-                        <span class="status-chip" [ngClass]="getActionTypeBadge(log.actionType)">{{ log.actionType }}</span>
-                        <div class="cell-sub" style="margin-top: 4px;">{{ (log.createDate + 'Z') | date:'MM/dd/yy h:mm a':'+0800' }}</div>
-                      </div>
-                      <div style="text-align: right;">
-                        <div class="cell-sub">Modified by</div>
-                        <div class="cell-primary" style="font-size: 12px;">{{ log.modifiedBy }}</div>
-                        @if (log.requestedBy) { <div class="cell-sub">Req: {{ log.requestedBy }}</div> }
-                      </div>
-                    </div>
-                    <div style="display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px;">
-                      <div>
-                        <div class="cell-sub">Status</div>
-                        <div style="display: flex; align-items: center; gap: 4px; margin-top: 4px;">
-                          @if (log.previousStatus) {
-                            <span class="badge-cancelled badge" style="font-size: 9px;">{{ log.previousStatus }}</span>
-                            <span style="color: var(--ink-muted);">→</span>
-                          }
-                          <span class="badge badge-approved" style="font-size: 9px;">{{ log.newStatus }}</span>
-                        </div>
-                      </div>
-                      <div>
-                        <div class="cell-sub">Amount</div>
-                        <div class="cell-primary" style="margin-top: 4px;">{{ log.amount | number:'1.2-2' }}</div>
-                      </div>
-                      <div>
-                        <div class="cell-sub">Code</div>
-                        <div class="cell-mono" style="color: var(--accent); margin-top: 4px;">{{ log.chargeCode }}</div>
-                      </div>
-                    </div>
-                    @if (log.remarks) {
-                      <div style="margin-top: 10px; padding: 8px 12px; background: var(--rule-light); border-radius: 6px; font-size: 12px; color: var(--ink-soft); border-left: 3px solid var(--rule);">
-                        {{ log.remarks }}
-                      </div>
-                    }
+        <div class="timeline">
+          @for (log of auditLogs; track log.id) {
+          <div class="timeline-item">
+            <div class="timeline-marker" [ngClass]="getActionTypeClass(log.actionType)"></div>
+            <div class="timeline-content">
+              <div class="summary-card" style="margin-bottom: 10px;">
+                <div
+                  style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                  <div>
+                    <span class="status-chip bg-secondary">{{ log.actionType }}</span>
+                    <div class="cell-sub" style="margin-top: 4px;">{{ (log.createDate + 'Z') | date:'MM/dd/yy h:mm
+                      a':'+0800' }}</div>
+                  </div>
+                  <div style="text-align: right;">
+                    <div class="cell-sub">Modified by</div>
+                    <div class="cell-primary" style="font-size: 12px;">{{ log.modifiedBy }}</div>
+                    @if (log.requestedBy) { <div class="cell-sub">Req: {{ log.requestedBy }}</div> }
                   </div>
                 </div>
+                <div style="display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px;">
+                  <div>
+                    <div class="cell-sub">Status</div>
+                    <div style="display: flex; align-items: center; gap: 4px; margin-top: 4px;">
+                      @if (log.previousStatus) {
+                      <span class="badge-cancelled badge" style="font-size: 9px;">{{ log.previousStatus }}</span>
+                      <span style="color: var(--ink-muted);">→</span>
+                      }
+                      <span class="badge badge-approved" style="font-size: 9px;">{{ log.newStatus }}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="cell-sub">Amount</div>
+                    <div class="cell-primary" style="margin-top: 4px;">{{ log.amount | number:'1.2-2' }}</div>
+                  </div>
+                  <div>
+                    <div class="cell-sub">Code</div>
+                    <div class="cell-mono" style="color: var(--accent); margin-top: 4px;">{{ log.chargeCode }}</div>
+                  </div>
+                </div>
+                @if (log.remarks) {
+                <div
+                  style="margin-top: 10px; padding: 8px 12px; background: var(--rule-light); border-radius: 6px; font-size: 12px; color: var(--ink-soft); border-left: 3px solid var(--rule);">
+                  {{ log.remarks }}
+                </div>
+                }
               </div>
-            }
+            </div>
           </div>
+          }
+        </div>
         }
 
         @if (!isLoadingAuditLog && (!auditLogs || auditLogs.length === 0)) {
-          <div class="empty-state">
-            <div class="empty-icon">◻</div>
-            <p>No audit log entries found for this transaction.</p>
-          </div>
+        <div class="empty-state">
+          <div class="empty-icon">◻</div>
+          <p>No audit log entries found for this transaction.</p>
+        </div>
         }
       </div>
       <div class="modal-footer" style="border-top: 1px solid var(--rule); padding: 12px 20px;">
@@ -745,17 +1001,27 @@
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
   <div class="toast align-items-center border-0" [class.show]="showSuccessToast" role="alert">
     <div class="d-flex">
-      <div class="toast-body rounded" style="background: var(--green-light); color: var(--green); display:flex; align-items:center; gap:10px; font-size:13px;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+      <div class="toast-body rounded"
+        style="background: var(--green-light); color: var(--green); display:flex; align-items:center; gap:10px; font-size:13px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
         <div><strong style="display:block;">Success!</strong>{{ successMessage }}</div>
       </div>
-      <button type="button" class="btn-close me-2 m-auto" (click)="showSuccessToast = false" aria-label="Close"></button>
+      <button type="button" class="btn-close me-2 m-auto" (click)="showSuccessToast = false"
+        aria-label="Close"></button>
     </div>
   </div>
   <div class="toast align-items-center border-0" [class.show]="showErrorToast" role="alert">
     <div class="d-flex">
-      <div class="toast-body rounded" style="background: #fdecea; color: var(--red); display:flex; align-items:center; gap:10px; font-size:13px;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+      <div class="toast-body rounded"
+        style="background: #fdecea; color: var(--red); display:flex; align-items:center; gap:10px; font-size:13px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <path d="m15 9-6 6M9 9l6 6" />
+        </svg>
         <div><strong style="display:block;">Error</strong>{{ errorMessage }}</div>
       </div>
       <button type="button" class="btn-close me-2 m-auto" (click)="showErrorToast = false" aria-label="Close"></button>

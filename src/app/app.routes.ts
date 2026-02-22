@@ -143,7 +143,7 @@ export const routes: Routes = [
             loadComponent: () => import('./views/approvals/pettycash/pettycash.component').then(m => m.PettycashComponent),
             data: {
               title: 'Petty Cash Approval',
-              roles: ['admin', 'treasurer','cashier','sales']
+              roles: ['admin', 'treasurer','cashier','sales','opsmgr']
             },
           },
           {
@@ -152,7 +152,7 @@ export const routes: Routes = [
             loadComponent: () => import('./views/approvals/pettycash-approval/pettycash-approval.component').then(m => m.PettycashApprovalComponent),
             data: {
               title: 'Petty Cash Approval',
-              roles: ['admin', 'treasurer','cashier']
+              roles: ['admin', 'treasurer','cashier','opsmgr']
             },
           },
           {
@@ -203,7 +203,7 @@ export const routes: Routes = [
             loadComponent: () => import('./views/report/liquidations/liquidations.component').then(m => m.LiquidationsComponent),
             data: {
               title: 'Released & Refunds',
-              roles: ['admin', 'treasurer','cashier']
+              roles: ['admin', 'treasurer','cashier','sales']
             },
           },
           {
@@ -212,7 +212,7 @@ export const routes: Routes = [
             loadComponent: () => import('./views/report/pettycash-released/pettycash-released.component').then(m => m.PettycashReleasedComponent),
             data: {
               title: 'Released Petty Cash',
-              roles: ['admin', 'treasurer','cashier']
+              roles: ['admin', 'treasurer','cashier','sales']
             },
           }
         ]

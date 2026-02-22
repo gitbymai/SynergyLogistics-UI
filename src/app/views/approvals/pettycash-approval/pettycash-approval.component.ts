@@ -98,6 +98,18 @@ export class PettycashApprovalComponent implements OnInit {
         }
       });
     }
+    else if (this.userRole === 'OPSMGR' || this.userRole === 'SALES') {
+      this.jobService.getAllChargeTransactionByGuidByOpsMgr(jobGuid).subscribe({
+        next: (success) => {
+          this.jobGuid = jobGuid;
+          this.charges = success.data;
+        },
+        error: (error) => {
+
+          console.error('Error loading job details:', error);
+        }
+      });
+    }
     else {
 
       this.jobService.getAllChargeTransactionByGuid(jobGuid).subscribe({

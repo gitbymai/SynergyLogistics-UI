@@ -94,6 +94,9 @@ export class TransactionlistComponent implements OnInit, OnChanges {
         this.loadAllJobWithPettyCashRelatedRequestSales();
 
       }
+      else if (userRole === 'OPSMGR') {
+        this.loadAllJobWithPettyCashRelatedOpsManager();
+      }
       else {
         this.loadJobList();
       }
@@ -117,7 +120,7 @@ export class TransactionlistComponent implements OnInit, OnChanges {
   loadJobList() {
 
     this.isLoading = true;
-    this.jobService.getAllJobs().subscribe({
+    this.jobService.getAllJobs(this.filters.dateFrom, this.filters.dateTo).subscribe({
 
       next: (response) => {
 
@@ -147,7 +150,7 @@ export class TransactionlistComponent implements OnInit, OnChanges {
   loadAllJobWithPettyCashRelatedRequestCashier() {
 
     this.isLoading = true;
-    this.jobService.getAllJobsByCashierWithRequest().subscribe({
+    this.jobService.getAllJobsByCashierWithRequest(this.filters.dateFrom, this.filters.dateTo).subscribe({
 
       next: (response) => {
 
@@ -177,7 +180,7 @@ export class TransactionlistComponent implements OnInit, OnChanges {
 
   loadAllJobWithPettyCashRelatedRequestTreasurer() {
     this.isLoading = true;
-    this.jobService.getAllJobsByTreasurerWithRequest().subscribe({
+    this.jobService.getAllJobsByTreasurerWithRequest(this.filters.dateFrom, this.filters.dateTo).subscribe({
 
       next: (response) => {
 
@@ -207,7 +210,38 @@ export class TransactionlistComponent implements OnInit, OnChanges {
   loadAllJobWithPettyCashRelatedRequestSales() {
 
     this.isLoading = true;
-    this.jobService.getAllJobsBySalesWithRequest().subscribe({
+    this.jobService.getAllJobsBySalesWithRequest(this.filters.dateFrom, this.filters.dateTo).subscribe({
+
+      next: (response) => {
+
+        if (response.success && response.data?.length) {
+          this.jobs = response.data
+            .filter(c => c.isActive)
+            .map(job => ({
+              ...job,
+              agingDays: this.calculateAgingDays(job.createdDate)
+            }))
+            .sort((a, b) => b.jobId - a.jobId);
+
+          this.filteredJobs = [...this.jobs];
+          this.currentPage = 1;
+          this.isLoading = false;
+        }
+
+      },
+      error: (error) => {
+        console.error('API returned error:', error.message);
+        this.isLoading = false;
+      }
+    });
+
+  }
+
+
+  loadAllJobWithPettyCashRelatedOpsManager() {
+
+    this.isLoading = true;
+    this.jobService.getAllJobTransactionOpsManager(this.filters.dateFrom, this.filters.dateTo).subscribe({
 
       next: (response) => {
 
@@ -236,7 +270,7 @@ export class TransactionlistComponent implements OnInit, OnChanges {
 
   loadAllJobTrasactionsAssignedToUser() {
     this.isLoading = true;
-    this.jobService.getAllJobTransactionAssignedToUser().subscribe({
+    this.jobService.getAllJobTransactionAssignedToUser(this.filters.dateFrom, this.filters.dateTo).subscribe({
 
       next: (response) => {
 
@@ -265,7 +299,7 @@ export class TransactionlistComponent implements OnInit, OnChanges {
 
   loadAllJobTrasactionNoOwnership() {
     this.isLoading = true;
-    this.jobService.getAllJobTransactionNoAssignedUser().subscribe({
+    this.jobService.getAllJobTransactionNoAssignedUser(this.filters.dateFrom, this.filters.dateTo).subscribe({
 
       next: (response) => {
 
@@ -568,29 +602,8 @@ export class TransactionlistComponent implements OnInit, OnChanges {
     if (this.filterCriteria === null || this.filterCriteria === undefined || this.filterCriteria === '') {
       this.pageTitle = 'Job Transaction List';
       this.loadJobList();
+    } else {
+      this.applyFilterCriteriaParameter();
     }
-
-    this.jobService.getAllJobs(this.filters.dateFrom, this.filters.dateTo).subscribe({
-      next: (response) => {
-        if (response.success && response.data?.length) {
-          this.jobs = response.data
-            .filter(c => c.isActive)
-            .map(job => ({
-              ...job,
-              agingDays: this.calculateAgingDays(job.createdDate)
-            }))
-            .sort((a, b) => b.jobId - a.jobId);;
-        }
-
-        this.filteredJobs = [...this.jobs];
-        this.currentPage = 1;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error(error);
-        this.isLoading = false;
-      }
-    });
-
   }
 }

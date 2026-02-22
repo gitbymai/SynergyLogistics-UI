@@ -23,10 +23,10 @@ export const navItems = [
         roles: ['sales', 'admin', 'finance', 'treasurer']
       },
       {
-        name: 'Transactions',
+        name: 'Job List',
         url: '/jobs/financials',
         iconComponent: { name: 'cil-notes' },
-        roles: ['admin', 'opsmgr', 'processor']
+        roles: ['admin', 'opsmgr', 'processor','cashier']
       }
     ]
   },
@@ -39,13 +39,13 @@ export const navItems = [
         name: 'Petty Cash',
         url: '/approvals/pettycash',
         iconComponent: { name: 'cil-credit-card' },
-        roles: ['admin','treasurer','cashier','sales']
+        roles: ['admin','treasurer','cashier','sales','opsmgr']
       },
       {
         name: 'Owned Transactions',
         url: '/approvals/owned-transactions',
         iconComponent: { name: 'cil-layers' },
-        roles: ['admin','processor','opsmgr']
+        roles: ['admin','processor']
       },
       {
         name: 'Waiting for Ownership',
@@ -89,13 +89,13 @@ export const navItems = [
         name: 'Released Petty Cash',
         url: '/report/pettycash-released',
         iconComponent: { name: 'cil-paper-plane' },
-        roles: ['admin','treasurer','cashier']
+        roles: ['admin','treasurer','cashier','sales']
       },
       {
         name: 'Actual Refunds',
         url: '/report/liquidations',
         iconComponent: { name: 'cil-paper-plane' },
-        roles: ['admin','treasurer','cashier']
+        roles: ['admin','treasurer','cashier','sales']
       }
     ]
   },

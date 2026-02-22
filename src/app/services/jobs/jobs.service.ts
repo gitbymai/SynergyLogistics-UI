@@ -46,24 +46,52 @@ export class JobsService extends ApiService {
     return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/job-list`, { params });
   }
 
-  getAllJobsByCashierWithRequest(): Observable<ApiResponse<Job[]>> {
-    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/getall-cashier`);
+  getAllJobsByCashierWithRequest(dateFrom?: string, dateTo?: string): Observable<ApiResponse<Job[]>> {
+    let params = new HttpParams();
+    if (dateFrom) params = params.set('dateFrom', dateFrom);
+    if (dateTo) params = params.set('dateTo', dateTo);
+
+    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/getall-cashier`, { params });
   }
 
-  getAllJobsByTreasurerWithRequest(): Observable<ApiResponse<Job[]>> {
-    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/getall-treasurer`);
+  getAllJobsByTreasurerWithRequest(dateFrom?: string, dateTo?: string): Observable<ApiResponse<Job[]>> {
+    let params = new HttpParams();
+    if (dateFrom) params = params.set('dateFrom', dateFrom);
+    if (dateTo) params = params.set('dateTo', dateTo);
+
+    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/getall-treasurer`, { params });
   }
 
-  getAllJobsBySalesWithRequest(): Observable<ApiResponse<Job[]>> {
-    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/getall-sales`);
+  getAllJobsBySalesWithRequest(dateFrom?: string, dateTo?: string): Observable<ApiResponse<Job[]>> {
+    let params = new HttpParams();
+    if (dateFrom) params = params.set('dateFrom', dateFrom);
+    if (dateTo) params = params.set('dateTo', dateTo);
+
+    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/getall-sales`, { params });
   }
 
-  getAllJobTransactionAssignedToUser(): Observable<ApiResponse<Job[]>> {
-    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/getall-assigned-to-user`);
+  getAllJobTransactionAssignedToUser(dateFrom?: string, dateTo?: string): Observable<ApiResponse<Job[]>> {
+    let params = new HttpParams();
+    if (dateFrom) params = params.set('dateFrom', dateFrom);
+    if (dateTo) params = params.set('dateTo', dateTo);
+
+    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/getall-assigned-to-user`, { params });
   }
 
-  getAllJobTransactionNoAssignedUser(): Observable<ApiResponse<Job[]>> {
-    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/getall-no-assigned`);
+  getAllJobTransactionNoAssignedUser(dateFrom?: string, dateTo?: string): Observable<ApiResponse<Job[]>> {
+    let params = new HttpParams();
+    if (dateFrom) params = params.set('dateFrom', dateFrom);
+    if (dateTo) params = params.set('dateTo', dateTo);
+
+    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/getall-no-assigned`, { params });
+  }
+
+  getAllJobTransactionOpsManager(dateFrom?: string, dateTo?: string): Observable<ApiResponse<Job[]>> {
+    let params = new HttpParams();
+    if (dateFrom) params = params.set('dateFrom', dateFrom);
+    if (dateTo) params = params.set('dateTo', dateTo);
+
+    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/getall-ops-manager`, { params });
   }
 
   getByGuid(jobGuid: string): Observable<Job> {
@@ -104,6 +132,10 @@ export class JobsService extends ApiService {
   getAllChargeTransactionByGuidByTreasurer(jobGuid: string): Observable<ApiResponse<ChargeTransaction[]>> {
 
     return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/${jobGuid}/charges/treasurer`);
+  }
+    getAllChargeTransactionByGuidByOpsMgr(jobGuid: string): Observable<ApiResponse<ChargeTransaction[]>> {
+
+    return this.http.get<ApiResponse<ChargeTransaction[]>>(`${this.apiUrl}/job/${jobGuid}/charges/opsmgr`);
   }
 
   getAllChargeTransactionByGuidByCashier(jobGuid: string): Observable<ApiResponse<ChargeTransaction[]>> {
