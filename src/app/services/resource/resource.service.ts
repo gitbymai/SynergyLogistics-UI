@@ -47,8 +47,12 @@ export class ResourceService extends ApiService {
     return this.http.put<ApiResponse<void>>(`${this.apiUrl}/resource/deactivate/${guid}`, {});
   }
 
-  getResourceTransactionsByResourceId(id: number): Observable<ApiResponse<ResourceTransaction[]>> {
-    return this.http.get<ApiResponse<ResourceTransaction[]>>(`${this.apiUrl}/resource/transactions/${id}`);
+  getResourceTransactionsByResourceId(id: number, dateFrom?: string, dateTo?: string): Observable<ApiResponse<ResourceTransaction[]>> {
+    let params = new HttpParams();
+    if (dateFrom) params = params.set('dateFrom', dateFrom);
+    if (dateTo) params = params.set('dateTo', dateTo);
+
+    return this.http.get<ApiResponse<ResourceTransaction[]>>(`${this.apiUrl}/resource/transactions/${id}`, { params });
   }
 
   addResourceTransaction(newResourceTransactionDto: NewResourceTransaction): Observable<ApiResponse<ResourceTransaction>> {

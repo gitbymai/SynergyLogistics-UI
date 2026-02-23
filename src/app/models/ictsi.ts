@@ -33,9 +33,9 @@ export interface IctsiTransaction {
   referenceNumber?: string;
   notes?: string;
   createdBy: number;
-  createdDate: Date;
+  createdDate?: string;
   modifiedBy: number;
-  modifiedDate: Date;
+  modifiedDate?: string;
   isActive: boolean;
   createdByName?: string;
   modifiedByName?: string;

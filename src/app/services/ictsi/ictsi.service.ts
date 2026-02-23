@@ -43,14 +43,18 @@ export class IctsiService extends ApiService {
     return this.http.put<ApiResponse<void>>(`${this.apiUrl}/ictsi/deactivate/${guid}`, {});
   }
 
-  getIctsiTransactionsByIctsiId(id: number): Observable<ApiResponse<IctsiTransaction[]>> {
-    return this.http.get<ApiResponse<IctsiTransaction[]>>(`${this.apiUrl}/ictsi/transactions/${id}`);
+  getIctsiTransactionsByIctsiId(id: number, dateFrom?: string, dateTo?: string): Observable<ApiResponse<IctsiTransaction[]>> {
+    let params = new HttpParams();
+    if (dateFrom) params = params.set('dateFrom', dateFrom);
+    if (dateTo) params = params.set('dateTo', dateTo);
+
+    return this.http.get<ApiResponse<IctsiTransaction[]>>(`${this.apiUrl}/ictsi/transactions/${id}`, { params });
   }
 
   addIctsiTransaction(newIctsiTransactionDto: NewIctsiTransaction): Observable<ApiResponse<IctsiTransaction>> {
     return this.http.post<ApiResponse<IctsiTransaction>>(`${this.apiUrl}/ictsi/transactions`, newIctsiTransactionDto);
   }
-  
+
   getResourceTransactionTypes(): Observable<ApiResponse<Configuration[]>> {
     return this.http.get<ApiResponse<Configuration[]>>(`${this.apiUrl}/configuration/resource-transaction-type`);
   }

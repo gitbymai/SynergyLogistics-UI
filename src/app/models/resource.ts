@@ -28,14 +28,16 @@ export interface ResourceTransaction {
   referenceNumber?: string;
   notes?: string;
   createdBy: number;
-  createdDate: Date;
+  createdDate?: string;
   modifiedBy: number;
-  modifiedDate: Date;
+  modifiedDate?: string;
   isActive: boolean;
   createdByName?: string;
   modifiedByName?: string;
   resourceTransactionTypeName?: string;
   resourceTypeName?: string;
+  resourceTransactionStatusId?: number;
+  resourceTransactionStatusName?: string
 }
 
 export interface NewResource {

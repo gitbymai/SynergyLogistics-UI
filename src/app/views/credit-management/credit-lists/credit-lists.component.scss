@@ -1,1 +1,72 @@
-*{font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}.card-header.bg-primary{background:linear-gradient(135deg,#1e88e5,#1565c0)!important;border-bottom:2px solid #1565c0;padding:1.25rem}.card-header h4{font-weight:700}.credit-summary-card{display:flex;align-items:center;padding:1.5rem;border-radius:.5rem;box-shadow:0 2px 8px rgba(0,0,0,.1);border:1px solid #ddd}.credit-summary-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.15)}.credit-summary-card.total{background:linear-gradient(135deg,#42a5f5,#1e88e5);border-color:#1565c0}.credit-summary-card.used{background:linear-gradient(135deg,#ff7043,#f4511e);border-color:#d84315}.credit-summary-card.remaining{background:linear-gradient(135deg,#66bb6a,#43a047);border-color:#2e7d32}.credit-summary-card .card-icon{width:50px;height:50px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-right:1rem}.credit-summary-card .card-icon i{font-size:1.5rem;color:#fff}.credit-summary-card .card-content{color:#fff;flex:1}.credit-summary-card .card-value{font-size:1.75rem;font-weight:700}.filters-section{background:#e3f2fd;padding:1rem;border-radius:.5rem;border:1px solid #90caf9}.filters-section .form-label{color:#1565c0;font-weight:600}.search-wrapper{position:relative}.search-icon{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:#1e88e5}.search-input{padding-left:2.5rem!important}.info-section{border-left:2px solid #0d6efd;padding-left:1rem}.bg-warning-subtle{background-color:#fff3cd}.form-control.bg-light{background-color:#f8f9fa!important;cursor:not-allowed}.form-control-custom,.form-select.form-control-custom{border:1px solid #90caf9;background-color:#fff}.form-control-custom:focus,.form-select.form-control-custom:focus{border-color:#1e88e5;box-shadow:0 0 0 .2rem rgba(30,136,229,.25)}.credits-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem;margin-top:1rem}.credit-card{background:#fff;border-radius:.5rem;box-shadow:0 2px 8px rgba(0,0,0,.1);border:1px solid #e3f2fd}.credit-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.15)}.credit-card.depleted{opacity:.6}.credit-card-header{background:linear-gradient(135deg,#e3f2fd,#bbdefb);padding:1rem;border-bottom:1px solid #90caf9;display:flex;justify-content:space-between;gap:1rem}.credit-name{font-size:1.1rem;font-weight:700;color:#1565c0}.credit-card-body{padding:1rem}.depletion-info{display:flex;justify-content:space-between;margin-bottom:.5rem}.remaining-amount{font-size:1.5rem;font-weight:700;color:#1565c0}.progress-bar-container{height:24px;background:#e0e0e0;border-radius:.5rem;overflow:hidden;margin-bottom:1rem}.progress-bar{height:100%;border-radius:.5rem}.progress-bar.good{background:#66bb6a}.progress-bar.warning{background:#ffa726}.progress-bar.critical{background:#ef5350}.credit-card-footer{padding:1rem;background:#f8f9fa;border-top:1px solid #e3f2fd;display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center}.btn-sm{padding:.5rem .75rem;font-size:.8rem;border-radius:.25rem;font-weight:600}.btn-primary-outline{background:#fff;border:1px solid #1e88e5;color:#1e88e5}.btn-primary-outline:hover{background:#e3f2fd}.btn-success-outline{background:#fff;border:1px solid #28a745;color:#28a745}.btn-success-outline:hover:not(:disabled){background:#e8f5e9}.btn-info-outline{background:#fff;border:1px solid #17a2b8;color:#17a2b8}.btn-info-outline:hover{background:#e0f7fa}.pagination{margin-top:1rem;gap:.25rem}.page-link{color:#1565c0;border:1px solid #90caf9;padding:.5rem .75rem}.page-link:hover:not(:disabled){background:#e3f2fd}.page-item.active .page-link{background:#1e88e5;border-color:#1565c0;color:#fff}.modal-backdrop{position:fixed;top:0;left:0;z-index:1040;width:100vw;height:100vh;background:rgba(0,0,0,.3)}.custom-modal{display:none;position:fixed;top:0;left:0;z-index:1050;width:100%;height:100%}.custom-modal.show,.custom-modal.d-block{display:block!important}.modal-content{border-radius:.5rem;box-shadow:0 4px 12px rgba(0,0,0,.2)}.modal-header{padding:1rem}.modal-header.bg-primary{background:linear-gradient(135deg,#1e88e5,#1565c0)!important}.modal-body{padding:1rem}.modal-footer{padding:1rem;background:#e3f2fd;gap:.5rem}.badge{padding:.375rem .75rem;border-radius:.25rem;font-weight:600;font-size:.75rem}.badge.bg-success{background:#28a745!important}.badge.bg-danger{background:#dc3545!important}.badge.bg-warning{background:#ffc107!important;color:#333}.dropdown-list{position:absolute;top:100%;left:0;right:0;max-height:200px;overflow-y:auto;background:#fff;border:1px solid #ddd;border-radius:.25rem;box-shadow:0 2px 8px rgba(0,0,0,.15);z-index:1000}.dropdown-list .dropdown-item-custom{padding:.5rem;cursor:pointer}.dropdown-list .dropdown-item-custom:hover{background:#f5f5f5}.bg-danger-subtle{background-color:#f8d7da!important}.bg-success-subtle{background-color:#d1e7dd!important}@media(max-width:768px){.credits-grid{grid-template-columns:1fr}.credit-card-footer{flex-direction:column}.credit-card-footer .btn{width:100%}}
+@import url('../../jobs/joblist/joblist.component.scss');
+
+/* ── Summary Strip ── */
+.summary-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #e8eaf0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+
+.summary-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.summary-card.summary-total  .summary-icon { background: #eff6ff; color: #3b82f6; }
+.summary-card.summary-remaining .summary-icon { background: #f0fdf4; color: #22c55e; }
+.summary-card.summary-used .summary-icon { background: #fff7ed; color: #f97316; }
+
+.summary-label {
+  font-size: 11.5px;
+  color: #8a8fa3;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  margin-bottom: 2px;
+}
+
+.summary-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e2235;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Status chips for ICTSI ── */
+.status-chip.status-active {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.status-chip.status-inactive {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* ── Inactive row ── */
+tr.inactive-row td {
+  opacity: 0.55;
+}
+
+@media (max-width: 768px) {
+  .summary-strip {
+    grid-template-columns: 1fr;
+  }
+}

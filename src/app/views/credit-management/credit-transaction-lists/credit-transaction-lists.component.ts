@@ -61,6 +61,17 @@ export class CreditTransactionListsComponent implements OnInit {
   itemsPerPage = 10;
   totalItems = 0;
 
+  showFilters: boolean = false;
+
+  filters = {
+    dateFrom: '',
+    dateTo: ''
+  };
+
+  maxDateTo: string = '';
+  dateRangeError: boolean = false;
+
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -146,7 +157,7 @@ export class CreditTransactionListsComponent implements OnInit {
   loadTransactions(): void {
     this.isLoading = true;
 
-    this.transactionService.getResourceTransactionsByResourceId(this.resourceId).subscribe({
+    this.transactionService.getResourceTransactionsByResourceId(this.resourceId, this.filters.dateFrom, this.filters.dateTo).subscribe({
       next: (response) => {
         if (response.success && response.data) {
           this.transactions = response.data;
@@ -209,7 +220,7 @@ export class CreditTransactionListsComponent implements OnInit {
       this.isSubmitting = true;
       // Your update logic here
       // After successful update:
-      
+
       this.closeEditTransactionModal();
       this.isSubmitting = false;
     }
@@ -360,4 +371,94 @@ export class CreditTransactionListsComponent implements OnInit {
       this.showErrorToast = false;
     }, 4000);
   }
+
+  clearFilters(): void {
+    this.filters = { dateFrom: '', dateTo: '' };
+    this.filteredTransactions = [...this.transactions];
+    this.currentPage = 1;
+  }
+
+  hasActiveFilters(): boolean {
+    return this.filters.dateFrom !== '' ||
+      this.filters.dateTo !== '';
+  }
+
+  activeFilterCount(): number {
+    let count = 0;
+    if (this.filters.dateFrom) count++;
+    if (this.filters.dateTo) count++;
+    return count;
+  }
+
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters;
+  }
+
+  generateReport(): void {
+    if (!this.filters.dateFrom || !this.filters.dateTo) {
+      alert('Please select both a Date From and Date To before generating.');
+      return;
+    }
+
+    this.isLoading = true;
+    this.transactions = [];
+    this.filteredTransactions = [];
+
+    this.transactionService.getResourceTransactionsByResourceId(this.resourceId, this.filters.dateFrom, this.filters.dateTo).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.transactions = response.data;
+          this.filteredTransactions = [...this.transactions];
+          this.totalItems = this.transactions.length;
+
+        } else {
+          this.showError(response.message || 'Failed to load transactions');
+        }
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading transactions:', error);
+        this.showError('Failed to load transactions. Please try again.');
+        this.isLoading = false;
+      }
+    });
+
+  }
+
+  onDateFromChange(): void {
+    this.dateRangeError = false;
+
+    if (this.filters.dateFrom) {
+      const from = new Date(this.filters.dateFrom);
+      const max = new Date(from);
+      max.setMonth(max.getMonth() + 1);
+
+      // Clamp to same day one month later
+      this.maxDateTo = max.toISOString().split('T')[0];
+
+      // If existing dateTo exceeds the new max, reset it
+      if (this.filters.dateTo && new Date(this.filters.dateTo) > max) {
+        this.filters.dateTo = '';
+        this.dateRangeError = false;
+      }
+    } else {
+      this.maxDateTo = '';
+    }
+  }
+
+  onDateToChange(): void {
+    if (!this.filters.dateFrom || !this.filters.dateTo) return;
+
+    const from = new Date(this.filters.dateFrom);
+    const to = new Date(this.filters.dateTo);
+    const max = new Date(from);
+    max.setMonth(max.getMonth() + 1);
+
+    this.dateRangeError = to > max;
+
+    if (this.dateRangeError) {
+      this.filters.dateTo = '';
+    }
+  }
+
 }
