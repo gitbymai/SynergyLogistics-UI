@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiService } from '../api.service';
@@ -94,9 +94,14 @@ export class ChargeTransactionService extends ApiService {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/releasecashcharge/${tranGuid}`, {});
   }
 
-  confirmCashReleaseCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
-    return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/actualcashrelease/${tranGuid}`, {});
-  }
+confirmCashReleaseCharge(tranGuid: string, referenceNo: string): Observable<ApiResponse<ChargeTransaction>> {
+  const params = new HttpParams().set('referenceNo', referenceNo);
+  return this.http.put<ApiResponse<ChargeTransaction>>(
+    `${this.apiUrl}/job/jobtransaction/actualcashrelease/${tranGuid}`,
+    {},
+    { params }
+  );
+}
 
   ownCharge(tranGuid: string): Observable<ApiResponse<ChargeTransaction>> {
     return this.http.put<ApiResponse<ChargeTransaction>>(`${this.apiUrl}/job/jobtransaction/owncharge/${tranGuid}`, {});

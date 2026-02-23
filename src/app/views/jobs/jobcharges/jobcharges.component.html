@@ -455,7 +455,8 @@
       <div class="modal-header" style="background: #1a3a6b;">
         <h5 class="modal-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:16px; color:#fff;">Add
           New Charge</h5>
-        <button type="button" class="btn-close btn-close-white" (click)="closeCreateChargeModal()" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white" (click)="closeCreateChargeModal()"
+          aria-label="Close"></button>
       </div>
       <div class="modal-body" style="padding: 24px;">
         <form [formGroup]="chargeFormGroup">
@@ -620,6 +621,42 @@
                 LIQUIDATION</span></span>
           </div>
         </div>
+
+        <!-- Reference Number Input -->
+        <div style="margin-bottom: 16px;" [formGroup]="cashReleaseForm">
+          <label style="display: block; font-size: 12px; font-weight: 600; color: var(--ink-soft); margin-bottom: 8px;">
+            Reference Type <span style="color: #e53e3e;">*</span>
+          </label>
+          <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+            <button type="button" [style.background]="cashReleaseRefType === 'CASH' ? '#1a3a6b' : 'var(--rule-light)'"
+              [style.color]="cashReleaseRefType === 'CASH' ? '#fff' : 'var(--ink-soft)'"
+              [style.border]="cashReleaseRefType === 'CASH' ? '1.5px solid #1a3a6b' : '1.5px solid var(--rule)'"
+              style="flex: 1; padding: 7px 0; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s;"
+              (click)="cashReleaseRefType = 'CASH'">
+              Cash No.
+            </button>
+            <button type="button" [style.background]="cashReleaseRefType === 'CHECK' ? '#1a3a6b' : 'var(--rule-light)'"
+              [style.color]="cashReleaseRefType === 'CHECK' ? '#fff' : 'var(--ink-soft)'"
+              [style.border]="cashReleaseRefType === 'CHECK' ? '1.5px solid #1a3a6b' : '1.5px solid var(--rule)'"
+              style="flex: 1; padding: 7px 0; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s;"
+              (click)="cashReleaseRefType = 'CHECK'">
+              Check No.
+            </button>
+          </div>
+          <input type="text" formControlName="cashReleasingReferenceNo"
+            [placeholder]="cashReleaseRefType === 'CASH' ? 'Enter Cash No.' : cashReleaseRefType === 'CHECK' ? 'Enter Check No.' : 'Select a reference type first'"
+            [attr.disabled]="!cashReleaseRefType ? true : null"
+            style="width: 100%; padding: 9px 12px; border: 1.5px solid var(--rule); border-radius: 6px; font-size: 13px; color: var(--ink); background: var(--surface); outline: none; box-sizing: border-box;"
+            [style.border-color]="cashReleaseForm.get('cashReleasingReferenceNo')?.touched && cashReleaseForm.get('cashReleasingReferenceNo')?.invalid ? '#e53e3e' : 'var(--rule)'" />
+          @if (cashReleaseForm.get('cashReleasingReferenceNo')?.touched &&
+          cashReleaseForm.get('cashReleasingReferenceNo')?.invalid) {
+          <div style="font-size: 11px; color: #e53e3e; margin-top: 4px;">Reference number is required.</div>
+          }
+          @if (cashReleaseForm.get('cashReleasingReferenceNo')?.touched && !cashReleaseRefType) {
+          <div style="font-size: 11px; color: #e53e3e; margin-top: 4px;">Please select Cash No. or Check No.</div>
+          }
+        </div>
+
         <div
           style="text-align: center; padding: 12px; background: var(--rule-light); border-radius: 8px; font-size: 13px; color: var(--ink-soft);">
           Are you sure you want to release this cash to the processor? <br />
@@ -630,7 +667,7 @@
         <button type="button" class="btn btn-ghost" (click)="closeCashReleaseConfirmModal()"
           [disabled]="isSubmitting">Cancel</button>
         <button type="button" class="btn btn-primary" style="background: var(--green);" (click)="confirmCashRelease()"
-          [disabled]="isSubmitting">
+          [disabled]="isSubmitting || cashReleaseForm.invalid || !cashReleaseRefType">
           @if (!isSubmitting) { Confirm Release }
           @else { <span class="spinner-border spinner-border-sm me-2"></span> Releasing... }
         </button>

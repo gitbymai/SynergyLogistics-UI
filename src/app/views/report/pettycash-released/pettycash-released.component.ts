@@ -46,7 +46,7 @@ export class PettycashReleasedComponent implements OnInit {
   }
 
   loadChargeList() {
-    this.reportService.getallActualReleasedPettyCash().subscribe({
+    this.reportService.getallActualReleasedPettyCash(this.filters.dateFrom, this.filters.dateTo).subscribe({
       next: (response) => {
         if (response.success && response.data?.length) {
           this.charges = response.data

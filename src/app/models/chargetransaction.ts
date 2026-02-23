@@ -87,6 +87,7 @@ export interface ChargeTransaction {
   houseAirwayBill?: string | null;
   masterBillLading?: string | null;
   houseBillLading?: string | null;
+  cashReleasingReferenceNo?: string | null;
 }
 
 export interface ChargeTransactionAuditLog {

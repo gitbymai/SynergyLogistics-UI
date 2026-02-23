@@ -59,6 +59,12 @@ export const navItems = [
         iconComponent: { name: 'cil-basket' },
         roles: ['admin', 'finance', 'treasurer']
       },
+      {
+        name: 'ICTSI Requests',
+        url: '/approvals/ictsi-requests',
+        iconComponent: { name: 'cil-share' },
+        roles: ['admin', 'finance', 'treasurer']
+      },
     ]
   },
   {
@@ -95,6 +101,12 @@ export const navItems = [
         name: 'Actual Refunds',
         url: '/report/liquidations',
         iconComponent: { name: 'cil-paper-plane' },
+        roles: ['admin','treasurer','cashier','sales']
+      },
+      {
+        name: 'Container Deposits',
+        url: '/report/container-deposits',
+        iconComponent: { name: 'cil-speedometer' },
         roles: ['admin','treasurer','cashier','sales']
       }
     ]

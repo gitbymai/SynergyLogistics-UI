@@ -41,6 +41,7 @@ export class JobChargesComponent implements OnInit, OnChanges {
   // Reactive Form
   chargeFormGroup!: FormGroup;
   refundFormGroup!: FormGroup;
+  cashReleaseForm!: FormGroup;
 
   // Toast Notifications
   showSuccessToast: boolean = false;
@@ -68,6 +69,10 @@ export class JobChargesComponent implements OnInit, OnChanges {
   refundAmount: number = 0;
   referenceNumber: string = '';
   refundNotes: string = '';
+
+  cashReleaseRefType: 'CASH' | 'CHECK' | null = null;
+  cashReleasingReferenceNo: string = '';
+  cashReleaseRefNoTouched: boolean = false;
 
   constructor(private fb: FormBuilder,
 
@@ -229,6 +234,9 @@ export class JobChargesComponent implements OnInit, OnChanges {
       conversionRate: [{ value: 1, disabled: false }, [Validators.required, Validators.min(0.0001)]],
     });
 
+    this.cashReleaseForm = this.fb.group({
+      cashReleasingReferenceNo: ['', Validators.required]
+    });
   }
 
   loadCharges(): void {
@@ -404,13 +412,15 @@ export class JobChargesComponent implements OnInit, OnChanges {
       this.showCashReleaseConfirmModal = false;
       this.selectedCharge = null;
       this.refundAmount = 0;
+      this.cashReleaseRefType = null;
+this.cashReleaseForm.reset();
     }
   }
 
   confirmCashRelease() {
     this.isSubmitting = true;
 
-    this.chargeService.confirmCashReleaseCharge(this.selectedCharge.chargeGuid).subscribe({
+    this.chargeService.confirmCashReleaseCharge(this.selectedCharge.chargeGuid, this.cashReleaseForm.get('cashReleasingReferenceNo')?.value).subscribe({
       next: (response) => {
         this.isSubmitting = false;
         this.showCashReleaseConfirmModal = false;
