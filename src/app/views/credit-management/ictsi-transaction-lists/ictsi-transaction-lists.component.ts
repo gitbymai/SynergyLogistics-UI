@@ -9,6 +9,7 @@ import { IctsiTransaction, NewIctsiTransaction, UpdateIctsiTransaction } from '.
 import { IctsiService } from '../../../services/ictsi/ictsi.service';
 import { Job } from '../../../models/job';
 import { JobsService } from '../../../services/jobs/jobs.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-ictsi-transaction-lists',
@@ -20,10 +21,12 @@ export class IctsiTransactionListsComponent implements OnInit {
 
   transactionForm!: FormGroup;
   editTransactionForm!: FormGroup;
+  cancelTransactionForm!: FormGroup;
   transactions: IctsiTransaction[] = [];
   filteredTransactions: IctsiTransaction[] = [];
 
   showTransactionModal = false;
+  showCancelTransactionModal = false;
   showDetailsModal = false;
   showEditTransactionModal = false;
   isSubmitting = false;
@@ -80,18 +83,24 @@ export class IctsiTransactionListsComponent implements OnInit {
   dateRangeError: boolean = false;
 
 
+  userRole: string = "";
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private transactionService: IctsiService,
-    private jobService: JobsService
+    private jobService: JobsService,
+    private authService: AuthService
   ) {
     this.initializeForm();
     this.initializeEditTransactionForm();
   }
 
   ngOnInit(): void {
+    
+    this.userRole = this.authService.getCurrentUserRole() || '';
+
     // Get query parameters
     this.route.queryParams.subscribe(params => {
       this.ictsiId = +params['ictsiId'] || 0;
@@ -119,6 +128,11 @@ export class IctsiTransactionListsComponent implements OnInit {
       isActive: [true],
       isReimbursement: [false]
     });
+
+    this.cancelTransactionForm = this.fb.group({
+      cancellationReason: ['', [Validators.required]]
+    });
+
   }
 
   initializeEditTransactionForm() {
@@ -207,8 +221,6 @@ export class IctsiTransactionListsComponent implements OnInit {
           this.transactions = response.data;
           this.filteredTransactions = [...this.transactions];
           this.totalItems = this.transactions.length;
-          console.log('Transactions loaded:', this.transactions);
-
         } else {
           this.showError(response.message || 'Failed to load transactions');
         }
@@ -345,20 +357,50 @@ export class IctsiTransactionListsComponent implements OnInit {
 
       const updatedAmount = this.editTransactionForm.get('amount')?.value;
 
-      // Call your service to update the transaction
-      // this.transactionService.updateTransaction(this.selectedTransaction.id, { amount: updatedAmount })
-      //     .subscribe({
-      //         next: (response) => {
-      //             this.isSubmitting = false;
-      //             this.closeEditTransactionModal();
-      //             // Refresh transaction list
-      //         },
-      //         error: (error) => {
-      //             this.isSubmitting = false;
-      //             console.error('Error updating transaction:', error);
-      //         }
-      //     });
     }
+  }
+
+  openCancelTransactionModal(transaction: IctsiTransaction) {
+    this.selectedTransaction = transaction;
+    this.cancelTransactionForm.reset();
+    this.showCancelTransactionModal = true;
+  }
+
+  closeCancelTransactionModal() {
+    this.showCancelTransactionModal = false;
+    this.cancelTransactionForm.reset();
+  }
+
+  submitCancelTransactionForm() {
+    if (this.cancelTransactionForm.invalid) return;
+
+    const cancellationReason = this.cancelTransactionForm.get('cancellationReason')?.value;
+    console.log('Cancellation reason:', cancellationReason);
+    console.log(this.selectedTransaction!.ictsiTransactionGuid);
+
+    this.isSubmitting = true;
+
+    this.transactionService.cancelIctsiTransaction(this.selectedTransaction!.ictsiTransactionGuid, cancellationReason)
+      .pipe(finalize(() => this.isSubmitting = false))
+      .subscribe({
+        next: (response) => {
+          if (response.success && response.data) {
+            this.transactions.unshift(response.data);
+            this.showSuccess('Transaction cancelled successfully');
+            this.closeCancelTransactionModal();
+
+            this.loadTransactions();
+            this.loadResourceDetails();
+
+          } else {
+            this.showError(response.message || 'Failed to cancel transaction');
+          }
+        },
+        error: (error) => {
+          console.error('Error cancelling transaction:', error);
+          this.showError(error?.error?.message || 'Failed to cancel transaction');
+        }
+      });
   }
 
   goBack(): void {
@@ -392,7 +434,6 @@ export class IctsiTransactionListsComponent implements OnInit {
     // Use your existing isDebitTransaction method
     return this.isDebitTransaction(Number(selectedTypeId));
   }
-
 
   getPageNumbers(): number[] {
     const totalPages = this.getTotalPages();
@@ -459,7 +500,6 @@ export class IctsiTransactionListsComponent implements OnInit {
       this.showErrorToast = false;
     }, 4000);
   }
-
 
   clearFilters(): void {
     this.filters = { dateFrom: '', dateTo: '' };
@@ -549,6 +589,5 @@ export class IctsiTransactionListsComponent implements OnInit {
       this.filters.dateTo = '';
     }
   }
-
 
 }

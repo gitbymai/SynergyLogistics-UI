@@ -116,6 +116,16 @@
     color: #fff;
   }
 }
+.action-btn-danger {
+  border-color: var(--red);
+  color: var(--red);
+
+  &:hover {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+  }
+}
 
 .filter-section-label {
   display: flex;

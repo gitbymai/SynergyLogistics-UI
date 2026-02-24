@@ -9,6 +9,7 @@ import {
 } from '../../../models/ictsi';
 import { finalize } from 'rxjs';
 import { IctsiService } from '../../../services/ictsi/ictsi.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-ictsi-lists',
@@ -40,13 +41,18 @@ export class IctsiListsComponent {
   itemsPerPage = 6;
   totalItems = 0;
 
+  userRole: string = "";
 
   constructor(private fb: FormBuilder,
     private ictsiService: IctsiService,
+    private authService: AuthService,
     private router: Router) {
     this.initializeForm();
   }
   ngOnInit(): void {
+    
+    this.userRole = this.authService.getCurrentUserRole() || '';
+    
     this.loadRecords();
   }
 

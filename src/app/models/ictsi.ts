@@ -43,6 +43,10 @@ export interface IctsiTransaction {
   isReimbursement?: boolean;
   jobId?: number;
   jobCode?: string;
+  ictsiTransactionStatusId?: number;
+  ictsiTransactionStatusName?: string;
+  chargeId?: number;
+  chargeCode?: string;
 }
 
 export interface NewIctsi {

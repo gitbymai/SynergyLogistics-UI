@@ -37,7 +37,8 @@ export interface ResourceTransaction {
   resourceTransactionTypeName?: string;
   resourceTypeName?: string;
   resourceTransactionStatusId?: number;
-  resourceTransactionStatusName?: string
+  resourceTransactionStatusName?: string;
+  
 }
 
 export interface NewResource {

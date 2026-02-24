@@ -59,4 +59,11 @@ export class IctsiService extends ApiService {
     return this.http.get<ApiResponse<Configuration[]>>(`${this.apiUrl}/configuration/resource-transaction-type`);
   }
 
+  cancelIctsiTransaction(guid: string, cancellationReason: string): Observable<ApiResponse<void>> {
+    let params = new HttpParams();
+    if (cancellationReason) params = params.set('cancellationReason', cancellationReason);
+
+    return this.http.put<ApiResponse<void>>(`${this.apiUrl}/ictsi/transactions/cancel/${guid}`, { params });
+  }
+
 }
