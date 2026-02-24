@@ -244,6 +244,8 @@
               <p>No charges found</p>
             </div>
           </td>
+          <td></td>
+          <td></td>
         </tr>
         }
       </tbody>
@@ -256,14 +258,14 @@
           <td class="right">
             <span class="total-amount">₱{{ totalChargeAmount | number:'1.2-2' }}</span>
           </td>
-          @if (userRole === 'SALES' || userRole === 'FINANCE' || userRole === 'TREASURER' || userRole === 'ADMIN') {
+          @if (['SALES','FINANCE','TREASURER','ADMIN'].includes(userRole)) {
           <td class="right">
             <span class="total-amount">₱{{ totalSellingAmount | number:'1.2-2' }}</span>
           </td>
           <td></td>
           }
           <td></td>
-          @if (userRole === 'CASHIER' || userRole === 'PROCESSOR' || userRole === 'OPSMGR') { <td></td> }
+          @if (['CASHIER','PROCESSOR','OPSMGR'].includes(userRole)) { <td></td> }
           <td></td>
           <td></td>
         </tr>

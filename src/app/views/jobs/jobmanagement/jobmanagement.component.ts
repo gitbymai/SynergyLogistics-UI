@@ -107,7 +107,6 @@ export class JobmanagementComponent implements OnInit {
       next: (job) => {
         this.job = job;
         this.isLoading = false;
-        console.log('Job details loaded successfully:', job);
         this.loadJobRelatedTransaction(jobGuid);
       },
       error: (error) => {

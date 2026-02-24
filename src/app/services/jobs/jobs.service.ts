@@ -46,6 +46,10 @@ export class JobsService extends ApiService {
     return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/job-list`, { params });
   }
 
+  getAllJobFromLast6Months(): Observable<ApiResponse<Job[]>> {
+    return this.http.get<ApiResponse<Job[]>>(`${this.apiUrl}/job/job-list-last6months`);
+  }
+
   getAllJobsByCashierWithRequest(dateFrom?: string, dateTo?: string): Observable<ApiResponse<Job[]>> {
     let params = new HttpParams();
     if (dateFrom) params = params.set('dateFrom', dateFrom);

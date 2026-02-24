@@ -26,7 +26,7 @@ export const navItems = [
         name: 'Job List',
         url: '/jobs/financials',
         iconComponent: { name: 'cil-notes' },
-        roles: ['admin', 'opsmgr', 'processor','cashier']
+        roles: ['admin', 'opsmgr', 'processor','cashier','opsstaff']
       }
     ]
   },

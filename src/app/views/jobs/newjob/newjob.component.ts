@@ -117,7 +117,7 @@ export class NewjobComponent implements OnInit {
 
     // Get selected transaction type
     const selectedTransaction = this.jobTransactionTypeList.find(
-      t => t.jobTransactionTypeId === this.jobDetailsForm.get('transactionType')?.value
+      t => t.jobTransactionTypeId == this.jobDetailsForm.get('transactionType')?.value
     );
     this.selectedTransactionType = selectedTransaction?.jobTransactionType || '';
   }

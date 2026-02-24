@@ -68,7 +68,7 @@ export class IctsiTransactionListsComponent implements OnInit {
 
   debitTypeId: number = 1;
 
-  
+
   showFilters: boolean = false;
 
   filters = {
@@ -122,14 +122,13 @@ export class IctsiTransactionListsComponent implements OnInit {
   }
 
   initializeEditTransactionForm() {
-      this.editTransactionForm = this.fb.group({
-          amount: ['', [Validators.required, Validators.min(0.01)]]
-      });
+    this.editTransactionForm = this.fb.group({
+      amount: ['', [Validators.required, Validators.min(0.01)]]
+    });
   }
 
-
   loadJobs(): void {
-    this.jobService.getAllJobs().subscribe({
+    this.jobService.getAllJobFromLast6Months().subscribe({
       next: (response) => {
         if (response.success && response.data) {
           this.allJobs = response.data.filter(x => x.isActive === true);
@@ -208,6 +207,7 @@ export class IctsiTransactionListsComponent implements OnInit {
           this.transactions = response.data;
           this.filteredTransactions = [...this.transactions];
           this.totalItems = this.transactions.length;
+          console.log('Transactions loaded:', this.transactions);
 
         } else {
           this.showError(response.message || 'Failed to load transactions');
@@ -308,13 +308,14 @@ export class IctsiTransactionListsComponent implements OnInit {
     this.showDetailsModal = true;
   }
 
-  openEditTransactionModal(transaction: IctsiTransaction): void{
-        this.selectedTransaction = transaction;
+  openEditTransactionModal(transaction: IctsiTransaction): void {
+    this.selectedTransaction = transaction;
     this.editTransactionForm.patchValue({
-        amount: transaction.amount
+      amount: transaction.amount
     });
     this.showEditTransactionModal = true;
   }
+
   closeTransactionModal(): void {
     this.showTransactionModal = false;
     this.transactionForm.reset();
@@ -326,38 +327,39 @@ export class IctsiTransactionListsComponent implements OnInit {
     this.filteredJobs = [...this.allJobs];
     this.jobCodeDropdownOpen = false;
   }
+
   closeEditTransactionModal() {
     this.showEditTransactionModal = false;
     this.editTransactionForm.reset();
     this.selectedTransaction = null;
-}
+  }
 
   closeDetailsModal(): void {
     this.showDetailsModal = false;
     this.selectedTransaction = null;
   }
-  
-submitEditTransactionForm() {
+
+  submitEditTransactionForm() {
     if (this.editTransactionForm.valid && this.selectedTransaction) {
-        this.isSubmitting = true;
-        
-        const updatedAmount = this.editTransactionForm.get('amount')?.value;
-        
-        // Call your service to update the transaction
-        // this.transactionService.updateTransaction(this.selectedTransaction.id, { amount: updatedAmount })
-        //     .subscribe({
-        //         next: (response) => {
-        //             this.isSubmitting = false;
-        //             this.closeEditTransactionModal();
-        //             // Refresh transaction list
-        //         },
-        //         error: (error) => {
-        //             this.isSubmitting = false;
-        //             console.error('Error updating transaction:', error);
-        //         }
-        //     });
+      this.isSubmitting = true;
+
+      const updatedAmount = this.editTransactionForm.get('amount')?.value;
+
+      // Call your service to update the transaction
+      // this.transactionService.updateTransaction(this.selectedTransaction.id, { amount: updatedAmount })
+      //     .subscribe({
+      //         next: (response) => {
+      //             this.isSubmitting = false;
+      //             this.closeEditTransactionModal();
+      //             // Refresh transaction list
+      //         },
+      //         error: (error) => {
+      //             this.isSubmitting = false;
+      //             console.error('Error updating transaction:', error);
+      //         }
+      //     });
     }
-}
+  }
 
   goBack(): void {
     this.router.navigate(['/financial/ictsi-management-list']);
@@ -458,7 +460,7 @@ submitEditTransactionForm() {
     }, 4000);
   }
 
-  
+
   clearFilters(): void {
     this.filters = { dateFrom: '', dateTo: '' };
     this.filteredTransactions = [...this.transactions];
@@ -491,7 +493,7 @@ submitEditTransactionForm() {
     this.transactions = [];
     this.filteredTransactions = [];
 
-       this.transactionService.getIctsiTransactionsByIctsiId(this.ictsiId, this.filters.dateFrom, this.filters.dateTo).subscribe({
+    this.transactionService.getIctsiTransactionsByIctsiId(this.ictsiId, this.filters.dateFrom, this.filters.dateTo).subscribe({
       next: (response) => {
         if (response.success && response.data) {
           this.transactions = response.data;

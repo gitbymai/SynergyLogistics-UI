@@ -129,6 +129,7 @@ export class JobchargesmanagementComponent implements OnInit {
         this.jobDetails = response;
         this.jobId = response.jobId;
         this.loadCharges();
+        this.loadChargeSubCategories();
       },
       error: (error) => {
         console.error('Error loading job details:', error);
@@ -149,7 +150,6 @@ export class JobchargesmanagementComponent implements OnInit {
             this.filteredCharges = this.charges;
             if (response.data.length) {
               this.jobCode = response.data[0].jobCode;
-              this.loadChargeSubCategories();
             }
           } else {
             this.charges = [];

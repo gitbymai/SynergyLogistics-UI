@@ -222,7 +222,7 @@ export const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
           title: 'Jobs',
-          roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales']
+          roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales','opsstaff']
         },
         children: [
           {
@@ -286,7 +286,7 @@ export const routes: Routes = [
               ),
             data: {
               title: 'Financial Transactions',
-              roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales']
+              roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales','opsstaff']
             },
             canActivate: [AuthGuard]
           },
@@ -298,7 +298,7 @@ export const routes: Routes = [
               ),
             data: {
               title: 'Charge List',
-              roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales']
+              roles: ['admin', 'cashier', 'finance', 'treasurer', 'opsmgr', 'processor', 'sales','opsstaff']
             },
             canActivate: [AuthGuard]
           }
