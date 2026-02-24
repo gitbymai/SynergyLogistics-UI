@@ -221,6 +221,8 @@ export class IctsiTransactionListsComponent implements OnInit {
           this.transactions = response.data;
           this.filteredTransactions = [...this.transactions];
           this.totalItems = this.transactions.length;
+
+          console.log('Loaded transactions:', this.transactions);
         } else {
           this.showError(response.message || 'Failed to load transactions');
         }
@@ -375,8 +377,6 @@ export class IctsiTransactionListsComponent implements OnInit {
     if (this.cancelTransactionForm.invalid) return;
 
     const cancellationReason = this.cancelTransactionForm.get('cancellationReason')?.value;
-    console.log('Cancellation reason:', cancellationReason);
-    console.log(this.selectedTransaction!.ictsiTransactionGuid);
 
     this.isSubmitting = true;
 
@@ -420,7 +420,7 @@ export class IctsiTransactionListsComponent implements OnInit {
 
   getTotalDebits(): number {
     return this.filteredTransactions
-      .filter(t => this.isDebitTransaction(t.optionIctsiTransactionTypeId) && t.isActive)
+      .filter(t => this.isDebitTransaction(t.optionIctsiTransactionTypeId) && t.isActive && t.ictsiTransactionStatusName !== 'CANCELLED')
       .reduce((sum, transaction) => sum + transaction.amount, 0);
   }
 
