@@ -63,4 +63,10 @@ export class ResourceService extends ApiService {
     return this.http.get<ApiResponse<Configuration[]>>(`${this.apiUrl}/configuration/resource-transaction-type`);
   }
 
+  cancelResourceTransaction(guid: string, cancellationReason: string): Observable<ApiResponse<void>> {
+    let params = new HttpParams();
+    if (cancellationReason) params = params.set('cancellationReason', cancellationReason);
+    return this.http.put<ApiResponse<void>>(`${this.apiUrl}/resource/transactions/cancel/${guid}`, null, { params });
+  }
+
 }

@@ -20,7 +20,6 @@ import { AuthService } from '../../../services/auth.service';
 export class IctsiTransactionListsComponent implements OnInit {
 
   transactionForm!: FormGroup;
-  editTransactionForm!: FormGroup;
   cancelTransactionForm!: FormGroup;
   transactions: IctsiTransaction[] = [];
   filteredTransactions: IctsiTransaction[] = [];
@@ -28,7 +27,7 @@ export class IctsiTransactionListsComponent implements OnInit {
   showTransactionModal = false;
   showCancelTransactionModal = false;
   showDetailsModal = false;
-  showEditTransactionModal = false;
+  showCloseParentModal = false;
   isSubmitting = false;
   isLoading = false;
 
@@ -36,6 +35,7 @@ export class IctsiTransactionListsComponent implements OnInit {
   ictsiId: number = 0;
   ictsiGuid: string = '';
   ictsiName: string = '';
+  ictsiStatus: boolean = false;
   currentBalance: number = 0;
 
   // Selected Transaction for edit/delete/view
@@ -71,7 +71,6 @@ export class IctsiTransactionListsComponent implements OnInit {
 
   debitTypeId: number = 1;
 
-
   showFilters: boolean = false;
 
   filters = {
@@ -94,11 +93,10 @@ export class IctsiTransactionListsComponent implements OnInit {
     private authService: AuthService
   ) {
     this.initializeForm();
-    this.initializeEditTransactionForm();
   }
 
   ngOnInit(): void {
-    
+
     this.userRole = this.authService.getCurrentUserRole() || '';
 
     // Get query parameters
@@ -121,7 +119,7 @@ export class IctsiTransactionListsComponent implements OnInit {
   initializeForm(): void {
     this.transactionForm = this.fb.group({
       optionIctsiTransactionTypeId: ['', [Validators.required]],
-      jobCode: [''],
+      jobId: [''],
       amount: ['', [Validators.required, Validators.min(-9999999999999999.99), Validators.max(9999999999999999.99)]],
       referenceNumber: ['', [Validators.maxLength(50)]],
       notes: ['', [Validators.maxLength(1000)]],
@@ -131,13 +129,6 @@ export class IctsiTransactionListsComponent implements OnInit {
 
     this.cancelTransactionForm = this.fb.group({
       cancellationReason: ['', [Validators.required]]
-    });
-
-  }
-
-  initializeEditTransactionForm() {
-    this.editTransactionForm = this.fb.group({
-      amount: ['', [Validators.required, Validators.min(0.01)]]
     });
   }
 
@@ -176,7 +167,7 @@ export class IctsiTransactionListsComponent implements OnInit {
   selectJobCode(job: Job): void {
     this.selectedJob = job;
     this.jobCodeSearch = `${job.jobCode}`;
-    this.transactionForm.patchValue({ jobCode: job.jobId });
+    this.transactionForm.patchValue({ jobId: job.jobId });
     this.jobCodeDropdownOpen = false;
   }
 
@@ -222,7 +213,6 @@ export class IctsiTransactionListsComponent implements OnInit {
           this.filteredTransactions = [...this.transactions];
           this.totalItems = this.transactions.length;
 
-          console.log('Loaded transactions:', this.transactions);
         } else {
           this.showError(response.message || 'Failed to load transactions');
         }
@@ -242,6 +232,11 @@ export class IctsiTransactionListsComponent implements OnInit {
       return;
     }
 
+    if (this.transactionForm.value.isReimbursement && !this.transactionForm.value.jobId) {
+      this.showError('Please fill in all required fields correctly');
+      return;
+    }
+
     this.isSubmitting = true;
 
     this.createTransaction();
@@ -254,7 +249,7 @@ export class IctsiTransactionListsComponent implements OnInit {
       amount: this.transactionForm.value.amount,
       referenceNumber: this.transactionForm.value.referenceNumber || null,
       notes: this.transactionForm.value.notes || null,
-      jobId: this.transactionForm.value.jobCode,
+      jobId: this.transactionForm.value.jobId,
       isReimbursement: this.transactionForm.value.isReimbursement
     };
 
@@ -286,6 +281,7 @@ export class IctsiTransactionListsComponent implements OnInit {
     this.transactionService.getIctsiByGuid(this.ictsiGuid).subscribe({
       next: (response) => {
         if (response.success && response.data) {
+          this.ictsiStatus = response.data.isActive;
           this.ictsiName = response.data.ictsiName || 'N/A';
           this.currentBalance = response.data.currentAmount || 0;
 
@@ -322,14 +318,6 @@ export class IctsiTransactionListsComponent implements OnInit {
     this.showDetailsModal = true;
   }
 
-  openEditTransactionModal(transaction: IctsiTransaction): void {
-    this.selectedTransaction = transaction;
-    this.editTransactionForm.patchValue({
-      amount: transaction.amount
-    });
-    this.showEditTransactionModal = true;
-  }
-
   closeTransactionModal(): void {
     this.showTransactionModal = false;
     this.transactionForm.reset();
@@ -342,24 +330,9 @@ export class IctsiTransactionListsComponent implements OnInit {
     this.jobCodeDropdownOpen = false;
   }
 
-  closeEditTransactionModal() {
-    this.showEditTransactionModal = false;
-    this.editTransactionForm.reset();
-    this.selectedTransaction = null;
-  }
-
   closeDetailsModal(): void {
     this.showDetailsModal = false;
     this.selectedTransaction = null;
-  }
-
-  submitEditTransactionForm() {
-    if (this.editTransactionForm.valid && this.selectedTransaction) {
-      this.isSubmitting = true;
-
-      const updatedAmount = this.editTransactionForm.get('amount')?.value;
-
-    }
   }
 
   openCancelTransactionModal(transaction: IctsiTransaction) {
@@ -402,6 +375,47 @@ export class IctsiTransactionListsComponent implements OnInit {
         }
       });
   }
+
+  openCloseParentModal(): void {
+    if (this.ictsiGuid === '') {
+      this.showError('No valid ICTSI record found to close.');
+      return;
+    }
+    this.showCloseParentModal = true;
+  }
+
+  submitCloseTransaction(): void {
+
+    if (this.isSubmitting)
+      return;
+
+    this.transactionService.deactivateIctsi(this.ictsiGuid)
+      .pipe(finalize(() => this.isSubmitting = false))
+      .subscribe({
+        next: (response) => {
+          if (response.success && response.data) {
+            this.showSuccess('ICTSI Record closed successfully');
+            this.closeCloseTransactionModal();
+
+            this.loadTransactions();
+            this.loadResourceDetails();
+
+          } else {
+            this.showError(response.message || 'Failed to close ICTSI record');
+          }
+        },
+        error: (error) => {
+          console.error('Error closing ICTSI record:', error);
+          this.showError(error?.error?.message || 'Failed to close ICTSI record');
+        }
+      });
+
+  }
+
+  closeCloseTransactionModal(): void {
+    this.showCloseParentModal = false;
+  }
+
 
   goBack(): void {
     this.router.navigate(['/financial/ictsi-management-list']);

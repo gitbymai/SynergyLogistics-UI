@@ -15,6 +15,7 @@ export class IctsiService extends ApiService {
   constructor(http: HttpClient) {
     super(http);  // Call parent constructor
   }
+  
   getAllIctsi(): Observable<ApiResponse<Ictsi[]>> {
     return this.http.get<ApiResponse<Ictsi[]>>(`${this.apiUrl}/ictsi`);
   }
@@ -59,10 +60,10 @@ export class IctsiService extends ApiService {
     return this.http.get<ApiResponse<Configuration[]>>(`${this.apiUrl}/configuration/resource-transaction-type`);
   }
 
-cancelIctsiTransaction(guid: string, cancellationReason: string): Observable<ApiResponse<void>> {
-  let params = new HttpParams();
-  if (cancellationReason) params = params.set('cancellationReason', cancellationReason);
-  return this.http.put<ApiResponse<void>>(`${this.apiUrl}/ictsi/transactions/cancel/${guid}`, null, { params });
-}
+  cancelIctsiTransaction(guid: string, cancellationReason: string): Observable<ApiResponse<void>> {
+    let params = new HttpParams();
+    if (cancellationReason) params = params.set('cancellationReason', cancellationReason);
+    return this.http.put<ApiResponse<void>>(`${this.apiUrl}/ictsi/transactions/cancel/${guid}`, null, { params });
+  }
 
 }

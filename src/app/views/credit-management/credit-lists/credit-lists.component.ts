@@ -144,7 +144,7 @@ export class CreditListsComponent implements OnInit {
     };
 
     this.resourceService.createResource(createRequest)
-      .pipe(finalize(() => this.isSubmitting = false))
+      .pipe(finalize(() => {this.isSubmitting = false; this.loadRecords(); }))
       .subscribe({
         next: (response) => {
           if (response.success && response.data) {

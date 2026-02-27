@@ -131,7 +131,7 @@ export class IctsiListsComponent {
     };
 
     this.ictsiService.createIctsi(createRequest)
-      .pipe(finalize(() => this.isSubmitting = false))
+      .pipe(finalize(() => {this.isSubmitting = false; this.loadRecords(); }))
       .subscribe({
         next: (response) => {
           if (response.success && response.data) {
@@ -141,7 +141,6 @@ export class IctsiListsComponent {
             this.totalItems = this.ictsisList.length;
 
             this.showSuccess(`Record ${response.data.ictsiName} created successfully`);
-
             this.closeIctsiModal();
           } else {
             this.showError(response.message || 'Failed to create record');

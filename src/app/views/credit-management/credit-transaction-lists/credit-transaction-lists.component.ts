@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit, HostListener } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, Form } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -9,8 +9,11 @@ import {
   UpdateResourceTransaction,
 } from '../../../models/resource';
 import { ResourceService } from '../../../services/resource/resource.service';
-import { finalize } from 'rxjs';
+import { ConnectableObservable, finalize } from 'rxjs';
 import { Configuration } from '../../../models/configuration';
+import { AuthService } from '../../../services/auth.service';
+import { JobsService } from '../../../services/jobs/jobs.service';
+import { Job } from '../../../models/job';
 
 @Component({
   selector: 'app-credit-transaction-lists',
@@ -20,13 +23,14 @@ import { Configuration } from '../../../models/configuration';
 })
 export class CreditTransactionListsComponent implements OnInit {
   transactionForm!: FormGroup;
-  editTransactionForm!: FormGroup;
+  cancelTransactionForm!: FormGroup;
   transactions: ResourceTransaction[] = [];
   filteredTransactions: ResourceTransaction[] = [];
 
   showTransactionModal = false;
   showDetailsModal = false;
-  showEditTransactionModal = false;
+  showCancelTransactionModal = false;
+  showCloseParentModal = false;
   isSubmitting = false;
   isLoading = false;
 
@@ -34,6 +38,7 @@ export class CreditTransactionListsComponent implements OnInit {
   resourceId: number = 0;
   resourceGuid: string = '';
   resourceName: string = '';
+  resourceStatus: boolean = false;
   currentBalance: number = 0;
 
   // Selected Transaction for edit/delete/view
@@ -61,6 +66,12 @@ export class CreditTransactionListsComponent implements OnInit {
   itemsPerPage = 10;
   totalItems = 0;
 
+  jobCodeSearch = '';
+  jobCodeDropdownOpen = false;
+  allJobs: Job[] = [];
+  filteredJobs: Job[] = [];
+  selectedJob: Job | null = null;
+
   showFilters: boolean = false;
 
   filters = {
@@ -71,17 +82,23 @@ export class CreditTransactionListsComponent implements OnInit {
   maxDateTo: string = '';
   dateRangeError: boolean = false;
 
+  userRole: string = "";
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private transactionService: ResourceService
+    private transactionService: ResourceService,
+    private authService: AuthService,
+    private jobService: JobsService
   ) {
     this.initializeForm();
   }
 
   ngOnInit(): void {
+
+    this.userRole = this.authService.getCurrentUserRole() || '';
+
     // Get query parameters
     this.route.queryParams.subscribe(params => {
       this.resourceId = +params['resourceId'] || 0;
@@ -91,6 +108,7 @@ export class CreditTransactionListsComponent implements OnInit {
         this.loadTransactions();
         this.loadResourceDetails();
         this.loadTransactionTypes();
+        this.loadJobs();
       } else {
         this.showError('Invalid resource');
         this.goBack();
@@ -104,18 +122,73 @@ export class CreditTransactionListsComponent implements OnInit {
       amount: ['', [Validators.required, Validators.min(-9999999999999999.99), Validators.max(9999999999999999.99)]],
       referenceNumber: ['', [Validators.maxLength(50)]],
       notes: ['', [Validators.maxLength(1000)]],
-      isActive: [true]
+      isActive: [true],
+      isReimbursement: [false],
+      jobId: [''],
+
     });
 
-    this.editTransactionForm = this.fb.group({
-      optionResourceTransactionTypeId: ['', [Validators.required]],
-      amount: ['', [Validators.required, Validators.min(-9999999999999999.99), Validators.max(9999999999999999.99)]],
-      referenceNumber: ['', [Validators.maxLength(50)]],
-      notes: ['', [Validators.maxLength(1000)]],
-      isActive: [true]
+    this.cancelTransactionForm = this.fb.group({
+      cancellationReason: ['', [Validators.required]]
     });
 
   }
+
+  loadJobs(): void {
+    this.jobService.getAllJobFromLast6Months().subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.allJobs = response.data.filter(x => x.isActive === true);
+          this.filteredJobs = [...this.allJobs];
+        } else {
+          this.showError(response.message || 'Failed to load job codes');
+        }
+      },
+      error: (error) => {
+        console.error('Error loading job codes:', error);
+        this.showError('Failed to load job codes. Please try again.');
+      }
+    });
+  }
+
+  onJobCodeSearchChange(searchValue: string): void {
+    this.jobCodeSearch = searchValue;
+    this.jobCodeDropdownOpen = true;
+
+    if (!searchValue.trim()) {
+      this.filteredJobs = [...this.allJobs];
+      return;
+    }
+
+    const searchLower = searchValue.toLowerCase();
+    this.filteredJobs = this.allJobs.filter(jobCode =>
+      jobCode.jobCode.toLowerCase().includes(searchLower)
+    );
+  }
+
+  selectJobCode(job: Job): void {
+    this.selectedJob = job;
+    this.jobCodeSearch = `${job.jobCode}`;
+    this.transactionForm.patchValue({ jobId: job.jobId });
+    this.jobCodeDropdownOpen = false;
+  }
+
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.jobCodeDropdownOpen) {
+      return; // Exit early if dropdown is already closed
+    }
+
+    const target = event.target as HTMLElement;
+
+    const clickedInsideDropdown = target.closest('.jobcode-dropdown');
+
+    if (!clickedInsideDropdown) {
+      this.jobCodeDropdownOpen = false;
+    }
+  }
+
 
   loadTransactionTypes(): void {
     this.transactionService.getResourceTransactionTypes().subscribe({
@@ -139,6 +212,7 @@ export class CreditTransactionListsComponent implements OnInit {
     this.transactionService.getResourceByGuid(this.resourceGuid).subscribe({
       next: (response) => {
         if (response.success && response.data) {
+          this.resourceStatus = response.data.isActive;
           this.resourceName = response.data.resourceName || 'N/A';
           this.currentBalance = response.data.currentAmount || 0;
 
@@ -163,7 +237,6 @@ export class CreditTransactionListsComponent implements OnInit {
           this.transactions = response.data;
           this.filteredTransactions = [...this.transactions];
           this.totalItems = this.transactions.length;
-
         } else {
           this.showError(response.message || 'Failed to load transactions');
         }
@@ -183,47 +256,19 @@ export class CreditTransactionListsComponent implements OnInit {
 
   openNewTransactionModal(): void {
     this.selectedTransaction = null;
-    this.transactionForm.reset({ isActive: true });
+    this.transactionForm.reset({ isActive: true, isReimbursement: false });
     this.transactionForm.get('optionResourceTransactionTypeId')?.enable();
     this.transactionForm.get('amount')?.enable();
+    this.jobCodeSearch = '';
+    this.selectedJob = null;
+    this.filteredJobs = [...this.allJobs];
+    this.jobCodeDropdownOpen = false;
     this.showTransactionModal = true;
   }
 
   viewTransactionDetails(transaction: ResourceTransaction): void {
     this.selectedTransaction = transaction;
     this.showDetailsModal = true;
-  }
-
-  editTransaction(transaction: ResourceTransaction): void {
-
-    this.selectedTransaction = transaction;
-    this.editTransactionForm.patchValue({
-      optionResourceTransactionTypeId: transaction.optionResourceTransactionTypeId,
-      amount: transaction.amount,
-      referenceNumber: transaction.referenceNumber,
-      notes: transaction.notes,
-      isActive: transaction.isActive
-    });
-    this.showEditTransactionModal = true;
-
-  }
-
-  closeEditTransactionModal(): void {
-
-    this.showEditTransactionModal = false;
-    this.editTransactionForm.reset();
-    this.selectedTransaction = null;
-  }
-
-  submitEditTransactionForm(): void {
-    if (this.editTransactionForm.valid) {
-      this.isSubmitting = true;
-      // Your update logic here
-      // After successful update:
-
-      this.closeEditTransactionModal();
-      this.isSubmitting = false;
-    }
   }
 
   closeTransactionModal(): void {
@@ -245,6 +290,11 @@ export class CreditTransactionListsComponent implements OnInit {
       return;
     }
 
+    if (this.transactionForm.value.isReimbursement && !this.transactionForm.value.jobId) {
+      this.showError('Please fill in all required fields correctly');
+      return;
+    }
+
     this.isSubmitting = true;
 
     this.createTransaction();
@@ -256,7 +306,9 @@ export class CreditTransactionListsComponent implements OnInit {
       optionResourceTransactionTypeId: this.transactionForm.value.optionResourceTransactionTypeId,
       amount: this.transactionForm.value.amount,
       referenceNumber: this.transactionForm.value.referenceNumber || null,
-      notes: this.transactionForm.value.notes || null
+      notes: this.transactionForm.value.notes || null,
+      jobId: this.transactionForm.value.jobId,
+      isReimbursement: this.transactionForm.value.isReimbursement
     };
 
     this.transactionService.addResourceTransaction(createRequest)
@@ -282,6 +334,87 @@ export class CreditTransactionListsComponent implements OnInit {
       });
   }
 
+  openCloseTransactionModal(): void {
+    if (this.resourceGuid === '') {
+      this.showError('No valid ICTSI record found to close.');
+      return;
+    }
+    this.showCloseParentModal = true;
+  }
+
+  submitCloseTransaction(): void {
+
+    if (this.isSubmitting)
+      return;
+
+    this.transactionService.deactivateResource(this.resourceGuid)
+      .pipe(finalize(() => this.isSubmitting = false))
+      .subscribe({
+        next: (response) => {
+          if (response.success && response.data) {
+            this.showSuccess('Credit record closed successfully');
+            this.closeCloseTransactionModal();
+
+            this.loadTransactions();
+            this.loadResourceDetails();
+
+          } else {
+            this.showError(response.message || 'Failed to close credit record');
+          }
+        },
+        error: (error) => {
+          console.error('Error closing credit record:', error);
+          this.showError(error?.error?.message || 'Failed to close credit record');
+        }
+      });
+
+  }
+
+  closeCloseTransactionModal(): void {
+    this.showCloseParentModal = false;
+  }
+
+  openCancelTransactionModal(transaction: ResourceTransaction) {
+    this.selectedTransaction = transaction;
+    this.cancelTransactionForm.reset();
+    this.showCancelTransactionModal = true;
+  }
+
+  closeCancelTransactionModal() {
+    this.showCancelTransactionModal = false;
+    this.cancelTransactionForm.reset();
+  }
+
+  submitCancelTransactionForm() {
+    if (this.cancelTransactionForm.invalid) return;
+
+    const cancellationReason = this.cancelTransactionForm.get('cancellationReason')?.value;
+
+    this.isSubmitting = true;
+
+    this.transactionService.cancelResourceTransaction(this.selectedTransaction!.transactionGuid, cancellationReason)
+      .pipe(finalize(() => this.isSubmitting = false))
+      .subscribe({
+        next: (response) => {
+          if (response.success && response.data) {
+            this.transactions.unshift(response.data);
+            this.showSuccess('Transaction cancelled successfully');
+            this.closeCancelTransactionModal();
+
+            this.loadTransactions();
+            this.loadResourceDetails();
+
+          } else {
+            this.showError(response.message || 'Failed to cancel transaction');
+          }
+        },
+        error: (error) => {
+          console.error('Error cancelling transaction:', error);
+          this.showError(error?.error?.message || 'Failed to cancel transaction');
+        }
+      });
+  }
+
   goBack(): void {
     this.router.navigate(['/financial/credit-management-list']);
   }
@@ -302,6 +435,17 @@ export class CreditTransactionListsComponent implements OnInit {
     return this.filteredTransactions
       .filter(t => this.isDebitTransaction(t.optionResourceTransactionTypeId) && t.isActive)
       .reduce((sum, transaction) => sum + transaction.amount, 0);
+  }
+
+  isDebitSelected(): boolean {
+    const selectedTypeId = this.transactionForm.get('optionResourceTransactionTypeId')?.value;
+
+    if (!selectedTypeId) {
+      return false;
+    }
+
+    // Use your existing isDebitTransaction method
+    return this.isDebitTransaction(Number(selectedTypeId));
   }
 
   // Pagination Methods

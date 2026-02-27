@@ -14,6 +14,8 @@
         </svg>
         Back
       </button>
+      @if(ictsiStatus){
+
       <button class="btn btn-primary" (click)="openNewTransactionModal()">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
           stroke="currentColor" stroke-width="2">
@@ -21,6 +23,14 @@
         </svg>
         Add Transaction
       </button>
+      <button class="btn btn-secondary" (click)="openCloseParentModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        Close
+      </button>
+      }
     </div>
   </header>
 
@@ -151,7 +161,7 @@
             <th>Transaction Type</th>
             <th class="text-right">Amount</th>
             <th>Reference #</th>
-            <th>Job Reference #</th>
+            <th>Job #</th>
             <th class="text-center">Reimbursable</th>
             <th>Status</th>
             <th class="text-right">Transaction Date</th>
@@ -248,7 +258,7 @@
                   View
                 </button>
                 @if(['TREASURER'].includes(userRole) && transaction.ictsiTransactionTypeName === 'DEBIT' &&
-                transaction.ictsiTransactionStatusName !== 'CANCELLED') {
+                transaction.ictsiTransactionStatusName !== 'CANCELLED' && ictsiStatus) {
                 <button class="action-btn action-btn-danger" (click)="openCancelTransactionModal(transaction)"
                   title="Cancel Transaction">
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
@@ -265,7 +275,7 @@
           }
           } @else {
           <tr>
-            <td colspan="8">
+            <td colspan="9">
               <div class="empty-state">
                 <div class="empty-icon">◻</div>
                 <p>No transactions found</p>
@@ -349,16 +359,20 @@
               }
             </div>
           </div>
-
-          <!-- Reference Number -->
+          <!-- Check Number -->
           <div class="row mb-2">
             <div class="col-md-12">
               <label class="form-label mb-1" style="font-size: 0.8rem;">
-                <i class="cil-notes me-1"></i> Reference Number
+                <i class="cil-notes me-1"></i> Check Number <span class="text-danger">*</span>
               </label>
               <input type="text" class="form-control form-control-sm form-control-custom"
-                formControlName="referenceNumber" placeholder="e.g., INV-2024-001" maxlength="50"
+                formControlName="referenceNumber" placeholder="e.g., CHK-2024-001" maxlength="50"
                 style="border: 1px solid #b3c2da; font-size: 0.8rem;" />
+              @if (transactionForm.get('referenceNumber')?.invalid && transactionForm.get('referenceNumber')?.touched) {
+              <div class="text-danger mt-1" style="font-size: 0.75rem;">
+                <i class="cil-warning me-1"></i> Check number is required.
+              </div>
+              }
             </div>
           </div>
 
@@ -367,16 +381,30 @@
           <div class="p-2 mb-2 rounded" style="background-color: #e8edf5; border: 1px solid #b3c2da;">
             <div class="d-flex align-items-center mb-2">
               <i class="cil-info me-2" style="color: #1a3a6b;"></i>
-              <small class="text-muted mb-0" style="font-size: 0.75rem;">Optional: Link to job and mark as
-                reimbursement</small>
+              <small class="text-muted mb-0" style="font-size: 0.75rem;">Optional: Mark as reimbursement and link to a
+                job</small>
             </div>
             <div class="row g-2">
-              <div class="col-md-8">
+
+              <!-- Reimbursement Checkbox -->
+              <div class="col-md-12">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="isReimbursement" formControlName="isReimbursement"
+                    style="border-color: #1a3a6b;">
+                  <label class="form-check-label" for="isReimbursement" style="font-size: 0.8rem;">
+                    <i class="cil-money me-1"></i> Reimbursement
+                  </label>
+                </div>
+              </div>
+
+              <!-- Job Code (required if reimbursement is checked) -->
+              @if (transactionForm.get('isReimbursement')?.value) {
+              <div class="col-md-12">
                 <div class="position-relative jobcode-dropdown">
                   <label class="form-label mb-1" style="font-size: 0.75rem;">
-                    <i class="cil-briefcase me-1"></i> Job Code
+                    <i class="cil-briefcase me-1"></i> Job Code <span class="text-danger">*</span>
                   </label>
-                  <input type="text" class="form-control form-control-sm" placeholder="Search job code"
+                  <input type="text" class="form-control form-control-sm" placeholder="Search job code..."
                     [value]="jobCodeSearch" (input)="onJobCodeSearchChange($any($event.target).value)"
                     (focus)="jobCodeDropdownOpen = true" style="border: 1px solid #b3c2da; font-size: 0.8rem;" />
                   @if (jobCodeDropdownOpen && filteredJobs.length > 0) {
@@ -393,18 +421,16 @@
                     <li class="dropdown-item-custom text-muted">No results</li>
                   </ul>
                   }
-                  <input type="hidden" formControlName="jobCode" />
+                  <input type="hidden" formControlName="jobId" />
+                  @if (transactionForm.get('jobId')?.invalid && transactionForm.get('jobId')?.touched) {
+                  <div class="text-danger mt-1" style="font-size: 0.75rem;">
+                    <i class="cil-warning me-1"></i> Job code is required for reimbursement.
+                  </div>
+                  }
                 </div>
               </div>
-              <div class="col-md-4 d-flex align-items-end">
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" id="isReimbursement" formControlName="isReimbursement"
-                    style="border-color: #1a3a6b;">
-                  <label class="form-check-label" for="isReimbursement" style="font-size: 0.8rem;">
-                    <i class="cil-money me-1"></i> Reimbursement
-                  </label>
-                </div>
-              </div>
+              }
+
             </div>
           </div>
           }
@@ -413,13 +439,18 @@
           <div class="row mb-1">
             <div class="col-md-12">
               <label class="form-label mb-1" style="font-size: 0.8rem;">
-                <i class="cil-note-add me-1"></i> Notes
+                <i class="cil-note-add me-1"></i> Short Description <span class="text-danger">*</span>
               </label>
-              <textarea class="form-control form-control-sm form-control-custom" formControlName="notes" rows="2"
-                placeholder="Additional notes..." maxlength="1000"
-                style="border: 1px solid #b3c2da; font-size: 0.8rem;"></textarea>
+              <input type="text" class="form-control form-control-sm form-control-custom" formControlName="notes"
+                placeholder="e.g. Utilities, Payroll, Government Payments, Storage Costs, Carrier Charges, Insurance..."
+                maxlength="100" style="border: 1px solid #b3c2da; font-size: 0.8rem;" />
+              @if (transactionForm.get('notes')?.invalid && transactionForm.get('notes')?.touched) {
+              <div class="text-danger mt-1" style="font-size: 0.75rem;">
+                <i class="cil-warning me-1"></i> Short description is required.
+              </div>
+              }
               <small class="text-muted" style="font-size: 0.72rem;">
-                {{ transactionForm.get('notes')?.value?.length || 0 }}/1000
+                {{ transactionForm.get('notes')?.value?.length || 0 }}/255
               </small>
             </div>
           </div>
@@ -446,164 +477,57 @@
   </div>
 </div>
 
-<!-- ── Edit Transaction Modal ── -->
-@if (showEditTransactionModal) {
-<div class="modal-backdrop" (click)="closeEditTransactionModal()"></div>
+<!-- ── Close Transaction Modal ── -->
+@if (showCloseParentModal) {
+<div class="modal-backdrop" (click)="closeCloseTransactionModal()"></div>
 }
-<div class="modal custom-modal" [class.show]="showEditTransactionModal" [class.d-block]="showEditTransactionModal"
-  tabindex="-1" role="dialog">
+<div class="modal custom-modal" [class.show]="showCloseParentModal" [class.d-block]="showCloseParentModal" tabindex="-1"
+  role="dialog">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" (click)="$event.stopPropagation()"
     role="document">
     <div class="modal-content">
 
-      <div class="modal-header py-2 text-white" style="background-color: #1a3a6b;">
+      <!-- Header -->
+      <div class="modal-header py-2 text-white" style="background-color: #6c3a3a;">
         <h6 class="modal-title mb-0">
-          <i class="cil-pencil me-2"></i> Edit Transaction
+          <i class="cil-x me-2"></i> Close Transaction
         </h6>
-        <button type="button" class="btn-close btn-close-white" (click)="closeEditTransactionModal()"
+        <button type="button" class="btn-close btn-close-white" (click)="closeCloseTransactionModal()"
           aria-label="Close"></button>
       </div>
 
-      <div class="modal-body py-2">
-        <div class="alert d-flex align-items-center py-2 mb-2" role="alert"
-          style="background-color: #e8edf5; color: #1a3a6b; border: 1px solid #b3c2da; font-size: 0.8rem;">
-          <i class="cil-info me-2"></i>
-          <div><strong>Note:</strong> Only the transaction amount can be updated.</div>
+      <!-- Body -->
+      <div class="modal-body py-3">
+
+        <!-- Confirmation Notice -->
+        <div class="p-3 rounded d-flex align-items-start gap-2"
+          style="background-color: #fdf1f1; border: 1px solid #f0c0c0;">
+          <i class="cil-warning mt-1" style="color: #9b3333; font-size: 1.1rem;"></i>
+          <div>
+            <div style="font-size: 0.82rem; color: #7a2e2e; font-weight: 600;" class="mb-1">
+              Confirm Transaction Closure
+            </div>
+            <small style="font-size: 0.78rem; color: #7a2e2e;">
+              You are about to <strong>close</strong> this transaction. This action marks it as finalized
+              and cannot be undone. Are you sure you want to proceed?
+            </small>
+          </div>
         </div>
 
-        <form [formGroup]="editTransactionForm" class="form-professional">
-          <!-- Transaction Info + Job Info side by side -->
-          <div class="row mb-2">
-            <!-- Left: Transaction Information -->
-            <div class="col-md-6">
-              <h6 class="mb-2" style="color: #1a3a6b; font-size: 0.8rem;">
-                <i class="cil-list me-1"></i> Transaction Information
-              </h6>
-              <div class="mb-2">
-                <label class="form-label text-muted mb-1" style="font-size: 0.75rem;">
-                  <i class="cil-layers me-1"></i> Type
-                </label>
-                <div class="form-control form-control-sm bg-light"
-                  style="border: 1px solid #b3c2da; font-size: 0.8rem;">
-                  {{ selectedTransaction?.ictsiTransactionTypeName || 'N/A' }}
-                </div>
-              </div>
-              <div class="mb-2">
-                <label class="form-label text-muted mb-1" style="font-size: 0.75rem;">
-                  <i class="cil-calendar me-1"></i> Date
-                </label>
-                <div class="form-control form-control-sm bg-light"
-                  style="border: 1px solid #b3c2da; font-size: 0.8rem;">
-                  {{ selectedTransaction?.createdDate | date:'MM/dd/yy h:mm a' }}
-                </div>
-              </div>
-              <div class="mb-2">
-                <label class="form-label text-muted mb-1" style="font-size: 0.75rem;">
-                  <i class="cil-notes me-1"></i> Reference No.
-                </label>
-                <div class="form-control form-control-sm bg-light"
-                  style="border: 1px solid #b3c2da; font-size: 0.8rem;">
-                  {{ selectedTransaction?.referenceNumber || 'N/A' }}
-                </div>
-              </div>
-              <div class="mb-2">
-                <label class="form-label text-muted mb-1" style="font-size: 0.75rem;">
-                  <i class="cil-tag me-1"></i> Category
-                </label>
-                <div class="form-control form-control-sm bg-light d-flex align-items-center"
-                  style="border: 1px solid #b3c2da;">
-                  @if (selectedTransaction?.optionIctsiTransactionTypeId === debitTypeId) {
-                  <span class="status-chip"
-                    style="background-color: #e8edf5; color: #1a3a6b; font-size: 0.75rem;">Debit</span>
-                  } @else {
-                  <span class="status-chip status-active" style="font-size: 0.75rem;">Credit</span>
-                  }
-                </div>
-              </div>
-            </div>
-
-            <!-- Right: Job Information -->
-            <div class="col-md-6">
-              <h6 class="mb-2" style="color: #1a3a6b; font-size: 0.8rem;">
-                <i class="cil-briefcase me-1"></i> Job Information
-              </h6>
-              <div class="mb-2">
-                <label class="form-label text-muted mb-1" style="font-size: 0.75rem;">
-                  <i class="cil-briefcase me-1"></i> Job Code
-                </label>
-                <div class="form-control form-control-sm bg-light"
-                  style="border: 1px solid #b3c2da; font-size: 0.8rem;">
-                  {{ selectedTransaction?.jobCode || 'Not linked to any job' }}
-                </div>
-              </div>
-              <div class="mb-2">
-                <label class="form-label text-muted mb-1" style="font-size: 0.75rem;">
-                  <i class="cil-money me-1"></i> Reimbursement
-                </label>
-                <div class="form-control form-control-sm bg-light d-flex align-items-center"
-                  style="border: 1px solid #b3c2da;">
-                  @if (selectedTransaction?.isReimbursement) {
-                  <span class="status-chip status-active" style="font-size: 0.75rem;">Yes</span>
-                  } @else {
-                  <span class="status-chip status-inactive" style="font-size: 0.75rem;">No</span>
-                  }
-                </div>
-              </div>
-              <div class="mb-2">
-                <label class="form-label text-muted mb-1" style="font-size: 0.75rem;">
-                  <i class="cil-note-add me-1"></i> Notes
-                </label>
-                <div class="form-control form-control-sm bg-light"
-                  style="border: 1px solid #b3c2da; min-height: 72px; white-space: pre-wrap; font-size: 0.8rem;">
-                  {{ selectedTransaction?.notes || 'No notes available' }}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Editable Amount -->
-          <div class="p-2 rounded mb-1" style="background-color: #e8edf5; border: 1px solid #1a3a6b;">
-            <h6 class="mb-2" style="color: #1a3a6b; font-size: 0.8rem;">
-              <i class="cil-pencil me-1"></i> Editable Field
-            </h6>
-            <div class="row align-items-end">
-              <div class="col-md-8">
-                <label class="form-label mb-1" style="color: #1a3a6b; font-size: 0.8rem;">
-                  <i class="cil-dollar me-1"></i> Amount <span class="text-danger">*</span>
-                </label>
-                <input type="number" class="form-control form-control-sm" formControlName="amount" placeholder="0.00"
-                  min="0.01" step="0.01" style="border: 1px solid #1a3a6b;" />
-                @if (editTransactionForm.get('amount')?.invalid && editTransactionForm.get('amount')?.touched) {
-                <div class="text-danger mt-1" style="font-size: 0.75rem;">Amount is required and must be greater than 0
-                </div>
-                }
-              </div>
-              <div class="col-md-4 text-end">
-                <small class="text-muted" style="font-size: 0.75rem;">
-                  Original: <strong>₱{{ selectedTransaction?.amount | number:'1.2-2' }}</strong>
-                </small>
-              </div>
-            </div>
-          </div>
-
-        </form>
       </div>
 
+      <!-- Footer -->
       <div class="modal-footer py-2">
         <button type="button" class="btn btn-sm text-white" style="background-color: #6c757d;"
-          (click)="closeEditTransactionModal()">
-          <i class="cil-x me-1"></i> Cancel
+          (click)="closeCloseTransactionModal()">
+          <i class="cil-arrow-left me-1"></i> Cancel
         </button>
-        <button type="button" class="btn btn-sm text-white" style="background-color: #1a3a6b;"
-          (click)="submitEditTransactionForm()" [disabled]="!editTransactionForm.valid || isSubmitting">
-          @if (!isSubmitting) {
-          <span><i class="cil-check me-1"></i> Update Amount</span>
-          } @else {
-          <span><span class="spinner-border spinner-border-sm me-1"></span> Updating...</span>
-          }
+        <button type="button" class="btn btn-sm text-white" style="background-color: #9b3333;"
+          (click)="submitCloseTransaction()">
+          <span><i class="cil-x me-1"></i> Confirm Close</span>
+
         </button>
       </div>
-
     </div>
   </div>
 </div>

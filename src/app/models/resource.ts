@@ -4,6 +4,8 @@ export interface NewResourceTransaction {
   amount: number;
   referenceNumber?: string;
   notes?: string;
+  jobId: number;
+  isReimbursement?: boolean;
 }
 
 export interface UpdateResourceTransaction {
@@ -38,6 +40,11 @@ export interface ResourceTransaction {
   resourceTypeName?: string;
   resourceTransactionStatusId?: number;
   resourceTransactionStatusName?: string;
+  chargeId?: number;
+  jobId?: number;
+  jobCode?: string;
+  chargeCode?: string;
+  isReimbursement?: boolean;
   
 }
 

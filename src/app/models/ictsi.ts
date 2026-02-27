@@ -4,7 +4,7 @@ export interface NewIctsiTransaction {
   amount: number;
   referenceNumber?: string;
   notes?: string;
-  jobId: string;
+  jobId: number;
   isReimbursement?: boolean;
 }
 
