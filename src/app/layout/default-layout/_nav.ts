@@ -58,13 +58,7 @@ export const navItems = [
         url: '/approvals/cashdeposits',
         iconComponent: { name: 'cil-basket' },
         roles: ['admin', 'finance', 'treasurer']
-      },
-      {
-        name: 'ICTSI Requests',
-        url: '/approvals/ictsi-requests',
-        iconComponent: { name: 'cil-share' },
-        roles: ['admin', 'finance', 'treasurer']
-      },
+      }
     ]
   },
   {
