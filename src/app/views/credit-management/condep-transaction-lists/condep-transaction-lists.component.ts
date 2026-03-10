@@ -3,29 +3,25 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, Form } from '@
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import {
-  ResourceTransaction,
-  NewResourceTransaction,
-  UpdateResourceTransaction,
-} from '../../../models/resource';
-import { ResourceService } from '../../../services/resource/resource.service';
-import { ConnectableObservable, finalize } from 'rxjs';
+import { CondepTransaction, NewCondepTransaction, UpdateCondepTransaction } from '../../../models/condep';
+import { CondepService } from '../../../services/condep/condep.service';
 import { Configuration } from '../../../models/configuration';
 import { AuthService } from '../../../services/auth.service';
 import { JobsService } from '../../../services/jobs/jobs.service';
 import { Job } from '../../../models/job';
+import { ConnectableObservable, finalize } from 'rxjs';
 
 @Component({
-  selector: 'app-credit-transaction-lists',
+  selector: 'app-condep-transaction-lists',
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
-  templateUrl: './credit-transaction-lists.component.html',
-  styleUrl: './credit-transaction-lists.component.scss',
+  templateUrl: './condep-transaction-lists.component.html',
+  styleUrl: './condep-transaction-lists.component.scss',
 })
-export class CreditTransactionListsComponent implements OnInit {
+export class CondepTransactionListsComponent implements OnInit {
   transactionForm!: FormGroup;
   cancelTransactionForm!: FormGroup;
-  transactions: ResourceTransaction[] = [];
-  filteredTransactions: ResourceTransaction[] = [];
+  transactions: CondepTransaction[] = [];
+  filteredTransactions: CondepTransaction[] = [];
 
   showTransactionModal = false;
   showDetailsModal = false;
@@ -34,15 +30,9 @@ export class CreditTransactionListsComponent implements OnInit {
   isSubmitting = false;
   isLoading = false;
 
-  // Resource Info from Query Params
-  resourceId: number = 0;
-  resourceGuid: string = '';
-  resourceName: string = '';
-  resourceStatus: boolean = false;
-  currentBalance: number = 0;
 
   // Selected Transaction for edit/delete/view
-  selectedTransaction: ResourceTransaction | null = null;
+  selectedTransaction: CondepTransaction | null = null;
 
   // Transaction Types (You'll need to load these from your service/options)
   transactionTypes: Configuration[] = [];
@@ -84,41 +74,31 @@ export class CreditTransactionListsComponent implements OnInit {
 
   userRole: string = "";
 
-  constructor(
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private transactionService: ResourceService,
-    private authService: AuthService,
-    private jobService: JobsService
-  ) {
-    this.initializeForm();
-  }
+    constructor(
+      private fb: FormBuilder,
+      private route: ActivatedRoute,
+      private router: Router,
+      private transactionService: CondepService,
+      private authService: AuthService,
+      private jobService: JobsService
+    ) {
+      this.initializeForm();
+    }
+
 
   ngOnInit(): void {
 
     this.userRole = this.authService.getCurrentUserRole() || '';
 
-    // Get query parameters
-    this.route.queryParams.subscribe(params => {
-      this.resourceId = +params['resourceId'] || 0;
-      this.resourceGuid = params['guid'] || '';
-
-      if (this.resourceId) {
+    
         this.loadTransactions();
-        this.loadResourceDetails();
         this.loadTransactionTypes();
         this.loadJobs();
-      } else {
-        this.showError('Invalid resource');
-        this.goBack();
-      }
-    });
   }
 
   initializeForm(): void {
     this.transactionForm = this.fb.group({
-      optionResourceTransactionTypeId: ['', [Validators.required]],
+      optionCondepTransactionTypeId: ['', [Validators.required]],
       amount: ['', [Validators.required, Validators.min(-9999999999999999.99), Validators.max(9999999999999999.99)]],
       referenceNumber: ['', [Validators.maxLength(50)]],
       notes: ['', [Validators.maxLength(1000)]],
@@ -134,6 +114,7 @@ export class CreditTransactionListsComponent implements OnInit {
 
   }
 
+  
   loadJobs(): void {
     this.jobService.getAllJobFromLast6Months().subscribe({
       next: (response) => {
@@ -189,9 +170,9 @@ export class CreditTransactionListsComponent implements OnInit {
     }
   }
 
-
+  
   loadTransactionTypes(): void {
-    this.transactionService.getResourceTransactionTypes().subscribe({
+    this.transactionService.getCondepTransactionTypes().subscribe({
       next: (response) => {
         if (response.success && response.data) {
           this.transactionTypes = response.data.filter(x => x.isActive === true)
@@ -207,37 +188,15 @@ export class CreditTransactionListsComponent implements OnInit {
 
   }
 
-  loadResourceDetails(): void {
-
-    this.transactionService.getResourceByGuid(this.resourceGuid).subscribe({
-      next: (response) => {
-        if (response.success && response.data) {
-          this.resourceStatus = response.data.isActive;
-          this.resourceName = response.data.resourceName || 'N/A';
-          this.currentBalance = response.data.currentAmount || 0;
-
-        } else {
-          this.showError(response.message || 'Failed to load resource details');
-        }
-      },
-      error: (error) => {
-        console.error('Error loading resource details:', error);
-        this.showError('Failed to load resource details. Please try again.');
-      }
-    });
-
-  }
-
+  
   loadTransactions(): void {
     this.isLoading = true;
 
-    this.transactionService.getResourceTransactionsByResourceId(this.resourceId, this.filters.dateFrom, this.filters.dateTo).subscribe({
+    this.transactionService.getCondepTransactionsByCondepId(1, this.filters.dateFrom, this.filters.dateTo).subscribe({
       next: (response) => {
         if (response.success && response.data) {
           this.transactions = response.data;
           this.filteredTransactions = [...this.transactions];
-
-          console.log(this.filteredTransactions);
           this.totalItems = this.transactions.length;
         } else {
           this.showError(response.message || 'Failed to load transactions');
@@ -252,40 +211,42 @@ export class CreditTransactionListsComponent implements OnInit {
     });
   }
 
-  getTransactionTypeById(id: number): Configuration | undefined {
-    return this.transactionTypes.find(type => type.optionId === id);
-  }
 
-  openNewTransactionModal(): void {
-    this.selectedTransaction = null;
-    this.transactionForm.reset({ isActive: true, isReimbursement: false });
-    this.transactionForm.get('optionResourceTransactionTypeId')?.enable();
-    this.transactionForm.get('amount')?.enable();
-    this.jobCodeSearch = '';
-    this.selectedJob = null;
-    this.filteredJobs = [...this.allJobs];
-    this.jobCodeDropdownOpen = false;
-    this.showTransactionModal = true;
-  }
-
-  viewTransactionDetails(transaction: ResourceTransaction): void {
-    this.selectedTransaction = transaction;
-    this.showDetailsModal = true;
-  }
-
-  closeTransactionModal(): void {
-    this.showTransactionModal = false;
-    this.transactionForm.reset();
-    this.selectedTransaction = null;
-    this.transactionForm.get('optionResourceTransactionTypeId')?.enable();
-    this.transactionForm.get('amount')?.enable();
-  }
-
-  closeDetailsModal(): void {
-    this.showDetailsModal = false;
-    this.selectedTransaction = null;
-  }
-
+  
+    getTransactionTypeById(id: number): Configuration | undefined {
+      return this.transactionTypes.find(type => type.optionId === id);
+    }
+  
+    openNewTransactionModal(): void {
+      this.selectedTransaction = null;
+      this.transactionForm.reset({ isActive: true, isReimbursement: false });
+      this.transactionForm.get('optionCondepTransactionTypeId')?.enable();
+      this.transactionForm.get('amount')?.enable();
+      this.jobCodeSearch = '';
+      this.selectedJob = null;
+      this.filteredJobs = [...this.allJobs];
+      this.jobCodeDropdownOpen = false;
+      this.showTransactionModal = true;
+    }
+  
+    viewTransactionDetails(transaction: CondepTransaction): void {
+      this.selectedTransaction = transaction;
+      this.showDetailsModal = true;
+    }
+  
+    closeTransactionModal(): void {
+      this.showTransactionModal = false;
+      this.transactionForm.reset();
+      this.selectedTransaction = null;
+      this.transactionForm.get('optionCondepTransactionTypeId')?.enable();
+      this.transactionForm.get('amount')?.enable();
+    }
+  
+    closeDetailsModal(): void {
+      this.showDetailsModal = false;
+      this.selectedTransaction = null;
+    }
+  
   submitTransactionForm(): void {
     if (!this.transactionForm.valid) {
       this.showError('Please fill in all required fields correctly');
@@ -303,9 +264,9 @@ export class CreditTransactionListsComponent implements OnInit {
   }
 
   createTransaction(): void {
-    const createRequest: NewResourceTransaction = {
-      resourceId: this.resourceId,
-      optionResourceTransactionTypeId: this.transactionForm.value.optionResourceTransactionTypeId,
+    const createRequest: NewCondepTransaction = {
+      condepId: 1,
+      optionCondepTransactionTypeId: this.transactionForm.value.optionCondepTransactionTypeId,
       amount: this.transactionForm.value.amount,
       referenceNumber: this.transactionForm.value.referenceNumber || null,
       notes: this.transactionForm.value.notes || null,
@@ -313,7 +274,7 @@ export class CreditTransactionListsComponent implements OnInit {
       isReimbursement: this.transactionForm.value.isReimbursement
     };
 
-    this.transactionService.addResourceTransaction(createRequest)
+    this.transactionService.addCondepTransaction(createRequest)
       .pipe(finalize(() => this.isSubmitting = false))
       .subscribe({
         next: (response) => {
@@ -323,7 +284,6 @@ export class CreditTransactionListsComponent implements OnInit {
             this.closeTransactionModal();
 
             this.loadTransactions();
-            this.loadResourceDetails();
 
           } else {
             this.showError(response.message || 'Failed to create transaction');
@@ -336,47 +296,7 @@ export class CreditTransactionListsComponent implements OnInit {
       });
   }
 
-  openCloseTransactionModal(): void {
-    if (this.resourceGuid === '') {
-      this.showError('No valid record found to close.');
-      return;
-    }
-    this.showCloseParentModal = true;
-  }
-
-  submitCloseTransaction(): void {
-
-    if (this.isSubmitting)
-      return;
-
-    this.transactionService.deactivateResource(this.resourceGuid)
-      .pipe(finalize(() => this.isSubmitting = false))
-      .subscribe({
-        next: (response) => {
-          if (response.success && response.data) {
-            this.showSuccess('Credit record closed successfully');
-            this.closeCloseTransactionModal();
-
-            this.loadTransactions();
-            this.loadResourceDetails();
-
-          } else {
-            this.showError(response.message || 'Failed to close credit record');
-          }
-        },
-        error: (error) => {
-          console.error('Error closing credit record:', error);
-          this.showError(error?.error?.message || 'Failed to close credit record');
-        }
-      });
-
-  }
-
-  closeCloseTransactionModal(): void {
-    this.showCloseParentModal = false;
-  }
-
-  openCancelTransactionModal(transaction: ResourceTransaction) {
+  openCancelTransactionModal(transaction: CondepTransaction) {
     this.selectedTransaction = transaction;
     this.cancelTransactionForm.reset();
     this.showCancelTransactionModal = true;
@@ -387,6 +307,7 @@ export class CreditTransactionListsComponent implements OnInit {
     this.cancelTransactionForm.reset();
   }
 
+
   submitCancelTransactionForm() {
     if (this.cancelTransactionForm.invalid) return;
 
@@ -394,7 +315,7 @@ export class CreditTransactionListsComponent implements OnInit {
 
     this.isSubmitting = true;
 
-    this.transactionService.cancelResourceTransaction(this.selectedTransaction!.transactionGuid, cancellationReason)
+    this.transactionService.cancelCondepTransaction(this.selectedTransaction!.condepTransactionGuid, cancellationReason)
       .pipe(finalize(() => this.isSubmitting = false))
       .subscribe({
         next: (response) => {
@@ -404,7 +325,6 @@ export class CreditTransactionListsComponent implements OnInit {
             this.closeCancelTransactionModal();
 
             this.loadTransactions();
-            this.loadResourceDetails();
 
           } else {
             this.showError(response.message || 'Failed to cancel transaction');
@@ -417,89 +337,85 @@ export class CreditTransactionListsComponent implements OnInit {
       });
   }
 
-  goBack(): void {
-    this.router.navigate(['/financial/credit-management-list']);
-  }
-
-  isDebitTransaction(transactionTypeId: number): boolean {
-    const transactionType = this.transactionTypes.find(type => type.optionId === transactionTypeId);
-    return transactionType ? transactionType.value === 'DEBIT' : false;
-  }
-
-  // Summary Calculations
-  getTotalCredits(): number {
-    return this.filteredTransactions
-      .filter(t => !this.isDebitTransaction(t.optionResourceTransactionTypeId) && t.isActive)
-      .reduce((sum, transaction) => sum + transaction.amount, 0);
-  }
-
-  getTotalDebits(): number {
-    return this.filteredTransactions
-      .filter(t => this.isDebitTransaction(t.optionResourceTransactionTypeId) && t.isActive)
-      .reduce((sum, transaction) => sum + transaction.amount, 0);
-  }
-
-  isDebitSelected(): boolean {
-    const selectedTypeId = this.transactionForm.get('optionResourceTransactionTypeId')?.value;
-
-    if (!selectedTypeId) {
-      return false;
+    isDebitTransaction(transactionTypeId: number): boolean {
+      const transactionType = this.transactionTypes.find(type => type.optionId === transactionTypeId);
+      return transactionType ? transactionType.value === 'DEBIT' : false;
     }
-
-    // Use your existing isDebitTransaction method
-    return this.isDebitTransaction(Number(selectedTypeId));
-  }
-
-  // Pagination Methods
-  getPageNumbers(): number[] {
-    const totalPages = this.getTotalPages();
-    const pages: number[] = [];
-
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
+  
+    // Summary Calculations
+    getTotalCredits(): number {
+      return this.filteredTransactions
+        .filter(t => !this.isDebitTransaction(t.optionCondepTransactionTypeId) && t.isActive)
+        .reduce((sum, transaction) => sum + transaction.amount, 0);
+    }
+  
+    getTotalDebits(): number {
+      return this.filteredTransactions
+        .filter(t => this.isDebitTransaction(t.optionCondepTransactionTypeId) && t.isActive)
+        .reduce((sum, transaction) => sum + transaction.amount, 0);
+    }
+  
+    isDebitSelected(): boolean {
+      const selectedTypeId = this.transactionForm.get('optionCondepTransactionTypeId')?.value;
+  
+      if (!selectedTypeId) {
+        return false;
       }
-    } else {
-      if (this.currentPage <= 4) {
-        for (let i = 1; i <= 5; i++) pages.push(i);
-        pages.push(-1);
-        pages.push(totalPages);
-      } else if (this.currentPage >= totalPages - 3) {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+  
+      // Use your existing isDebitTransaction method
+      return this.isDebitTransaction(Number(selectedTypeId));
+    }
+  
+    // Pagination Methods
+    getPageNumbers(): number[] {
+      const totalPages = this.getTotalPages();
+      const pages: number[] = [];
+  
+      if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) {
+          pages.push(i);
+        }
       } else {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) pages.push(i);
-        pages.push(-1);
-        pages.push(totalPages);
+        if (this.currentPage <= 4) {
+          for (let i = 1; i <= 5; i++) pages.push(i);
+          pages.push(-1);
+          pages.push(totalPages);
+        } else if (this.currentPage >= totalPages - 3) {
+          pages.push(1);
+          pages.push(-1);
+          for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+        } else {
+          pages.push(1);
+          pages.push(-1);
+          for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) pages.push(i);
+          pages.push(-1);
+          pages.push(totalPages);
+        }
+      }
+  
+      return pages;
+    }
+
+    getPagedTransactions(): CondepTransaction[] {
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      return this.filteredTransactions.slice(startIndex, startIndex + this.itemsPerPage);
+    }
+  
+    getTotalPages(): number {
+      return Math.ceil(this.filteredTransactions.length / this.itemsPerPage);
+    }
+  
+    previousPage(): void {
+      if (this.currentPage > 1) {
+        this.currentPage--;
       }
     }
-
-    return pages;
-  }
-
-  getPagedTransactions(): ResourceTransaction[] {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    return this.filteredTransactions.slice(startIndex, startIndex + this.itemsPerPage);
-  }
-
-  getTotalPages(): number {
-    return Math.ceil(this.filteredTransactions.length / this.itemsPerPage);
-  }
-
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
+  
+    nextPage(): void {
+      if (this.currentPage < this.getTotalPages()) {
+        this.currentPage++;
+      }
     }
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.getTotalPages()) {
-      this.currentPage++;
-    }
-  }
 
   // Toast Notifications
   showSuccess(message: string): void {
@@ -539,38 +455,7 @@ export class CreditTransactionListsComponent implements OnInit {
   toggleFilters(): void {
     this.showFilters = !this.showFilters;
   }
-
-  generateReport(): void {
-    if (!this.filters.dateFrom || !this.filters.dateTo) {
-      alert('Please select both a Date From and Date To before generating.');
-      return;
-    }
-
-    this.isLoading = true;
-    this.transactions = [];
-    this.filteredTransactions = [];
-
-    this.transactionService.getResourceTransactionsByResourceId(this.resourceId, this.filters.dateFrom, this.filters.dateTo).subscribe({
-      next: (response) => {
-        if (response.success && response.data) {
-          this.transactions = response.data;
-          this.filteredTransactions = [...this.transactions];
-          this.totalItems = this.transactions.length;
-
-        } else {
-          this.showError(response.message || 'Failed to load transactions');
-        }
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading transactions:', error);
-        this.showError('Failed to load transactions. Please try again.');
-        this.isLoading = false;
-      }
-    });
-
-  }
-
+  
   onDateFromChange(): void {
     this.dateRangeError = false;
 
@@ -605,6 +490,37 @@ export class CreditTransactionListsComponent implements OnInit {
     if (this.dateRangeError) {
       this.filters.dateTo = '';
     }
+  }
+  
+  generateReport(): void {
+    if (!this.filters.dateFrom || !this.filters.dateTo) {
+      alert('Please select both a Date From and Date To before generating.');
+      return;
+    }
+
+    this.isLoading = true;
+    this.transactions = [];
+    this.filteredTransactions = [];
+
+    this.transactionService.getCondepTransactionsByCondepId(1, this.filters.dateFrom, this.filters.dateTo).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.transactions = response.data;
+          this.filteredTransactions = [...this.transactions];
+          this.totalItems = this.transactions.length;
+
+        } else {
+          this.showError(response.message || 'Failed to load transactions');
+        }
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading transactions:', error);
+        this.showError('Failed to load transactions. Please try again.');
+        this.isLoading = false;
+      }
+    });
+
   }
 
 }

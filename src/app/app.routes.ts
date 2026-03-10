@@ -122,6 +122,15 @@ export const routes: Routes = [
               roles: ['admin', 'opsstaff', 'treasurer']
             },
           },
+          {
+            path: 'condep-management-lists/condep-transaction-list',
+            canActivate:[AuthGuard],
+            loadComponent: () => import('./views/credit-management/condep-transaction-lists/condep-transaction-lists.component').then(m=> m.CondepTransactionListsComponent),
+            data:{
+              title: 'ConDep Transaction',
+              roles: ['admin','opstaff','treasurer']
+            }
+          }
         ]
       },
       {

@@ -80,9 +80,9 @@ export const navItems = [
       },
       {
         name: 'Container Deposits',
-        url: '/financial/container-deposits',
+        url: '/financial/condep-management-lists/condep-transaction-list',
         iconComponent: { name: 'cil-speedometer' },
-        roles: ['admin','treasurer','cashier','sales']
+        roles: ['admin', 'opsstaff', 'treasurer']
       }
     ]
   },

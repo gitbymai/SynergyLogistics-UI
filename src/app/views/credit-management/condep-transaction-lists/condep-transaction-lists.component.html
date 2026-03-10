@@ -3,19 +3,10 @@
   <!-- ── Page Header ── -->
   <header class="list-header">
     <div class="list-header-left">
-      <div class="list-label">Finance · Credit Management</div>
-      <h1 class="list-title">Credit Transactions — {{ resourceName }}</h1>
+      <div class="list-label">Finance · Condep Management</div>
+      <h1 class="list-title">Condep Transactions </h1>
     </div>
     <div class="list-header-right">
-      <button class="btn btn-ghost" (click)="goBack()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-        </svg>
-        Back
-      </button>
-      @if(resourceStatus){
-
       <button class="btn btn-primary" (click)="openNewTransactionModal()">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
           stroke="currentColor" stroke-width="2">
@@ -23,16 +14,6 @@
         </svg>
         Add Transaction
       </button>
-
-      <button class="btn btn-secondary" (click)="openCloseTransactionModal()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-        Close
-      </button>
-
-      }
     </div>
   </header>
 
@@ -48,19 +29,6 @@
       <div class="summary-content">
         <div class="summary-label">Total Credits</div>
         <div class="summary-value">{{ getTotalCredits() | number:'1.2-2' }}</div>
-      </div>
-    </div>
-    <div class="summary-card summary-remaining">
-      <div class="summary-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-        </svg>
-      </div>
-      <div class="summary-content">
-        <div class="summary-label">Current Balance</div>
-        <div class="summary-value">{{ currentBalance | number:'1.2-2' }}</div>
       </div>
     </div>
     <div class="summary-card summary-used">
@@ -114,7 +82,6 @@
         All</button>
     </div>
     <div class="filter-panel-body">
-
       <div class="filter-group">
         <label class="filter-label">Date From</label>
         <input type="date" class="filter-input" [(ngModel)]="filters.dateFrom" (change)="onDateFromChange()" />
@@ -174,11 +141,11 @@
         </thead>
         <tbody>
           @if (getPagedTransactions().length > 0) {
-          @for (transaction of getPagedTransactions(); track transaction.transactionId) {
+          @for (transaction of getPagedTransactions(); track transaction.condepTransactionId) {
           <tr [class.inactive-row]="!transaction.isActive">
             <td>
               <div style="display: flex; align-items: center; gap: 8px;">
-                @if (isDebitTransaction(transaction.optionResourceTransactionTypeId)) {
+                @if (isDebitTransaction(transaction.optionCondepTransactionTypeId)) {
                 <span class="tx-direction-chip tx-debit">
                   <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="3">
@@ -193,11 +160,11 @@
                   </svg>
                 </span>
                 }
-                <span class="cell-primary" style="font-size: 12px;">{{ transaction.resourceTransactionTypeName }}</span>
+                <span class="cell-primary" style="font-size: 12px;">{{ transaction.condepTransactionTypeName }}</span>
               </div>
             </td>
             <td class="text-right">
-              @if (isDebitTransaction(transaction.optionResourceTransactionTypeId)) {
+              @if (isDebitTransaction(transaction.optionCondepTransactionTypeId)) {
               <span class="cell-mono" style="color: #ef4444; font-weight: 600;">-{{ transaction.amount | number:'1.2-2'
                 }}</span>
               } @else {
@@ -235,8 +202,8 @@
             </td>
             <td>
               <span class="cell-primary" style="font-size: 12px;"
-                [style.color]="transaction.resourceTransactionStatusName === 'APPROVED' ? '#15803d' : '#991b1b'">
-                {{ transaction.resourceTransactionStatusName }}
+                [style.color]="transaction.condepTransactionStatusName === 'APPROVED' ? '#15803d' : '#991b1b'">
+                {{ transaction.condepTransactionStatusName }}
               </span>
             </td>
             <td class="text-right">
@@ -268,8 +235,8 @@
                   View
                 </button>
 
-                @if(['TREASURER'].includes(userRole) && transaction.resourceTransactionTypeName === 'DEBIT' &&
-                transaction.resourceTransactionStatusName !== 'CANCELLED' && resourceStatus) {
+                @if(['TREASURER'].includes(userRole) && transaction.condepTransactionTypeName === 'DEBIT' &&
+                transaction.condepTransactionStatusName !== 'CANCELLED') {
                 <button class="action-btn action-btn-danger" (click)="openCancelTransactionModal(transaction)"
                   title="Cancel Transaction">
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
@@ -349,14 +316,14 @@
                 <i class="cil-layers me-1"></i> Transaction Type <span class="text-danger">*</span>
               </label>
               <select class="form-select form-select-sm form-control-custom"
-                formControlName="optionResourceTransactionTypeId" style="border: 1px solid #b3c2da; font-size: 0.8rem;">
+                formControlName="optionCondepTransactionTypeId" style="border: 1px solid #b3c2da; font-size: 0.8rem;">
                 <option value="">Select Type</option>
                 @for (type of transactionTypes; track type.optionId) {
                 <option [value]="type.optionId">{{ type.value }}</option>
                 }
               </select>
-              @if (transactionForm.get('optionResourceTransactionTypeId')?.invalid &&
-              transactionForm.get('optionResourceTransactionTypeId')?.touched) {
+              @if (transactionForm.get('optionCondepTransactionTypeId')?.invalid &&
+              transactionForm.get('optionCondepTransactionTypeId')?.touched) {
               <div class="text-danger mt-1" style="font-size: 0.75rem;">Transaction type is required</div>
               }
             </div>
@@ -373,7 +340,6 @@
             </div>
           </div>
 
-          <!-- Reference Number -->
           <!-- Check Number -->
           <div class="row mb-2">
             <div class="col-md-12">
@@ -412,7 +378,7 @@
                 </div>
               </div>
 
-              <!-- Job Code (required if reimbursement is checked) -->
+              <!-- Job Code -->
               @if (transactionForm.get('isReimbursement')?.value) {
               <div class="col-md-12">
                 <div class="position-relative jobcode-dropdown">
@@ -449,6 +415,7 @@
             </div>
           </div>
           }
+
           <!-- Notes -->
           <div class="row mb-1">
             <div class="col-md-12">
@@ -491,61 +458,6 @@
   </div>
 </div>
 
-<!-- ── Close Transaction Modal ── -->
-@if (showCloseParentModal) {
-<div class="modal-backdrop" (click)="closeCloseTransactionModal()"></div>
-}
-<div class="modal custom-modal" [class.show]="showCloseParentModal" [class.d-block]="showCloseParentModal" tabindex="-1"
-  role="dialog">
-  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" (click)="$event.stopPropagation()"
-    role="document">
-    <div class="modal-content">
-
-      <!-- Header -->
-      <div class="modal-header py-2 text-white" style="background-color: #6c3a3a;">
-        <h6 class="modal-title mb-0">
-          <i class="cil-x me-2"></i> Close Transaction
-        </h6>
-        <button type="button" class="btn-close btn-close-white" (click)="closeCloseTransactionModal()"
-          aria-label="Close"></button>
-      </div>
-
-      <!-- Body -->
-      <div class="modal-body py-3">
-
-        <!-- Confirmation Notice -->
-        <div class="p-3 rounded d-flex align-items-start gap-2"
-          style="background-color: #fdf1f1; border: 1px solid #f0c0c0;">
-          <i class="cil-warning mt-1" style="color: #9b3333; font-size: 1.1rem;"></i>
-          <div>
-            <div style="font-size: 0.82rem; color: #7a2e2e; font-weight: 600;" class="mb-1">
-              Confirm Credit Closure
-            </div>
-            <small style="font-size: 0.78rem; color: #7a2e2e;">
-              You are about to <strong>close</strong> this credit. This action marks it as finalized
-              and cannot be undone. Are you sure you want to proceed?
-            </small>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Footer -->
-      <div class="modal-footer py-2">
-        <button type="button" class="btn btn-sm text-white" style="background-color: #6c757d;"
-          (click)="closeCloseTransactionModal()">
-          <i class="cil-arrow-left me-1"></i> Cancel
-        </button>
-        <button type="button" class="btn btn-sm text-white" style="background-color: #9b3333;"
-          (click)="submitCloseTransaction()">
-          <span><i class="cil-x me-1"></i> Confirm Close</span>
-
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- ── Cancellation Transaction Modal ── -->
 @if (showCancelTransactionModal) {
 <div class="modal-backdrop" (click)="closeCancelTransactionModal()"></div>
@@ -567,7 +479,6 @@
       <div class="modal-body py-2">
         @if (selectedTransaction) {
 
-        <!-- Warning Banner -->
         <div class="d-flex align-items-center p-2 rounded mb-2"
           style="background-color: #fdecea; border: 1px solid #f5c6cb; font-size: 0.8rem; color: #991b1b;">
           <i class="cil-warning me-2" style="font-size: 1rem;"></i>
@@ -577,7 +488,6 @@
           </div>
         </div>
 
-        <!-- Transaction Summary -->
         <div class="rounded mb-2 p-2" style="background-color: #e8edf5; border: 1px solid #b3c2da;">
           <h6 class="mb-2" style="color: #1a3a6b; font-size: 0.8rem;">
             <i class="cil-list me-1"></i> Transaction Summary
@@ -585,7 +495,7 @@
           <div class="row g-2">
             <div class="col-6">
               <small class="text-muted d-block" style="font-size: 0.72rem;">Amount</small>
-              @if (isDebitTransaction(selectedTransaction.optionResourceTransactionTypeId)) {
+              @if (isDebitTransaction(selectedTransaction.optionCondepTransactionTypeId)) {
               <div class="fw-bold text-danger" style="font-size: 0.95rem;">
                 <i class="cil-arrow-bottom me-1"></i>₱{{ selectedTransaction.amount | number:'1.2-2' }}
               </div>
@@ -597,8 +507,7 @@
             </div>
             <div class="col-6">
               <small class="text-muted d-block" style="font-size: 0.72rem;">Transaction Type</small>
-              <span class="tx-chip" style="font-size: 0.78rem;">{{ selectedTransaction.resourceTransactionTypeName
-                }}</span>
+              <span class="tx-chip" style="font-size: 0.78rem;">{{ selectedTransaction.condepTransactionTypeName }}</span>
             </div>
             <div class="col-6">
               <small class="text-muted d-block" style="font-size: 0.72rem;">Reference Number</small>
@@ -633,7 +542,6 @@
           </div>
         </div>
 
-        <!-- Cancellation Reason -->
         <form [formGroup]="cancelTransactionForm" class="form-professional">
           <div class="rounded p-2" style="border: 1px solid #f5c6cb; background-color: #fff8f8;">
             <h6 class="mb-2" style="color: #991b1b; font-size: 0.8rem;">
@@ -698,12 +606,11 @@
       <div class="modal-body py-2">
         @if (selectedTransaction) {
 
-        <!-- Amount Summary -->
         <div class="rounded mb-2 p-2" style="background-color: #e8edf5; border: 1px solid #b3c2da;">
           <div class="row g-2 align-items-center">
             <div class="col-md-5 text-center" style="border-right: 1px solid #b3c2da;">
               <small class="text-muted d-block mb-1" style="font-size: 0.72rem;">Transaction Amount</small>
-              @if (isDebitTransaction(selectedTransaction.optionResourceTransactionTypeId)) {
+              @if (isDebitTransaction(selectedTransaction.optionCondepTransactionTypeId)) {
               <div class="fw-bold text-danger" style="font-size: 1.4rem;">
                 <i class="cil-arrow-bottom me-1"></i>₱{{ selectedTransaction.amount | number:'1.2-2' }}
               </div>
@@ -720,8 +627,7 @@
             <div class="col-md-7">
               <div class="mb-2">
                 <small class="text-muted d-block" style="font-size: 0.72rem;">Transaction Type</small>
-                <span class="tx-chip" style="font-size: 0.78rem;">{{ selectedTransaction.resourceTransactionTypeName
-                  }}</span>
+                <span class="tx-chip" style="font-size: 0.78rem;">{{ selectedTransaction.condepTransactionTypeName }}</span>
               </div>
               <div class="mb-2">
                 <small class="text-muted d-block" style="font-size: 0.72rem;">Reference Number</small>
@@ -737,10 +643,8 @@
           </div>
         </div>
 
-        <!-- Balance + Job Info side by side -->
         <div class="row g-2 mb-2">
 
-          <!-- Balance Information -->
           <div class="col-md-6">
             <div class="rounded h-100 p-2" style="border: 1px solid #b3c2da;">
               <h6 class="mb-2" style="color: #1a3a6b; font-size: 0.8rem;">
@@ -762,7 +666,7 @@
               </div>
               <div class="pt-2 text-center" style="border-top: 1px solid #b3c2da;">
                 <small class="text-muted d-block" style="font-size: 0.72rem;">Balance Change</small>
-                @if (isDebitTransaction(selectedTransaction.optionResourceTransactionTypeId)) {
+                @if (isDebitTransaction(selectedTransaction.optionCondepTransactionTypeId)) {
                 <div class="text-danger fw-bold" style="font-size: 0.85rem;">
                   <i class="cil-arrow-bottom me-1"></i>-₱{{ selectedTransaction.amount | number:'1.2-2' }}
                 </div>
@@ -775,7 +679,6 @@
             </div>
           </div>
 
-          <!-- Job Information -->
           <div class="col-md-6">
             <div class="rounded h-100 p-2" style="border: 1px solid #b3c2da;">
               <h6 class="mb-2" style="color: #1a3a6b; font-size: 0.8rem;">
@@ -808,7 +711,6 @@
 
         </div>
 
-        <!-- Notes -->
         @if (selectedTransaction.notes) {
         <div class="rounded mb-2 p-2" style="border: 1px solid #b3c2da;">
           <h6 class="mb-1" style="color: #1a3a6b; font-size: 0.8rem;">
@@ -820,7 +722,6 @@
         </div>
         }
 
-        <!-- Audit Trail -->
         <div class="rounded p-2" style="border: 1px solid #b3c2da;">
           <h6 class="mb-2" style="color: #1a3a6b; font-size: 0.8rem;">
             <i class="cil-history me-1"></i> Audit Trail

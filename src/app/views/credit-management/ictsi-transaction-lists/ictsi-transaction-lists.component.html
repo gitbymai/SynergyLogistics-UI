@@ -160,6 +160,7 @@
           <tr>
             <th>Transaction Type</th>
             <th class="text-right">Amount</th>
+            <th class="text-right">Category</th>
             <th>Reference #</th>
             <th>Job #</th>
             <th class="text-center">Reimbursable</th>
@@ -200,6 +201,13 @@
               } @else {
               <span class="cell-mono" style="color: #22c55e; font-weight: 600;">+{{ transaction.amount | number:'1.2-2'
                 }}</span>
+              }
+            </td>
+            <td>
+              @if (transaction.notes) {
+              <span class="cell-mono" style="font-size: 12px;">{{ transaction.notes }}</span>
+              } @else {
+              <span class="empty-dash">—</span>
               }
             </td>
             <td>
