@@ -55,8 +55,8 @@
           <tr>
             <th>Name</th>
             <th>Email</th>
-            <th class="text-center">Department</th>
             <th class="text-center">Role</th>
+            <th class="text-center">Department</th>
             <th class="text-center">Last Login</th>
             <th class="text-center">Status</th>
             <th class="text-center">Actions</th>
@@ -76,10 +76,10 @@
                 </a>
               </td>
               <td class="text-center">
-                {{ user.department || '—' }}
+                <span class="ref-chip">{{ getRoleName(user.role) }}</span>
               </td>
               <td class="text-center">
-                <span class="ref-chip">{{ getRoleName(user.role) }}</span>
+                {{ user.department || '—' }}
               </td>
               <td class="text-center">
                 @if (user.lastLogin) {

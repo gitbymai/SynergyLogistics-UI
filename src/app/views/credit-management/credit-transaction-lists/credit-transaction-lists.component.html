@@ -3,8 +3,8 @@
   <!-- ── Page Header ── -->
   <header class="list-header">
     <div class="list-header-left">
-      <div class="list-label">Finance · Credit Management</div>
-      <h1 class="list-title">Credit Transactions — {{ resourceName }}</h1>
+      <div class="list-label">Finance · Operating Expense</div>
+      <h1 class="list-title">{{ resourceName }}</h1>
     </div>
     <div class="list-header-right">
       <button class="btn btn-ghost" (click)="goBack()">
@@ -24,7 +24,7 @@
         Add Transaction
       </button>
 
-      <button class="btn btn-secondary" (click)="openCloseTransactionModal()">
+      <button hidden class="btn btn-secondary" (click)="openCloseTransactionModal()">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
           stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -457,14 +457,14 @@
               </label>
               <input type="text" class="form-control form-control-sm form-control-custom" formControlName="notes"
                 placeholder="e.g. Utilities, Payroll, Government Payments, Storage Costs, Carrier Charges, Insurance..."
-                maxlength="100" style="border: 1px solid #b3c2da; font-size: 0.8rem;" />
+                maxlength="50" style="border: 1px solid #b3c2da; font-size: 0.8rem;" />
               @if (transactionForm.get('notes')?.invalid && transactionForm.get('notes')?.touched) {
               <div class="text-danger mt-1" style="font-size: 0.75rem;">
                 <i class="cil-warning me-1"></i> Short description is required.
               </div>
               }
               <small class="text-muted" style="font-size: 0.72rem;">
-                {{ transactionForm.get('notes')?.value?.length || 0 }}/255
+                {{ transactionForm.get('notes')?.value?.length || 0 }}/50
               </small>
             </div>
           </div>

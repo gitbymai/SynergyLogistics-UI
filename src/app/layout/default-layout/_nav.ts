@@ -52,12 +52,6 @@ export const navItems = [
         url: '/approvals/waiting-for-ownership',
         iconComponent: { name: 'cil-layers' },
         roles: ['admin','processor','opsmgr']
-      },
-      {
-        name: 'Cash Deposit',
-        url: '/approvals/cashdeposits',
-        iconComponent: { name: 'cil-basket' },
-        roles: ['admin', 'finance', 'treasurer']
       }
     ]
   },
@@ -67,7 +61,7 @@ export const navItems = [
     iconComponent: { name: 'cil-file' },
     children: [
       {
-        name: 'Credit Management',
+        name: 'Operating Expense',
         url: '/financial/credit-management-list',
         iconComponent: { name: 'cil-description' },
         roles: ['admin', 'finance', 'treasurer']
