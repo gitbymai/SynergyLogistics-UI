@@ -100,8 +100,8 @@ export class CondepTransactionListsComponent implements OnInit {
     this.transactionForm = this.fb.group({
       optionCondepTransactionTypeId: ['', [Validators.required]],
       amount: ['', [Validators.required, Validators.min(-9999999999999999.99), Validators.max(9999999999999999.99)]],
-      referenceNumber: ['', [Validators.maxLength(50)]],
-      notes: ['', [Validators.maxLength(1000)]],
+      referenceNumber: ['', [Validators.required,Validators.maxLength(50)]],
+      notes: ['',[Validators.required,Validators.maxLength(1000)]],
       isActive: [true],
       isReimbursement: [false],
       jobId: [''],
@@ -268,8 +268,8 @@ export class CondepTransactionListsComponent implements OnInit {
       condepId: 1,
       optionCondepTransactionTypeId: this.transactionForm.value.optionCondepTransactionTypeId,
       amount: this.transactionForm.value.amount,
-      referenceNumber: this.transactionForm.value.referenceNumber || null,
-      notes: this.transactionForm.value.notes || null,
+      referenceNumber: this.transactionForm.value.referenceNumber || '',
+      notes: this.transactionForm.value.notes || '',
       jobId: this.transactionForm.value.jobId,
       isReimbursement: this.transactionForm.value.isReimbursement
     };
