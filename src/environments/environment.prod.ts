@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://synergy-api-brfnfpevdfabgnep.southeastasia-01.azurewebsites.net/api'
+  apiUrl: 'https://synergylogistics-api-hdc4fuhvamc8h4d3.southeastasia-01.azurewebsites.net/api'
 };
