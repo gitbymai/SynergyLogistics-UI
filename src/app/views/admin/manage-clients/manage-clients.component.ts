@@ -59,16 +59,18 @@ export class ManageClientsComponent implements OnInit {
   initializeForm(): void {
     this.customerForm = this.fb.group({
 
-      customerName: ['', [Validators.required, Validators.maxLength(100)]],
+      customerName: ['', [Validators.required, Validators.maxLength(180)]],
       mainAddress: ['', [Validators.required, Validators.maxLength(900)]],
       state: ['', [Validators.maxLength(50)]],
       city: ['', [Validators.maxLength(50)]],
       contactPerson: ['', [Validators.maxLength(100)]],
       contactNumber: ['', [Validators.maxLength(20)]],
       emailAddress: ['', [Validators.email, Validators.maxLength(50)]],
-      taxIdentificationNumber: ['', [Validators.maxLength(90)]],
+      taxIdentificationNumber: ['', [Validators.required, Validators.maxLength(90)]],
       optionClientCategoryId: ['0'],
       optionIndustryId: ['0'],
+    isShipper: [false],
+    isConsignee: [true],
     });
   }
 
@@ -172,6 +174,8 @@ export class ManageClientsComponent implements OnInit {
       taxIdentificationNumber: customer.taxIdentificationNumber,
       optionClientCategoryId: customer.optionClientCategoryId,
       optionIndustryId: customer.optionIndustryId,
+       isShipper: customer.isShipper,
+  isConsignee: customer.isConsignee,
     });
 
     this.showModal = true;
@@ -206,11 +210,13 @@ export class ManageClientsComponent implements OnInit {
       city: this.customerForm.value.city,
       state: this.customerForm.value.state,
       contactPerson: this.customerForm.value.contactPerson,
-      emailAddress: this.customerForm.value.email,
-      contactNumber: this.customerForm.value.phone,
+      emailAddress: this.customerForm.value.emailAddress,
+      contactNumber: this.customerForm.value.contactNumber,
       taxIdentificationNumber: this.customerForm.value.taxIdentificationNumber,
       optionClientCategoryId: this.customerForm.value.optionClientCategoryId ?? 0,
       optionIndustryId: this.customerForm.value.optionIndustryId ?? 0,
+      isConsignee: this.customerForm.value.isConsignee ?? false,
+      isShipper: this.customerForm.value.isShipper ?? false
     };
 
     this.customerService.createCustomer(createRequest)
@@ -233,7 +239,7 @@ export class ManageClientsComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error creating customer:', error);
-          this.showError(error?.error?.message || 'Failed to create customer');
+          this.showError(error?.error?.Message || 'Failed to create customer');
         }
       });
   }
@@ -247,12 +253,14 @@ export class ManageClientsComponent implements OnInit {
       city: this.customerForm.value.city,
       state: this.customerForm.value.state,
       contactPerson: this.customerForm.value.contactPerson,
-      emailAddress: this.customerForm.value.email,
-      contactNumber: this.customerForm.value.phone,
+      emailAddress: this.customerForm.value.emailAddress,
+      contactNumber: this.customerForm.value.contactNumber,
       taxIdentificationNumber: this.customerForm.value.taxIdentificationNumber,
       optionClientCategoryId: this.customerForm.value.optionClientCategoryId ?? 0,
       optionIndustryId: this.customerForm.value.optionIndustryId ?? 0,
       customerGuid: this.selectedCustomer.customerGuid,
+      isConsignee: this.customerForm.value.isConsignee ?? false,
+      isShipper: this.customerForm.value.isShipper ?? false
     };
 
     this.customerService.updateCustomer(updateRequest)

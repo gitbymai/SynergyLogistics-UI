@@ -13,6 +13,8 @@ export interface CustomerAccount {
   optionClientCategoryId: number;
   optionIndustryId: number;
   isActive: boolean;
+  isConsignee: boolean;
+  isShipper: boolean;
   createdBy: number;
   createdDate: Date;
   modifiedBy: number;
@@ -30,6 +32,8 @@ export interface NewCustomerAccount {
   taxIdentificationNumber: string;
   optionClientCategoryId: number;
   optionIndustryId: number;
+  isConsignee: boolean;
+  isShipper: boolean;
 }
 
 export interface UpdateCustomerAccount extends NewCustomerAccount {
