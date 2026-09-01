@@ -52,7 +52,7 @@
         <div class="row mb-3">
           <div class="col-md-8 col-lg-6">
             <div class="position-relative client-dropdown">
-              <label class="filter-label" style="margin-bottom: 6px; display: block;">Client</label>
+              <label class="filter-label" style="margin-bottom: 6px; display: block; font-size:0.875rem;">Client</label>
               <input type="text" class="filter-input" style="width: 100%;" placeholder="Search or select client"
                 [value]="clientSearch" (input)="onClientSearchChange($event.target.value)"
                 (focus)="clientDropdownOpen = true" />
@@ -70,7 +70,7 @@
 
         <div class="row mb-3">
           <div class="col-md-8 col-lg-6">
-            <label class="filter-label" style="margin-bottom: 6px; display: block;">Transaction Type</label>
+            <label class="filter-label" style="margin-bottom: 6px; display: block;  font-size:0.875rem;">Transaction Type</label>
             <select formControlName="transactionType" class="filter-input" style="width: 100%;"
               (change)="onTransactionTypeChange($event)">
               <option value="">Select Transaction</option>
@@ -85,7 +85,7 @@
 
         <div class="row mb-3">
           <div class="col-md-6 mb-3">
-            <label class="filter-label" style="margin-bottom: 6px; display: block;">Payment Type</label>
+            <label class="filter-label" style="margin-bottom: 6px; display: block; font-size:0.875rem;">Payment Type</label>
             <select formControlName="paymentType" class="filter-input" style="width: 100%;">
               <option value="">Select Payment</option>
               @for (payment of paymenTypeList; track payment.optionId) {
@@ -94,7 +94,7 @@
             </select>
           </div>
           <div class="col-md-4">
-            <label class="filter-label" style="margin-bottom: 6px; display: block;">Incoterms</label>
+            <label class="filter-label" style="margin-bottom: 6px; display: block; font-size:0.875rem;">Incoterms</label>
             <select formControlName="incoterms" class="filter-input" style="width: 100%;">
               <option value="">Select Incoterms</option>
               @for (term of incotermsList; track term.optionId) {
@@ -131,16 +131,16 @@
 
         <div class="row mb-4">
           <div class="col-md-6 mb-3">
-            <label class="filter-label" style="margin-bottom: 6px; display: block;">Origin / Port of Loading</label>
-            <input type="text" class="filter-input" style="width: 100%;" formControlName="origin" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">Origin / Port of Loading</label>
+            <input type="text" class="filter-input" style="width: 100%; text-transform: uppercase;" formControlName="origin" />
           </div>
           <div class="col-md-6 mb-3">
-            <label class="filter-label" style="margin-bottom: 6px; display: block;">Destination / Port of Discharge</label>
-            <input type="text" class="filter-input" style="width: 100%;" formControlName="destination" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">Destination / Port of Discharge</label>
+            <input type="text" class="filter-input" style="width: 100%; text-transform: uppercase;" formControlName="destination" />
           </div>
           <div class="col-md-6 mb-3">
-            <label class="filter-label" style="margin-bottom: 6px; display: block;">Port / CFS</label>
-            <input type="text" class="filter-input" style="width: 100%;" formControlName="portCfs" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">Port / CFS</label>
+            <input type="text" class="filter-input" style="width: 100%; text-transform: uppercase;" formControlName="portCfs" />
           </div>
         </div>
 
@@ -153,20 +153,16 @@
 
         <div class="row">
           <div class="col-md-4 mb-3">
-            <label class="filter-label" style="margin-bottom: 6px; display: block;">Commodity</label>
-            <input type="text" class="filter-input" style="width: 100%;" formControlName="commodity" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">Volume (m³)</label>
+            <input type="number" step="0.001" class="filter-input" style="width: 100%; text-transform: uppercase;" formControlName="volume" />
           </div>
           <div class="col-md-4 mb-3">
-            <label class="filter-label" style="margin-bottom: 6px; display: block;">Volume (m³)</label>
-            <input type="number" step="0.001" class="filter-input" style="width: 100%;" formControlName="volume" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">Gross Weight (kg)</label>
+            <input type="number" step="0.01" class="filter-input" style="width: 100%; text-transform: uppercase;" formControlName="grossWeight" />
           </div>
           <div class="col-md-4 mb-3">
-            <label class="filter-label" style="margin-bottom: 6px; display: block;">Gross Weight (kg)</label>
-            <input type="number" step="0.01" class="filter-input" style="width: 100%;" formControlName="grossWeight" />
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="filter-label" style="margin-bottom: 6px; display: block;">Number of Packages</label>
-            <input type="number" class="filter-input" style="width: 100%;" formControlName="numberOfPackages" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">Number of Packages</label>
+            <input type="number" class="filter-input" style="width: 100%; text-transform: uppercase;" formControlName="numberOfPackages" />
           </div>
         </div>
 
@@ -202,19 +198,19 @@
         @if (isSeaFreight) {
           <div class="row mb-4">
             <div class="col-md-6 mb-3">
-              <label class="filter-label" style="margin-bottom: 6px; display: block;">MBL Reference</label>
-              <input type="text" class="filter-input" style="width: 100%;" formControlName="mbl" />
+              <label class="filter-label" style="margin-bottom: 6px; display: block;  font-size:0.875rem;">MBL Reference</label>
+              <input type="text" class="filter-input" style="width: 100%; text-transform: uppercase;" formControlName="mbl" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="filter-label" style="margin-bottom: 6px; display: block;">HBL Reference</label>
-              <input type="text" class="filter-input" style="width: 100%;" formControlName="hbl" />
+              <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">HBL Reference</label>
+              <input type="text" class="filter-input" style="width: 100%; text-transform: uppercase;" formControlName="hbl" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="filter-label" style="margin-bottom: 6px; display: block;">Vessel</label>
-              <input type="text" class="filter-input" style="width: 100%;" formControlName="vessel" />
+              <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">Vessel</label>
+              <input type="text" class="filter-input" style="width: 100%; text-transform: uppercase;" formControlName="vessel" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="filter-label" style="margin-bottom: 6px; display: block;">Container Type</label>
+              <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">Container Type</label>
               <select class="filter-input" style="width: 100%;" formControlName="containerType">
                 <option value="">Select Size</option>
                 <option value="20GP">20GP</option>
@@ -228,20 +224,20 @@
         @if (isAirFreight) {
           <div class="row mb-4">
             <div class="col-md-6 mb-3">
-              <label class="filter-label" style="margin-bottom: 6px; display: block;">MAWB Reference</label>
-              <input type="text" class="filter-input" style="width: 100%;" formControlName="mawb" />
+              <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">MAWB Reference</label>
+              <input type="text" class="filter-input" style="width: 100%; text-transform: uppercase;" formControlName="mawb" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="filter-label" style="margin-bottom: 6px; display: block;">HAWB Reference</label>
-              <input type="text" class="filter-input" style="width: 100%;" formControlName="hawb" />
+              <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">HAWB Reference</label>
+              <input type="text" class="filter-input" style="width: 100%; text-transform: uppercase;" formControlName="hawb" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="filter-label" style="margin-bottom: 6px; display: block;">Flight No.</label>
-              <input type="text" class="filter-input" style="width: 100%;" formControlName="flightNo" />
+              <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">Flight No.</label>
+              <input type="text" class="filter-input" style="width: 100%; text-transform: uppercase;" formControlName="flightNo" />
             </div>
             <div class="col-md-6 mb-3">
-              <label class="filter-label" style="margin-bottom: 6px; display: block;">Chargeable Weight (kg)</label>
-              <input type="number" step="0.01" class="filter-input" style="width: 100%;" formControlName="chargeableWeight" />
+              <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">Chargeable Weight (kg)</label>
+              <input type="number" step="0.01" class="filter-input" style="width: 100%; text-transform: uppercase;" formControlName="chargeableWeight" />
             </div>
           </div>
         }
@@ -255,25 +251,21 @@
 
         <div class="row">
           <div class="col-md-6 mb-3">
-            <label class="filter-label" style="margin-bottom: 6px; display: block;">BL / AWB / Booking No.</label>
-            <input type="text" class="filter-input" style="width: 100%;" formControlName="bookingNo" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">Carrier / Airline</label>
+            <input type="text" class="filter-input" style="width: 100%; text-transform: uppercase;" formControlName="carrier" />
           </div>
           <div class="col-md-6 mb-3">
-            <label class="filter-label" style="margin-bottom: 6px; display: block;">Carrier / Airline</label>
-            <input type="text" class="filter-input" style="width: 100%;" formControlName="carrier" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">Shipper</label>
+            <input type="text" class="filter-input" style="width: 100%; text-transform: uppercase;" formControlName="shipper" />
           </div>
           <div class="col-md-6 mb-3">
-            <label class="filter-label" style="margin-bottom: 6px; display: block;">Shipper</label>
-            <input type="text" class="filter-input" style="width: 100%;" formControlName="shipper" />
-          </div>
-          <div class="col-md-6 mb-3">
-            <label class="filter-label" style="margin-bottom: 6px; display: block;">Consignee</label>
-            <input type="text" class="filter-input" style="width: 100%;" formControlName="consignee" />
+            <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">Consignee</label>
+            <input type="text" class="filter-input" style="width: 100%; text-transform: uppercase;" formControlName="consignee" />
           </div>
           <div class="col-md-6 mb-3">
             <div class="position-relative agency-dropdown">
-              <label class="filter-label" style="margin-bottom: 6px; display: block;">Agent</label>
-              <input type="text" class="filter-input" style="width: 100%;" placeholder="Search or select agent"
+              <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">Agent</label>
+              <input type="text" class="filter-input" style="width: 100%; text-transform: uppercase;" placeholder="Search or select agent"
                 [value]="agencySearch" (input)="onAgencySearchChange($any($event.target).value)"
                 (focus)="agencyDropdownOpen = true" />
               @if (agencyDropdownOpen && filteredAgencies.length > 0) {
@@ -287,7 +279,7 @@
             </div>
           </div>
           <div class="col-md-12 mb-3">
-            <label class="filter-label" style="margin-bottom: 6px; display: block;">Remarks</label>
+            <label class="filter-label" style="margin-bottom: 6px; display: block; font-size: 0.875rem;">Remarks</label>
             <textarea rows="3" class="filter-input" style="width: 100%; resize: vertical; min-height: 80px;"
               formControlName="remarks"></textarea>
           </div>
