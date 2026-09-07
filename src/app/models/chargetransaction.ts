@@ -6,6 +6,7 @@ export interface CreateChargeTransactionRequest {
   amountSelling: number;
   jobId: number;
   isForProcessing?: boolean | false;
+  isDoNotBillRemarks?: boolean | false;
   currencyCode: string;
   conversionRate: number;
 }
@@ -67,6 +68,7 @@ export interface ChargeTransaction {
   modifiedDate?: string | null;
   modifiedBy?: number | null;
   isActive?: boolean | null;
+  isDoNotBillRemarks?: boolean | false;
   isForProcessing?: boolean | null;
   isForDisbursement?: boolean | null;
   chargeCategoryId?: number | null;

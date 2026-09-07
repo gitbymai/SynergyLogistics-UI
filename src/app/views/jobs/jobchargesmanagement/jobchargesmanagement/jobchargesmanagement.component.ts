@@ -91,6 +91,7 @@ export class JobchargesmanagementComponent implements OnInit {
       amount: [0, [Validators.required, Validators.min(0)]],
       amountSelling: [0, [Validators.required, Validators.min(0)]],
       isForProcessing: [false],
+      isDoNotBillRemarks: [false],
       jobId: [0]
     });
 
@@ -223,9 +224,11 @@ export class JobchargesmanagementComponent implements OnInit {
       jobId: 0,
       optionChargeStatusId: 0,
       isForProcessing: false,
+      isDoNotBillRemarks: false,
     });
     this.chargeFormGroup.get('chargeCode')?.enable();
     this.chargeFormGroup.get('isForProcessing')?.enable();
+    this.chargeFormGroup.get('isDoNotBillRemarks')?.enable();
     this.categorySearch = '';
     this.selectedSubCategory = null;
     this.filteredCategories = [...this.chargeSubCategories];
@@ -246,6 +249,7 @@ export class JobchargesmanagementComponent implements OnInit {
       currency: charge.currencyCode,
       conversionRate: charge.conversionRate,
       isForProcessing: charge.isForProcessing || false,
+      isDoNotBillRemarks: charge.isDoNotBillRemarks || false,
     });
 
       // Find and set the selected category
@@ -261,6 +265,7 @@ export class JobchargesmanagementComponent implements OnInit {
     // Disable charge code in edit mode
     this.chargeFormGroup.get('chargeCode')?.disable();
     this.chargeFormGroup.get('isForProcessing')?.disable();
+    this.chargeFormGroup.get('isDoNotBillRemarks')?.disable();
     this.showModal = true;
   }
 
@@ -372,6 +377,7 @@ export class JobchargesmanagementComponent implements OnInit {
       amount: this.chargeFormGroup.value.amount,
       amountSelling: this.chargeFormGroup.value.amountSelling,
       isForProcessing: this.chargeFormGroup.value.isForProcessing,
+      isDoNotBillRemarks: this.chargeFormGroup.value.isDoNotBillRemarks,
       currencyCode: this.chargeFormGroup.value.currency,
       conversionRate: this.chargeFormGroup.value.conversionRate ?? 0,
       jobId: this.jobId,
@@ -406,6 +412,7 @@ export class JobchargesmanagementComponent implements OnInit {
       amount: this.chargeFormGroup.value.amount,
       amountSelling: this.chargeFormGroup.value.amountSelling,
       isForProcessing: this.selectedCharge.isForProcessing || false,
+      isDoNotBillRemarks: this.selectedCharge.isDoNotBillRemarks || false,
       jobId: this.selectedCharge.jobId,
       currencyCode: this.chargeFormGroup.value.currency,
       conversionRate: this.chargeFormGroup.value.conversionRate
