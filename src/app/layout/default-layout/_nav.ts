@@ -42,6 +42,12 @@ export const navItems = [
         roles: ['admin','treasurer','cashier','sales','opsmgr']
       },
       {
+        name: 'For Clearing',
+        url: '/approvals/for-liquidation',
+        iconComponent: { name: 'cil-layers' },
+        roles: ['admin','cashier','treasurer']
+      },
+      {
         name: 'Owned Transactions',
         url: '/approvals/owned-transactions',
         iconComponent: { name: 'cil-layers' },
@@ -52,7 +58,13 @@ export const navItems = [
         url: '/approvals/waiting-for-ownership',
         iconComponent: { name: 'cil-layers' },
         roles: ['admin','processor','opsmgr']
-      }
+      },
+      {
+        name: 'For Liquidation',
+        url: '/approvals/for-liquidation',
+        iconComponent: { name: 'cil-layers' },
+        roles: ['admin','processor']
+      },
     ]
   },
   {
